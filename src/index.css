@@ -2,94 +2,72 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
+
+/* SkillsMark Design System — All colors MUST be HSL */
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Core brand */
+    --navy: 218 60% 10%;
+    --navy-mid: 218 50% 15%;
+    --navy-light: 218 40% 20%;
+    --teal: 178 72% 42%;
+    --teal-light: 178 72% 55%;
+    --gold: 42 95% 55%;
+    --gold-light: 42 95% 68%;
+
+    /* Semantic tokens */
+    --background: 220 30% 97%;
+    --foreground: 218 60% 10%;
 
     --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card-foreground: 218 60% 10%;
 
     --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover-foreground: 218 60% 10%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    --primary: 178 72% 42%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    --secondary: 218 60% 10%;
+    --secondary-foreground: 0 0% 100%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 220 20% 93%;
+    --muted-foreground: 218 20% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    --accent: 42 95% 55%;
+    --accent-foreground: 218 60% 10%;
 
-    --destructive: 0 84.2% 60.2%;
-    --destructive-foreground: 210 40% 98%;
+    --destructive: 0 84% 60%;
+    --destructive-foreground: 0 0% 100%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 220 20% 88%;
+    --input: 220 20% 88%;
+    --ring: 178 72% 42%;
 
-    --radius: 0.5rem;
+    --radius: 0.75rem;
+
+    /* Gradients */
+    --gradient-hero: linear-gradient(135deg, hsl(218, 60%, 10%) 0%, hsl(218, 50%, 18%) 50%, hsl(185, 60%, 18%) 100%);
+    --gradient-teal: linear-gradient(135deg, hsl(178, 72%, 42%), hsl(185, 70%, 36%));
+    --gradient-gold: linear-gradient(135deg, hsl(42, 95%, 55%), hsl(35, 95%, 50%));
+    --gradient-card: linear-gradient(135deg, hsl(0, 0%, 100%), hsl(220, 30%, 97%));
+
+    /* Shadows */
+    --shadow-sm: 0 2px 8px hsl(218 60% 10% / 0.08);
+    --shadow-md: 0 8px 24px hsl(218 60% 10% / 0.12);
+    --shadow-lg: 0 16px 48px hsl(218 60% 10% / 0.16);
+    --shadow-teal: 0 8px 32px hsl(178 72% 42% / 0.3);
+    --shadow-gold: 0 8px 32px hsl(42 95% 55% / 0.3);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
-    --sidebar-ring: 217.2 91.2% 59.8%;
-  }
-
-  .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
-    --destructive: 0 62.8% 30.6%;
-    --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 }
@@ -99,7 +77,75 @@ All colors MUST be HSL.
     @apply border-border;
   }
 
+  html {
+    scroll-behavior: smooth;
+  }
+
   body {
     @apply bg-background text-foreground;
+    font-family: 'Inter', sans-serif;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    font-family: 'Sora', sans-serif;
   }
 }
+
+@layer utilities {
+  .gradient-hero {
+    background: var(--gradient-hero);
+  }
+  .gradient-teal {
+    background: var(--gradient-teal);
+  }
+  .gradient-gold {
+    background: var(--gradient-gold);
+  }
+  .text-navy {
+    color: hsl(var(--navy));
+  }
+  .text-teal {
+    color: hsl(var(--teal));
+  }
+  .text-gold {
+    color: hsl(var(--gold));
+  }
+  .bg-navy {
+    background-color: hsl(var(--navy));
+  }
+  .bg-navy-mid {
+    background-color: hsl(var(--navy-mid));
+  }
+  .bg-navy-light {
+    background-color: hsl(var(--navy-light));
+  }
+  .bg-teal {
+    background-color: hsl(var(--teal));
+  }
+  .bg-gold {
+    background-color: hsl(var(--gold));
+  }
+  .border-teal {
+    border-color: hsl(var(--teal));
+  }
+  .border-gold {
+    border-color: hsl(var(--gold));
+  }
+  .shadow-teal {
+    box-shadow: var(--shadow-teal);
+  }
+  .shadow-gold {
+    box-shadow: var(--shadow-gold);
+  }
+  .glass-card {
+    background: hsl(0 0% 100% / 0.06);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(0 0% 100% / 0.12);
+  }
+  .glass-card-light {
+    background: hsl(0 0% 100% / 0.8);
+    backdrop-filter: blur(12px);
+    border: 1px solid hsl(0 0% 100% / 0.9);
+  }
+}
+
