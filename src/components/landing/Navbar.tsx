@@ -10,7 +10,11 @@ const navLinks = [
   { label: "How It Works", href: "#how-it-works" },
 ];
 
-export default function Navbar() {
+interface NavbarProps {
+  onGetStarted?: () => void;
+}
+
+export default function Navbar({ onGetStarted }: NavbarProps) {
   const [scrolled, setScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
 
@@ -56,15 +60,15 @@ export default function Navbar() {
 
           {/* CTA */}
           <div className="hidden md:flex items-center gap-3">
-            <a href="#users" className="text-sm text-white/80 hover:text-white transition-colors px-3 py-1.5">
+            <button onClick={onGetStarted} className="text-sm text-white/80 hover:text-white transition-colors px-3 py-1.5">
               Sign In
-            </a>
-            <a
-              href="#users"
+            </button>
+            <button
+              onClick={onGetStarted}
               className="text-sm font-semibold px-4 py-2 rounded-lg gradient-teal text-white shadow-teal hover:opacity-90 transition-opacity"
             >
               Get Started Free
-            </a>
+            </button>
           </div>
 
           {/* Mobile toggle */}
@@ -97,13 +101,12 @@ export default function Navbar() {
                   {link.label}
                 </a>
               ))}
-              <a
-                href="#users"
+              <button
                 className="mt-2 text-center font-semibold px-4 py-3 rounded-lg gradient-teal text-white"
-                onClick={() => setMobileOpen(false)}
+                onClick={() => { setMobileOpen(false); onGetStarted?.(); }}
               >
                 Get Started Free
-              </a>
+              </button>
             </div>
           </motion.div>
         )}

@@ -1,3 +1,4 @@
+import { useState } from "react";
 import Navbar from "@/components/landing/Navbar";
 import Hero from "@/components/landing/Hero";
 import ComplianceBanner from "@/components/landing/ComplianceBanner";
@@ -9,12 +10,15 @@ import HowItWorks from "@/components/landing/HowItWorks";
 import Testimonials from "@/components/landing/Testimonials";
 import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
+import GetStartedModal from "@/components/landing/GetStartedModal";
 
 const Index = () => {
+  const [modalOpen, setModalOpen] = useState(false);
+
   return (
     <div className="min-h-screen">
-      <Navbar />
-      <Hero />
+      <Navbar onGetStarted={() => setModalOpen(true)} />
+      <Hero onGetStarted={() => setModalOpen(true)} />
       <ComplianceBanner />
       <UserPathways />
       <TripleVerification />
@@ -22,8 +26,9 @@ const Index = () => {
       <SupportMarketplace />
       <HowItWorks />
       <Testimonials />
-      <CTASection />
+      <CTASection onGetStarted={() => setModalOpen(true)} />
       <Footer />
+      <GetStartedModal open={modalOpen} onClose={() => setModalOpen(false)} />
     </div>
   );
 };

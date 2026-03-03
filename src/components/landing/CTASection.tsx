@@ -1,7 +1,11 @@
 import { motion } from "framer-motion";
 import { ArrowRight, Smartphone, Globe } from "lucide-react";
 
-export default function CTASection() {
+interface CTASectionProps {
+  onGetStarted?: () => void;
+}
+
+export default function CTASection({ onGetStarted }: CTASectionProps) {
   return (
     <section className="py-20 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -30,7 +34,7 @@ export default function CTASection() {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-4 justify-center mb-12">
-              <button className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl gradient-teal text-white font-semibold text-lg shadow-teal hover:opacity-90 transition-all hover:scale-105">
+              <button onClick={onGetStarted} className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl gradient-teal text-white font-semibold text-lg shadow-teal hover:opacity-90 transition-all hover:scale-105">
                 Get Started Free <ArrowRight className="w-5 h-5" />
               </button>
               <button className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-white/20 text-white font-semibold text-lg hover:bg-white/10 transition-all">
