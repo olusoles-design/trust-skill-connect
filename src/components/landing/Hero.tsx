@@ -8,7 +8,11 @@ const stats = [
   { value: "4.9★", label: "Platform Rating", icon: Star },
 ];
 
-export default function Hero() {
+interface HeroProps {
+  onGetStarted?: () => void;
+}
+
+export default function Hero({ onGetStarted }: HeroProps) {
   return (
     <section className="relative min-h-screen gradient-hero flex flex-col justify-center overflow-hidden">
       {/* Background grid */}
@@ -70,12 +74,12 @@ export default function Hero() {
             transition={{ duration: 0.6, delay: 0.3 }}
             className="flex flex-col sm:flex-row gap-4 justify-center mb-16"
           >
-            <a
-              href="#users"
+            <button
+              onClick={onGetStarted}
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl gradient-teal text-white font-semibold text-lg shadow-teal hover:opacity-90 transition-all hover:scale-105"
             >
               Join the Ecosystem <ArrowRight className="w-5 h-5" />
-            </a>
+            </button>
             <a
               href="#verification"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-white/20 text-white font-semibold text-lg hover:bg-white/10 transition-all"
