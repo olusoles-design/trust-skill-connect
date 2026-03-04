@@ -4,6 +4,7 @@ import { X, ArrowLeft, ArrowRight, GraduationCap, Briefcase, School, Users, Shop
 
 type Role = "learner" | "sponsor" | "provider" | "practitioner" | "support_provider" | null;
 type PractitionerRole = "facilitator" | "assessor" | "moderator" | "sdf" | "mentor" | null;
+type PlanName = "Starter" | "Professional" | "Enterprise" | null;
 
 interface RoleCard {
   id: Role;
@@ -86,6 +87,8 @@ export default function GetStartedModal({ open, onClose }: Props) {
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<Role>(null);
   const [practitionerRole, setPractitionerRole] = useState<PractitionerRole>(null);
+  const [selectedPlan, setSelectedPlan] = useState<PlanName>(null);
+  const [showConfirmation, setShowConfirmation] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
   const [form, setForm] = useState({
     username: "",
@@ -122,6 +125,8 @@ export default function GetStartedModal({ open, onClose }: Props) {
     setStep(1);
     setSelectedRole(null);
     setPractitionerRole(null);
+    setSelectedPlan(null);
+    setShowConfirmation(false);
     setShowLogin(false);
     setForm({
       username: "", email: "", password: "", firstName: "", lastName: "", phone: "",
@@ -222,13 +227,13 @@ export default function GetStartedModal({ open, onClose }: Props) {
                     <button
                       key={r.id}
                       onClick={() => { setPractitionerRole(r.id as PractitionerRole); }}
-                      className="w-full flex items-center justify-between p-4 rounded-xl border border-purple-500/30 bg-purple-500/5 hover:bg-purple-500/10 hover:border-purple-500/60 transition-all text-left group"
+                      className="w-full flex items-center justify-between p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 transition-all text-left group"
                     >
                       <div>
                         <div className="font-semibold text-white">{r.label}</div>
-                        {r.sub && <div className="text-xs text-purple-400 mt-0.5">{r.sub}</div>}
+                        {r.sub && <div className="text-xs text-teal mt-0.5">{r.sub}</div>}
                       </div>
-                      <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-purple-400 transition-colors" />
+                      <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-teal transition-colors" />
                     </button>
                   ))}
                 </div>
@@ -366,7 +371,7 @@ export default function GetStartedModal({ open, onClose }: Props) {
               )}
 
               {/* STEP 3 - Plan Selection */}
-              {!showLogin && step === 3 && (
+              {!showLogin && step === 3 && !showConfirmation && (
                 <div className="max-w-2xl mx-auto">
                   <div className="flex gap-2 mb-8">
                     {[1, 2, 3].map(s => (
@@ -376,20 +381,49 @@ export default function GetStartedModal({ open, onClose }: Props) {
                   <p className="text-center text-white/50 text-sm mb-6">Choose the plan that fits your needs</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {[
-                      { name: "Starter", price: "Free", period: "30-day trial", features: ["3 opportunity posts", "Basic profile", "Email support"], highlight: false },
-                      { name: "Professional", price: "R499", period: "per month", features: ["Unlimited posts", "Priority matching", "BEE dashboard", "Dedicated support"], highlight: true },
-                      { name: "Enterprise", price: "Custom", period: "per month", features: ["Custom contracts", "API access", "Dedicated account manager", "SLA guarantee"], highlight: false },
-                    ].map(plan => (
-                      <button key={plan.name}
-                        className={`flex flex-col p-5 rounded-xl border text-left transition-all hover:scale-[1.02] ${
+                    {([
+                      {
+                        name: "Starter" as PlanName,
+                        price: "Free",
+                        period: "30-day trial",
+                        features: ["3 opportunity posts", "Basic profile", "Email support"],
+                        highlight: false,
+                        badge: null,
+                        cta: "Start Free Trial",
+                      },
+                      {
+                        name: "Professional" as PlanName,
+                        price: "R499",
+                        period: "per month",
+                        features: ["Unlimited posts", "Priority matching", "BEE dashboard", "Dedicated support"],
+                        highlight: true,
+                        badge: "Most Popular",
+                        cta: "Subscribe Now",
+                      },
+                      {
+                        name: "Enterprise" as PlanName,
+                        price: "Custom",
+                        period: "pricing",
+                        features: ["Custom contracts", "API access", "Dedicated account manager", "SLA guarantee"],
+                        highlight: false,
+                        badge: null,
+                        cta: "Contact Sales",
+                      },
+                    ] as const).map(plan => (
+                      <button
+                        key={plan.name}
+                        onClick={() => {
+                          setSelectedPlan(plan.name);
+                          setShowConfirmation(true);
+                        }}
+                        className={`group flex flex-col p-5 rounded-xl border text-left transition-all duration-200 hover:scale-[1.02] cursor-pointer ${
                           plan.highlight
                             ? "border-teal bg-teal/10 shadow-teal"
-                            : "border-white/10 bg-white/3 hover:border-white/30"
+                            : "border-white/10 bg-white/3 hover:border-white/20"
                         }`}
                       >
-                        {plan.highlight && (
-                          <span className="text-xs font-bold uppercase tracking-wider text-teal mb-2">Most Popular</span>
+                        {plan.badge && (
+                          <span className="text-xs font-bold uppercase tracking-wider text-teal mb-2">{plan.badge}</span>
                         )}
                         <div className="font-bold text-xl text-white">{plan.name}</div>
                         <div className="mt-1 mb-4">
@@ -403,13 +437,90 @@ export default function GetStartedModal({ open, onClose }: Props) {
                             </li>
                           ))}
                         </ul>
-                        <div className={`mt-4 py-2 rounded-lg text-center text-sm font-semibold ${plan.highlight ? "gradient-teal text-white" : "border border-white/20 text-white/70"}`}>
-                          {plan.highlight ? "Get Started" : "Select Plan"}
+                        <div className={`mt-4 py-2.5 rounded-lg text-center text-sm font-semibold transition-all ${
+                          plan.highlight
+                            ? "gradient-teal text-white group-hover:opacity-90"
+                            : "border border-white/20 text-white/70 group-hover:border-white/40 group-hover:text-white"
+                        }`}>
+                          {plan.cta}
                         </div>
                       </button>
                     ))}
                   </div>
                 </div>
+              )}
+
+              {/* STEP 3 - Confirmation Screen */}
+              {!showLogin && step === 3 && showConfirmation && (
+                <motion.div
+                  initial={{ opacity: 0, y: 12 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.25 }}
+                  className="max-w-md mx-auto text-center"
+                >
+                  {/* Success icon */}
+                  <div className="w-16 h-16 rounded-full bg-teal/20 border border-teal/40 flex items-center justify-center mx-auto mb-5">
+                    <span className="text-3xl">
+                      {selectedPlan === "Starter" ? "🚀" : selectedPlan === "Professional" ? "⭐" : "🏢"}
+                    </span>
+                  </div>
+
+                  <h3 className="text-xl font-bold text-white mb-1">
+                    {selectedPlan === "Enterprise" ? "Let's talk!" : `${selectedPlan} plan selected`}
+                  </h3>
+                  <p className="text-white/50 text-sm mb-6">
+                    {selectedPlan === "Starter" && "Your 30-day free trial gives you full access to explore the platform."}
+                    {selectedPlan === "Professional" && "You're subscribing to Professional at R499/month. Billed monthly — cancel anytime."}
+                    {selectedPlan === "Enterprise" && "Our team will reach out within 1 business day to build a custom package for you."}
+                  </p>
+
+                  {/* Summary card */}
+                  <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 text-left space-y-2">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Role</span>
+                      <span className="text-white font-medium capitalize">{roleData?.title ?? selectedRole}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Plan</span>
+                      <span className="text-white font-medium">{selectedPlan}</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Billing</span>
+                      <span className="text-white font-medium">
+                        {selectedPlan === "Starter" ? "Free for 30 days" : selectedPlan === "Professional" ? "R499 / month" : "Custom"}
+                      </span>
+                    </div>
+                    {selectedPlan === "Professional" && (
+                      <div className="flex justify-between text-sm">
+                        <span className="text-white/50">First charge</span>
+                        <span className="text-teal font-medium">After 30-day trial</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {selectedPlan === "Enterprise" ? (
+                    <button
+                      onClick={handleClose}
+                      className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all"
+                    >
+                      Request a Demo →
+                    </button>
+                  ) : (
+                    <button
+                      onClick={handleClose}
+                      className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all"
+                    >
+                      {selectedPlan === "Starter" ? "Activate Free Trial →" : "Confirm Subscription →"}
+                    </button>
+                  )}
+
+                  <button
+                    onClick={() => setShowConfirmation(false)}
+                    className="mt-3 text-xs text-white/40 hover:text-white/70 transition-colors"
+                  >
+                    ← Change plan
+                  </button>
+                </motion.div>
               )}
 
               {/* SIGN IN */}
