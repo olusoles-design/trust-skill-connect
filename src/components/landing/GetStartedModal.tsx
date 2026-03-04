@@ -81,11 +81,12 @@ const PRACTITIONER_ROLES = [
 interface Props {
   open: boolean;
   onClose: () => void;
+  initialRole?: Role;
 }
 
-export default function GetStartedModal({ open, onClose }: Props) {
+export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
   const [step, setStep] = useState(1);
-  const [selectedRole, setSelectedRole] = useState<Role>(null);
+  const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
   const [practitionerRole, setPractitionerRole] = useState<PractitionerRole>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanName>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
@@ -104,6 +105,18 @@ export default function GetStartedModal({ open, onClose }: Props) {
     accreditationNumber: "",
     serviceCategory: "",
   });
+  // Sync initialRole and auto-advance when modal opens
+  useEffect(() => {
+    if (open) {
+      if (initialRole) {
+        setSelectedRole(initialRole);
+        setStep(2);
+      } else {
+        setStep(1);
+        setSelectedRole(null);
+      }
+    }
+  }, [open, initialRole]);
 
   // Close on ESC
   useEffect(() => {
