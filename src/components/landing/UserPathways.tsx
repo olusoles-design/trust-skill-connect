@@ -56,7 +56,15 @@ const users = [
   },
 ];
 
-export default function UserPathways() {
+type RoleKey = "learner" | "sponsor" | "provider" | "practitioner" | "support_provider" | null;
+
+const roleKeys: RoleKey[] = ["learner", "sponsor", "provider", "practitioner", "support_provider"];
+
+interface Props {
+  onRoleSelect?: (role: RoleKey) => void;
+}
+
+export default function UserPathways({ onRoleSelect }: Props) {
   return (
     <section id="users" className="py-20 lg:py-32 bg-background">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -115,7 +123,10 @@ export default function UserPathways() {
               </ul>
 
               {/* CTA */}
-              <button className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r ${user.color} text-white text-sm font-semibold group-hover:opacity-90 transition-opacity`}>
+              <button
+                onClick={() => onRoleSelect?.(roleKeys[i])}
+                className={`w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-lg bg-gradient-to-r ${user.color} text-white text-sm font-semibold group-hover:opacity-90 transition-opacity`}
+              >
                 {user.cta} <ArrowRight className="w-4 h-4" />
               </button>
             </motion.div>

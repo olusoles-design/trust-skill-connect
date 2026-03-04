@@ -12,23 +12,31 @@ import CTASection from "@/components/landing/CTASection";
 import Footer from "@/components/landing/Footer";
 import GetStartedModal from "@/components/landing/GetStartedModal";
 
+type ModalRole = "learner" | "sponsor" | "provider" | "practitioner" | "support_provider" | null;
+
 const Index = () => {
   const [modalOpen, setModalOpen] = useState(false);
+  const [modalRole, setModalRole] = useState<ModalRole>(null);
+
+  const openModal = (role: ModalRole = null) => {
+    setModalRole(role);
+    setModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen">
-      <Navbar onGetStarted={() => setModalOpen(true)} />
-      <Hero onGetStarted={() => setModalOpen(true)} />
+      <Navbar onGetStarted={() => openModal()} />
+      <Hero onGetStarted={() => openModal()} />
       <ComplianceBanner />
-      <UserPathways />
+      <UserPathways onRoleSelect={openModal} />
       <TripleVerification />
       <PlatformFeatures />
       <SupportMarketplace />
       <HowItWorks />
       <Testimonials />
-      <CTASection onGetStarted={() => setModalOpen(true)} />
+      <CTASection onGetStarted={() => openModal()} />
       <Footer />
-      <GetStartedModal open={modalOpen} onClose={() => setModalOpen(false)} />
+      <GetStartedModal open={modalOpen} onClose={() => setModalOpen(false)} initialRole={modalRole} />
     </div>
   );
 };
