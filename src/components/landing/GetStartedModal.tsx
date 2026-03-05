@@ -1,6 +1,8 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowLeft, ArrowRight, GraduationCap, Briefcase, School, Users, ShoppingBag } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, GraduationCap, Briefcase, School, Users, ShoppingBag, Loader2 } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useToast } from "@/hooks/use-toast";
 
 type Role = "learner" | "sponsor" | "provider" | "practitioner" | "support_provider" | null;
 type PractitionerRole = "facilitator" | "assessor" | "moderator" | "sdf" | "mentor" | null;
@@ -85,12 +87,14 @@ interface Props {
 }
 
 export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
+  const { toast } = useToast();
   const [step, setStep] = useState(1);
   const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
   const [practitionerRole, setPractitionerRole] = useState<PractitionerRole>(null);
   const [selectedPlan, setSelectedPlan] = useState<PlanName>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
   const [showLogin, setShowLogin] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     username: "",
     email: "",
@@ -166,8 +170,63 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
   };
 
-  const roleData = ROLES.find(r => r.id === selectedRole);
+  // Real Supabase sign-up
+  const handleSignUp = async () => {
+    if (!form.email || !form.password) {
+      toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { data, error } = await supabase.auth.signUp({
+        email: form.email,
+        password: form.password,
+        options: { emailRedirectTo: window.location.origin },
+      });
+      if (error) throw error;
+      const userId = data.user?.id;
+      if (userId) {
+        // Save profile
+        await supabase.from("profiles").upsert({
+          user_id: userId,
+          first_name: form.firstName || null,
+          last_name: form.lastName || null,
+          username: form.username || null,
+          phone: form.phone || null,
+        });
+        // Save role
+        if (selectedRole) {
+          await supabase.from("user_roles").upsert({ user_id: userId, role: selectedRole });
+        }
+      }
+      setStep(3);
+    } catch (err: unknown) {
+      toast({ title: "Sign-up failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
 
+  // Real Supabase sign-in
+  const handleSignIn = async () => {
+    if (!form.email || !form.password) {
+      toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
+      if (error) throw error;
+      toast({ title: "Welcome back!", description: "You have signed in successfully." });
+      handleClose();
+    } catch (err: unknown) {
+      toast({ title: "Sign-in failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const roleData = ROLES.find(r => r.id === selectedRole);
   const stepLabel = showLogin ? "Sign In" : `Step ${step} of 3`;
 
   return (
@@ -375,10 +434,11 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   </div>
 
                   <button
-                    onClick={() => setStep(3)}
-                    className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all hover:scale-[1.01] flex items-center justify-center gap-2"
+                    onClick={handleSignUp}
+                    disabled={submitting}
+                    className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    Continue to Step 3 <ArrowRight className="w-4 h-4" />
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Continue to Step 3 <ArrowRight className="w-4 h-4" /></>}
                   </button>
                 </div>
               )}
@@ -554,8 +614,12 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   <div className="text-right">
                     <button className="text-xs text-teal hover:underline">Forgot password?</button>
                   </div>
-                  <button className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all">
-                    Sign In
+                  <button
+                    onClick={handleSignIn}
+                    disabled={submitting}
+                    className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                  >
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
                   </button>
                 </div>
               )}
