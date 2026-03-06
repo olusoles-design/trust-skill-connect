@@ -219,6 +219,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       if (error) throw error;
       toast({ title: "Welcome back!", description: "You have signed in successfully." });
       handleClose();
+      window.location.href = "/dashboard";
     } catch (err: unknown) {
       toast({ title: "Sign-in failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
     } finally {
