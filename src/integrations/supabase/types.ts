@@ -118,6 +118,11 @@ export type Database = {
         | "provider"
         | "practitioner"
         | "support_provider"
+        | "admin"
+        | "seta"
+        | "government"
+        | "fundi"
+        | "employer"
       subscription_plan: "starter" | "professional" | "enterprise"
     }
     CompositeTypes: {
@@ -252,6 +257,11 @@ export const Constants = {
         "provider",
         "practitioner",
         "support_provider",
+        "admin",
+        "seta",
+        "government",
+        "fundi",
+        "employer",
       ],
       subscription_plan: ["starter", "professional", "enterprise"],
     },
