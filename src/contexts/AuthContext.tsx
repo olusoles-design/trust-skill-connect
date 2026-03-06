@@ -1,19 +1,20 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
-import type { Database } from "@/integrations/supabase/types";
-
-type AppRole = Database["public"]["Enums"]["app_role"];
-type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
+import type { AppRole, SubscriptionPlan, Capability, Persona } from "@/lib/permissions";
+import { ROLE_CAPABILITIES, ROLE_PERSONA, roleHasCapability } from "@/lib/permissions";
 
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
   role: AppRole | null;
   plan: SubscriptionPlan | null;
+  persona: Persona | null;
+  capabilities: Capability[];
   trialEndsAt: string | null;
   isTrialActive: boolean;
   loading: boolean;
+  hasCapability: (cap: Capability) => boolean;
   signOut: () => Promise<void>;
 }
 
@@ -22,9 +23,12 @@ const AuthContext = createContext<AuthContextValue>({
   session: null,
   role: null,
   plan: null,
+  persona: null,
+  capabilities: [],
   trialEndsAt: null,
   isTrialActive: false,
   loading: true,
+  hasCapability: () => false,
   signOut: async () => {},
 });
 
@@ -47,7 +51,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   useEffect(() => {
-    // Set up listener BEFORE getSession
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
       setSession(sess);
       setUser(sess?.user ?? null);
@@ -73,12 +76,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const isTrialActive = plan === "starter" && !!trialEndsAt && new Date(trialEndsAt) > new Date();
 
+  // Derived from role — no extra state needed
+  const capabilities: Capability[] = role ? ROLE_CAPABILITIES[role] ?? [] : [];
+  const persona: Persona | null = role ? ROLE_PERSONA[role] ?? null : null;
+
+  const hasCapability = (cap: Capability): boolean => roleHasCapability(role, cap);
+
   const signOut = async () => {
     await supabase.auth.signOut();
   };
 
   return (
-    <AuthContext.Provider value={{ user, session, role, plan, trialEndsAt, isTrialActive, loading, signOut }}>
+    <AuthContext.Provider
+      value={{
+        user,
+        session,
+        role,
+        plan,
+        persona,
+        capabilities,
+        trialEndsAt,
+        isTrialActive,
+        loading,
+        hasCapability,
+        signOut,
+      }}
+    >
       {children}
     </AuthContext.Provider>
   );

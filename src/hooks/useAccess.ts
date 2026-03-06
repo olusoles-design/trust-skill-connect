@@ -1,46 +1,27 @@
+/**
+ * useAccess — Capability-based access control hook
+ *
+ * Accepts either:
+ *   - A named feature string (e.g. "learner:digital_cv") — looked up via FEATURE_CAPABILITY map
+ *   - A direct capability (e.g. "build_profile")
+ *
+ * Returns { allowed, reason, upgradeRequired, limit }
+ *
+ * Access is denied if:
+ *   1. User is not signed in
+ *   2. User's role does not have the required capability
+ *   3. User's plan is below the capability's minPlan (and trial has expired)
+ */
+
 import { useAuth } from "@/contexts/AuthContext";
-import type { Database } from "@/integrations/supabase/types";
-
-type AppRole = Database["public"]["Enums"]["app_role"];
-type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
-
-// Feature definitions: which plans unlock each feature per role
-const FEATURE_ACCESS: Record<string, { roles: AppRole[]; minPlan: SubscriptionPlan; limit?: number }> = {
-  // Learner
-  "learner:browse_opportunities":       { roles: ["learner"], minPlan: "starter", limit: 3 },
-  "learner:unlimited_opportunities":    { roles: ["learner"], minPlan: "professional" },
-  "learner:digital_cv":                 { roles: ["learner"], minPlan: "professional" },
-  "learner:priority_application":       { roles: ["learner"], minPlan: "professional" },
-  "learner:micro_tasks":                { roles: ["learner"], minPlan: "starter" },
-
-  // Sponsor
-  "sponsor:candidate_pipeline":         { roles: ["sponsor"], minPlan: "starter" },
-  "sponsor:bee_dashboard":              { roles: ["sponsor"], minPlan: "professional" },
-  "sponsor:tax_calculator":             { roles: ["sponsor"], minPlan: "professional" },
-  "sponsor:compliance_reports":         { roles: ["sponsor"], minPlan: "professional" },
-
-  // Provider (SDP)
-  "provider:post_programmes":           { roles: ["provider"], minPlan: "starter", limit: 1 },
-  "provider:unlimited_programmes":      { roles: ["provider"], minPlan: "professional" },
-  "provider:learner_intake":            { roles: ["provider"], minPlan: "professional" },
-  "provider:outcome_tracking":          { roles: ["provider"], minPlan: "professional" },
-
-  // Practitioner
-  "practitioner:browse_gigs":           { roles: ["practitioner"], minPlan: "starter" },
-  "practitioner:bid_contracts":         { roles: ["practitioner"], minPlan: "professional" },
-  "practitioner:verified_badge":        { roles: ["practitioner"], minPlan: "professional" },
-
-  // Support Provider
-  "support_provider:listing":           { roles: ["support_provider"], minPlan: "starter", limit: 1 },
-  "support_provider:unlimited_listing": { roles: ["support_provider"], minPlan: "professional" },
-  "support_provider:tender_matching":   { roles: ["support_provider"], minPlan: "professional" },
-};
-
-const PLAN_RANK: Record<SubscriptionPlan, number> = {
-  starter: 0,
-  professional: 1,
-  enterprise: 2,
-};
+import {
+  FEATURE_CAPABILITY,
+  CAPABILITY_GATES,
+  PLAN_RANK,
+  roleHasCapability,
+  type Capability,
+} from "@/lib/permissions";
+import type { SubscriptionPlan } from "@/lib/permissions";
 
 export interface AccessResult {
   allowed: boolean;
@@ -49,26 +30,42 @@ export interface AccessResult {
   limit?: number;
 }
 
-export function useAccess(feature: string): AccessResult {
+export function useAccess(featureOrCapability: string): AccessResult {
   const { user, role, plan, isTrialActive } = useAuth();
 
-  const def = FEATURE_ACCESS[feature];
-  if (!def) return { allowed: true };
+  // Resolve to a capability
+  const capability = (
+    FEATURE_CAPABILITY[featureOrCapability] ?? featureOrCapability
+  ) as Capability;
 
-  // Not logged in
-  if (!user) return { allowed: false, reason: "Sign in to access this feature.", upgradeRequired: false };
+  const gate = CAPABILITY_GATES[capability];
 
-  // Wrong role
-  if (role && !def.roles.includes(role)) {
-    return { allowed: false, reason: "This feature is not available for your account type." };
+  // Unknown capability — allow by default
+  if (!gate) return { allowed: true };
+
+  // Not signed in
+  if (!user) {
+    return {
+      allowed: false,
+      reason: "Sign in to access this feature.",
+      upgradeRequired: false,
+    };
+  }
+
+  // Role doesn't have this capability
+  if (!roleHasCapability(role, capability)) {
+    return {
+      allowed: false,
+      reason: "This feature is not available for your account type.",
+    };
   }
 
   const effectivePlan: SubscriptionPlan = plan ?? "starter";
   const planRank = PLAN_RANK[effectivePlan];
-  const requiredRank = PLAN_RANK[def.minPlan];
+  const requiredRank = PLAN_RANK[gate.minPlan];
 
-  // Starter plan: check trial
-  if (effectivePlan === "starter" && !isTrialActive && def.minPlan !== "starter") {
+  // Starter trial expired and feature requires a paid plan
+  if (effectivePlan === "starter" && !isTrialActive && gate.minPlan !== "starter") {
     return {
       allowed: false,
       reason: "Your free trial has ended. Upgrade to unlock this feature.",
@@ -76,14 +73,24 @@ export function useAccess(feature: string): AccessResult {
     };
   }
 
+  // Plan too low
   if (planRank < requiredRank) {
+    const planName = gate.minPlan.charAt(0).toUpperCase() + gate.minPlan.slice(1);
     return {
       allowed: false,
-      reason: `Available on ${def.minPlan.charAt(0).toUpperCase() + def.minPlan.slice(1)} plan and above.`,
+      reason: `Available on the ${planName} plan and above.`,
       upgradeRequired: true,
-      limit: def.limit,
+      limit: gate.limit,
     };
   }
 
-  return { allowed: true, limit: def.limit };
+  return { allowed: true, limit: gate.limit };
+}
+
+/**
+ * useCapability — Check raw capability access without a feature string
+ * Useful in dashboard components that want to conditionally render widgets.
+ */
+export function useCapability(capability: Capability): AccessResult {
+  return useAccess(capability);
 }

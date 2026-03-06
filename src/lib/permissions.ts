@@ -1,0 +1,204 @@
+/**
+ * Capability-Based Permission System
+ *
+ * Instead of checking role names directly, features check for capabilities.
+ * Each role is assigned a set of capabilities. Adding a new role = new entry in ROLE_CAPABILITIES.
+ * Adding a new feature = new entry in CAPABILITY_FEATURE_MAP.
+ *
+ * Subscription tiers still gate premium capabilities via CAPABILITY_MIN_PLAN.
+ */
+
+import type { Database } from "@/integrations/supabase/types";
+
+export type AppRole = Database["public"]["Enums"]["app_role"];
+export type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
+
+// ─── 11 Core Capabilities ──────────────────────────────────────────────────
+
+export type Capability =
+  | "find_opportunities"       // Browse learnerships, jobs, gigs
+  | "apply_for_opportunities"  // Submit applications / bids
+  | "build_profile"            // Create CV / professional profile
+  | "post_opportunities"       // Post jobs, programmes, gigs
+  | "manage_learners"          // Intake, tracking, reporting on learners
+  | "fund_learners"            // Sponsor / finance skills development
+  | "verify_documents"         // Compliance checks, credential verification
+  | "view_reports"             // Access analytics, SARS/SETA, BEE reports
+  | "marketplace_listing"      // List services in support marketplace
+  | "tender_matching"          // Match to government / corporate tenders
+  | "platform_admin";          // Full platform oversight
+
+// ─── Persona Groups (for future Universal Dashboard grouping) ───────────────
+
+export type Persona = "talent" | "business" | "funding" | "oversight";
+
+export const ROLE_PERSONA: Record<AppRole, Persona> = {
+  learner:          "talent",
+  practitioner:     "talent",
+  employer:         "business",
+  support_provider: "business",
+  provider:         "business",
+  sponsor:          "funding",
+  fundi:            "funding",
+  admin:            "oversight",
+  seta:             "oversight",
+  government:       "oversight",
+};
+
+// ─── Role → Capabilities map ────────────────────────────────────────────────
+// Adding a new role: add one entry here. Nothing else needs to change.
+
+export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
+  learner: [
+    "find_opportunities",
+    "apply_for_opportunities",
+    "build_profile",
+  ],
+  practitioner: [
+    "find_opportunities",
+    "apply_for_opportunities",
+    "build_profile",
+    "marketplace_listing",
+  ],
+  employer: [
+    "post_opportunities",
+    "manage_learners",
+    "view_reports",
+  ],
+  provider: [
+    "post_opportunities",
+    "manage_learners",
+    "view_reports",
+    "verify_documents",
+  ],
+  sponsor: [
+    "fund_learners",
+    "manage_learners",
+    "view_reports",
+    "verify_documents",
+  ],
+  fundi: [
+    "fund_learners",
+    "find_opportunities",
+    "view_reports",
+  ],
+  support_provider: [
+    "marketplace_listing",
+    "tender_matching",
+    "view_reports",
+  ],
+  seta: [
+    "verify_documents",
+    "view_reports",
+    "manage_learners",
+    "platform_admin",
+  ],
+  government: [
+    "view_reports",
+    "verify_documents",
+    "tender_matching",
+    "platform_admin",
+  ],
+  admin: [
+    "find_opportunities",
+    "apply_for_opportunities",
+    "build_profile",
+    "post_opportunities",
+    "manage_learners",
+    "fund_learners",
+    "verify_documents",
+    "view_reports",
+    "marketplace_listing",
+    "tender_matching",
+    "platform_admin",
+  ],
+};
+
+// ─── Subscription gating ─────────────────────────────────────────────────────
+// Maps capability → minimum plan required (and optional starter limit)
+
+export interface CapabilityGate {
+  minPlan: SubscriptionPlan;
+  limit?: number; // e.g. max 3 results on starter
+}
+
+export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
+  find_opportunities:      { minPlan: "starter", limit: 3 },
+  apply_for_opportunities: { minPlan: "professional" },
+  build_profile:           { minPlan: "professional" },
+  post_opportunities:      { minPlan: "starter", limit: 1 },
+  manage_learners:         { minPlan: "professional" },
+  fund_learners:           { minPlan: "starter" },
+  verify_documents:        { minPlan: "professional" },
+  view_reports:            { minPlan: "professional" },
+  marketplace_listing:     { minPlan: "starter", limit: 1 },
+  tender_matching:         { minPlan: "professional" },
+  platform_admin:          { minPlan: "starter" }, // gated by role, not plan
+};
+
+// ─── Plan ranking ──────────────────────────────────────────────────────────
+
+export const PLAN_RANK: Record<SubscriptionPlan, number> = {
+  starter:      0,
+  professional: 1,
+  enterprise:   2,
+};
+
+// ─── Helper: does a role have a capability? ──────────────────────────────────
+
+export function roleHasCapability(role: AppRole | null, capability: Capability): boolean {
+  if (!role) return false;
+  return ROLE_CAPABILITIES[role]?.includes(capability) ?? false;
+}
+
+// ─── Feature → capability map ─────────────────────────────────────────────
+// Maps legacy/named feature strings (used by <GatedFeature>) to capabilities.
+// This is the backwards-compatible bridge — existing feature strings still work.
+
+export const FEATURE_CAPABILITY: Record<string, Capability> = {
+  // Learner
+  "learner:browse_opportunities":       "find_opportunities",
+  "learner:unlimited_opportunities":    "find_opportunities",
+  "learner:digital_cv":                 "build_profile",
+  "learner:priority_application":       "apply_for_opportunities",
+  "learner:micro_tasks":                "find_opportunities",
+
+  // Employer
+  "employer:post_jobs":                 "post_opportunities",
+  "employer:manage_candidates":         "manage_learners",
+  "employer:reports":                   "view_reports",
+
+  // Sponsor
+  "sponsor:candidate_pipeline":         "manage_learners",
+  "sponsor:bee_dashboard":              "view_reports",
+  "sponsor:tax_calculator":             "view_reports",
+  "sponsor:compliance_reports":         "view_reports",
+  "sponsor:fund_learner":               "fund_learners",
+
+  // Provider (SDP)
+  "provider:post_programmes":           "post_opportunities",
+  "provider:unlimited_programmes":      "post_opportunities",
+  "provider:learner_intake":            "manage_learners",
+  "provider:outcome_tracking":          "manage_learners",
+
+  // Practitioner
+  "practitioner:browse_gigs":           "find_opportunities",
+  "practitioner:bid_contracts":         "apply_for_opportunities",
+  "practitioner:verified_badge":        "build_profile",
+
+  // Support Provider
+  "support_provider:listing":           "marketplace_listing",
+  "support_provider:unlimited_listing": "marketplace_listing",
+  "support_provider:tender_matching":   "tender_matching",
+
+  // Fundi
+  "fundi:fund_learner":                 "fund_learners",
+  "fundi:reports":                      "view_reports",
+
+  // Oversight
+  "seta:verify":                        "verify_documents",
+  "seta:reports":                       "view_reports",
+  "government:reports":                 "view_reports",
+  "government:tender_matching":         "tender_matching",
+  "admin:platform":                     "platform_admin",
+};
