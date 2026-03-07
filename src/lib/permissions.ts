@@ -269,6 +269,10 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   view_reports:            { minPlan: "professional" },
   view_reports_seta:       { minPlan: "professional" },
   audit_system:            { minPlan: "professional" },
+  trust_ledger:            { minPlan: "professional" },
+  // Phase 3 – Glue
+  marketplace_discovery:   { minPlan: "starter" },
+  workflow_engine:         { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
 };
