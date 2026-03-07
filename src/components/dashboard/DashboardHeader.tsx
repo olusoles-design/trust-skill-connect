@@ -1,5 +1,5 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Bell, ChevronDown } from "lucide-react";
+import { Bell, ChevronDown, Eye, X } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +8,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { useNavigate } from "react-router-dom";
 import type { AppRole } from "@/lib/permissions";
 
 const PERSONA_LABELS: Record<string, { label: string; color: string }> = {
