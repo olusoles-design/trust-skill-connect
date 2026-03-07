@@ -1,6 +1,14 @@
 import { useAuth } from "@/contexts/AuthContext";
-import { Badge } from "@/components/ui/badge";
-import { Bell } from "lucide-react";
+import { Bell, ChevronDown } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import type { AppRole } from "@/lib/permissions";
 
 const PERSONA_LABELS: Record<string, { label: string; color: string }> = {
   talent:   { label: "Talent Hub",   color: "bg-teal/10 text-teal border-teal/20" },
@@ -15,32 +23,70 @@ const PLAN_COLORS: Record<string, string> = {
   enterprise:   "bg-accent/20 text-accent-foreground",
 };
 
+const ROLE_LABELS: Record<AppRole, string> = {
+  learner:          "Learner",
+  practitioner:     "Practitioner",
+  employer:         "Employer",
+  support_provider: "Support Provider",
+  provider:         "Skills Dev Provider",
+  sponsor:          "Sponsor",
+  fundi:            "Fundi",
+  admin:            "Admin",
+  seta:             "SETA",
+  government:       "Government",
+};
+
 export function DashboardHeader() {
-  const { user, role, persona, plan, isTrialActive } = useAuth();
+  const { user, role, allRoles, switchRole, persona, plan, isTrialActive } = useAuth();
 
   const personaInfo = persona ? PERSONA_LABELS[persona] : null;
   const planLabel = plan ? plan.charAt(0).toUpperCase() + plan.slice(1) : "Starter";
+  const hasMultipleRoles = allRoles.length > 1;
 
   return (
     <div className="flex items-center justify-between w-full">
-      {/* Left: page context */}
-      <div className="flex items-center gap-3">
+      {/* Left: persona badge + role switcher */}
+      <div className="flex items-center gap-2">
         {personaInfo && (
           <span className={`text-xs font-medium px-2.5 py-1 rounded-full border ${personaInfo.color}`}>
             {personaInfo.label}
           </span>
         )}
-        <span className="text-sm text-muted-foreground capitalize hidden sm:block">
-          {role?.replace("_", " ") ?? "Guest"}
-        </span>
+
+        {hasMultipleRoles ? (
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <button className="flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground transition-colors capitalize hidden sm:flex">
+                {role ? ROLE_LABELS[role] : "Select Role"}
+                <ChevronDown className="w-3 h-3" />
+              </button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start" className="w-48">
+              <DropdownMenuLabel className="text-xs text-muted-foreground">Switch Active Role</DropdownMenuLabel>
+              <DropdownMenuSeparator />
+              {allRoles.map((r) => (
+                <DropdownMenuItem
+                  key={r}
+                  onClick={() => switchRole(r)}
+                  className={`text-sm capitalize cursor-pointer ${r === role ? "font-semibold text-primary" : ""}`}
+                >
+                  {ROLE_LABELS[r]}
+                  {r === role && <span className="ml-auto text-primary text-xs">Active</span>}
+                </DropdownMenuItem>
+              ))}
+            </DropdownMenuContent>
+          </DropdownMenu>
+        ) : (
+          <span className="text-sm text-muted-foreground capitalize hidden sm:block">
+            {role ? ROLE_LABELS[role] : "Guest"}
+          </span>
+        )}
       </div>
 
-      {/* Right: plan badge + notifications + user avatar */}
+      {/* Right: plan badge + notifications + avatar */}
       <div className="flex items-center gap-3 ml-auto">
         {isTrialActive && (
-          <span className="text-xs text-gold font-medium hidden sm:block">
-            Trial active
-          </span>
+          <span className="text-xs text-gold font-medium hidden sm:block">Trial active</span>
         )}
         <span className={`text-xs font-medium px-2.5 py-1 rounded-full ${PLAN_COLORS[plan ?? "starter"]}`}>
           {planLabel}
