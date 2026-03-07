@@ -123,7 +123,7 @@ export function ProfileCVWidget() {
   const removeSkill = (skill: string) =>
     setForm(p => ({ ...p, skills: (p.skills ?? []).filter(s => s !== skill) }));
 
-  const fullName = `${form.first_name ?? ""} ${form.last_name ?? ""}`.trim() || user?.email ?? "Your Name";
+  const fullName = (`${form.first_name ?? ""} ${form.last_name ?? ""}`.trim()) || (user?.email ?? "Your Name");
   const avatarUrl = profile?.avatar_url;
 
   if (isLoading) return (
