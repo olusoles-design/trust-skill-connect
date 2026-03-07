@@ -86,7 +86,6 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "marketplace_listing",
     "document_vault",
   ],
-  ],
   employer: [
     "post_opportunities",
     "post_tasks",
