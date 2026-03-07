@@ -22,6 +22,7 @@ import { CredentialWalletWidget }      from "./talent/CredentialWalletWidget";
 import { MicroTaskBoardWidget }        from "./talent/MicroTaskBoardWidget";
 import { MyTasksWidget }               from "./talent/MyTasksWidget";
 import { ProfileCVWidget }             from "./talent/ProfileCVWidget";
+import { DocumentVaultWidget }         from "./talent/DocumentVaultWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";

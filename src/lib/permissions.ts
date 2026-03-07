@@ -138,6 +138,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "tender_matching",
     "audit_system",
     "platform_admin",
+    "document_vault",
   ],
   admin: [
     "find_opportunities",
@@ -147,6 +148,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_credentials",
     "view_tasks",
     "my_tasks",
+    "document_vault",
     "post_opportunities",
     "post_tasks",
     "manage_learners",
