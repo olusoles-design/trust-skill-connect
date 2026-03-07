@@ -112,12 +112,15 @@ export default function Dashboard() {
 
               {/* Shared */}
               <Route path="marketplace" element={<PageView title="Marketplace Listing" description="Manage your services in the SkillsMark marketplace."><MarketplaceListingWidget /></PageView>} />
+              <Route path="discovery"   element={<PageView title="Marketplace Discovery" description="Find accredited SDPs, facilitators, venues and suppliers."><MarketplaceDiscoveryWidget /></PageView>} />
               <Route path="tenders"     element={<PageView title="Tender Matching" description="Matched government and corporate tender opportunities."><TenderMatchingWidget /></PageView>} />
               <Route path="funding"     element={<PageView title="Fund Learners" description="Sponsor skills development and track B-BBEE impact."><FundingAllocationWidget /></PageView>} />
+              <Route path="workflow"    element={<PageView title="Workflow Engine" description="RFP → bid → award → learner registration → SETA packet."><WorkflowEngineWidget /></PageView>} />
 
               {/* Oversight */}
               <Route path="verify"  element={<PageView title="Verification Queue" description="Review and action pending document verification requests."><VerificationQueueWidget /></PageView>} />
               <Route path="reports" element={<PageView title="Reports & Analytics" description="SETA, SARS, B-BBEE and operational dashboards."><ReportsAnalyticsWidget /></PageView>} />
+              <Route path="ledger"  element={<PageView title="Trust Ledger" description="Immutable audit trail with QR verification for B-BBEE audits."><TrustLedgerWidget /></PageView>} />
               <Route path="admin"   element={<PageView title="Platform Administration" description="Users, content moderation and system settings."><PlatformAdminWidget /></PageView>} />
 
               <Route path="*" element={<WidgetGrid />} />
