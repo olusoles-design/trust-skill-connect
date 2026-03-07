@@ -27,6 +27,7 @@ import { TaxCalculatorWidget }         from "./business/TaxCalculatorWidget";
 import { WSPReportWidget }             from "./business/WSPReportWidget";
 import { ProcurementDashboardWidget }  from "./business/ProcurementDashboardWidget";
 import { MarketplaceListingWidget }    from "./business/MarketplaceListingWidget";
+import { MarketplaceDiscoveryWidget }  from "./business/MarketplaceDiscoveryWidget";
 import { TenderMatchingWidget }        from "./business/TenderMatchingWidget";
 import { TenderFeedWidget }            from "./business/TenderFeedWidget";
 import { LearnerRecruitmentWidget }    from "./business/LearnerRecruitmentWidget";
@@ -35,6 +36,7 @@ import { ProcurementAlertsWidget }     from "./business/ProcurementAlertsWidget"
 import { RFQBoardWidget }              from "./business/RFQBoardWidget";
 import { FacilityBookingWidget }       from "./business/FacilityBookingWidget";
 import { TaskPosterWidget }            from "./business/TaskPosterWidget";
+import { WorkflowEngineWidget }        from "./business/WorkflowEngineWidget";
 
 // ─── Funding
 import { FundingAllocationWidget }     from "./funding/FundingAllocationWidget";
@@ -46,6 +48,7 @@ import { ReportsAnalyticsWidget }      from "./oversight/ReportsAnalyticsWidget"
 import { SETAReportingWidget }         from "./oversight/SETAReportingWidget";
 import { ComplianceMonitorWidget }     from "./oversight/ComplianceMonitorWidget";
 import { PlatformAdminWidget }         from "./oversight/PlatformAdminWidget";
+import { TrustLedgerWidget }           from "./oversight/TrustLedgerWidget";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -241,9 +244,26 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title: "Compliance Monitor", description: "Full audit trails, compliance monitoring and system health.",
     icon: "ShieldAlert", color: "bg-primary/10", accentColor: "text-primary",
   },
+  trust_ledger: {
+    component: TrustLedgerWidget, layout: "full", persona: "oversight",
+    title: "Trust Ledger", description: "Immutable audit trail — QR-verified proof for B-BBEE auditors.",
+    icon: "Link2", color: "bg-primary/10", accentColor: "text-primary",
+  },
   platform_admin: {
     component: PlatformAdminWidget, layout: "full", persona: "oversight",
     title: "Platform Administration", description: "Users, content moderation and system settings.",
     icon: "Settings", color: "bg-primary/10", accentColor: "text-primary",
+  },
+
+  // ── Phase 3 – Glue ─────────────────────────────────────────────────────────
+  marketplace_discovery: {
+    component: MarketplaceDiscoveryWidget, layout: "full", persona: "business",
+    title: "Marketplace Discovery", description: "Powerful search: find accredited SDPs, facilitators, venues and suppliers.",
+    icon: "Store", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  workflow_engine: {
+    component: WorkflowEngineWidget, layout: "full", persona: "business",
+    title: "Workflow Engine", description: "RFP → bid → award → learner registration → SETA submission in one flow.",
+    icon: "GitBranch", color: "bg-primary/10", accentColor: "text-primary",
   },
 };
