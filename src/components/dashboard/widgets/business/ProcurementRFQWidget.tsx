@@ -98,7 +98,8 @@ export function ProcurementRFQWidget() {
 
   const createRFQ = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase.from("rfqs" as never).insert({
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from as any)("rfqs").insert({
         buyer_id: user!.id,
         title: form.title,
         description: form.description || null,
@@ -122,8 +123,8 @@ export function ProcurementRFQWidget() {
 
   const updateResponseStatus = useMutation({
     mutationFn: async ({ responseId, status }: { responseId: string; status: string }) => {
-      const { error } = await supabase
-        .from("rfq_responses" as never)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from as any)("rfq_responses")
         .update({ status })
         .eq("id", responseId);
       if (error) throw error;
@@ -136,7 +137,8 @@ export function ProcurementRFQWidget() {
 
   const closeRFQ = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("rfqs" as never).update({ status: "closed" }).eq("id", id);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from as any)("rfqs").update({ status: "closed" }).eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
