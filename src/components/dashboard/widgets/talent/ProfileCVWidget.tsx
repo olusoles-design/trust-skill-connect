@@ -210,6 +210,37 @@ export function ProfileCVWidget() {
           </div>
           <textarea {...field("bio")} placeholder="Short bio (2–3 sentences about yourself)" rows={3} className={`${INPUT} resize-none`} />
 
+          {/* Practitioner roles — only shown for practitioner role */}
+          {isPractitioner && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Practitioner Roles</p>
+              <div className="grid grid-cols-2 gap-2">
+                {PRACTITIONER_TYPES.map(pt => {
+                  const Icon = pt.icon;
+                  const active = practitionerTypes.includes(pt.key);
+                  return (
+                    <button
+                      key={pt.key}
+                      type="button"
+                      onClick={() => togglePractType(pt.key)}
+                      className={`text-left p-2.5 rounded-lg border-2 transition-all flex items-center gap-2 ${
+                        active ? "border-primary/40 bg-primary/5" : "border-border opacity-60 hover:opacity-80"
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-semibold text-foreground">{pt.label}</p>
+                        <p className="text-[9px] text-muted-foreground">{pt.desc}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+
+
           {/* Skills */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Skills</p>
