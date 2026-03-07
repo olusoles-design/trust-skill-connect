@@ -125,8 +125,28 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     color:       "bg-primary/10",
     accentColor: "text-primary",
   },
+  my_tasks: {
+    component:   MyTasksWidget,
+    layout:      "half",
+    persona:     "talent",
+    title:       "My Tasks & Earnings",
+    description: "Track completed tasks, earnings history, and quality ratings.",
+    icon:        "Wallet",
+    color:       "bg-primary/10",
+    accentColor: "text-primary",
+  },
 
   // ── Business ───────────────────────────────────────────────────────────────
+  post_tasks: {
+    component:   TaskPosterWidget,
+    layout:      "half",
+    persona:     "business",
+    title:       "Task Poster",
+    description: "Post micro-tasks, review worker submissions, and manage payouts.",
+    icon:        "ListTodo",
+    color:       "bg-accent/20",
+    accentColor: "text-accent-foreground",
+  },
   post_opportunities: {
     component:   OpportunityManagerWidget,
     layout:      "full",

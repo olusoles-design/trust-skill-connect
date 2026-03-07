@@ -23,8 +23,10 @@ export type Capability =
   | "track_progress"           // View learning progress & milestones
   | "view_credentials"         // Digital badge & credential wallet
   | "view_tasks"               // Micro-task board for immediate income
+  | "my_tasks"                 // My tasks history & earnings
   // Business
   | "post_opportunities"       // Post jobs, programmes, gigs
+  | "post_tasks"               // Post micro-tasks & review submissions
   | "manage_learners"          // Intake, tracking, reporting on learners
   | "manage_procurement"       // RFQ management for support providers
   | "view_reports_bbee"        // Real-time B-BBEE scorecard dashboard
