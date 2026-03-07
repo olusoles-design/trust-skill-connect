@@ -109,6 +109,17 @@ export default function Settings() {
     account: true, platform: true, security: true, compliance: true,
   });
 
+  const isAdmin = role === "admin";
+
+  const filteredItems = useMemo(() => {
+    if (!searchQuery.trim()) return null;
+    return ALL_ITEMS.filter(
+      (item) =>
+        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        item.description.toLowerCase().includes(searchQuery.toLowerCase())
+    );
+  }, [searchQuery]);
+
   if (loading) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-background">
