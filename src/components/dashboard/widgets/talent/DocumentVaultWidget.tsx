@@ -115,13 +115,12 @@ export function DocumentVaultWidget() {
     queryKey: ["document_vault", user?.id],
     enabled: !!user,
     queryFn: async () => {
-      const { data, error } = await supabase
-        .from("document_vault" as any)
+      const { data, error } = await (supabase.from("document_vault" as any) as any)
         .select("*")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as VaultDoc[];
+      return ((data ?? []) as unknown) as VaultDoc[];
     },
   });
 
