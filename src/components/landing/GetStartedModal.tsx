@@ -378,7 +378,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const resetModal = useCallback(() => {
     setMode("entry"); setStep(1); setSelectedHub(null); setSelectedRole(null);
     setPractitionerRole(null); setAdditionalRoles([]); setSelectedPlan(null);
-    setForm(EMPTY_FORM); setUploads([]);
+    setForm(EMPTY_FORM); setUploads([]); setForgotSent(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -392,6 +392,26 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const toggleAdditionalRole = (role: AppRole) => {
     if (role === selectedRole) return;
     setAdditionalRoles(prev => prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]);
+  };
+
+  // ── Forgot Password ───────────────────────────────────────────────────────
+  const handleForgotPassword = async () => {
+    if (!form.email) {
+      toast({ title: "Email required", description: "Enter your email address.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setForgotSent(true);
+    } catch (err: unknown) {
+      toast({ title: "Error", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // ── Sign In ───────────────────────────────────────────────────────────────
@@ -481,6 +501,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   // ── Modal header config ───────────────────────────────────────────────────
   const modalTitle = (() => {
     if (mode === "login") return "Welcome back";
+    if (mode === "forgot") return forgotSent ? "Check your inbox" : "Reset password";
     if (mode === "entry") return "Join SkillsMark";
     if (step === 1) return "Choose your hub";
     if (step === 2 && !showPractitionerPicker) return `${currentHub?.label ?? ""} roles`;
@@ -494,6 +515,8 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const modalSubtitle = (() => {
     if (mode === "entry") return "Select how you'd like to get started";
     if (mode === "login") return "Sign in to your SkillsMark account";
+    if (mode === "forgot" && !forgotSent) return "We'll send a reset link to your email";
+    if (mode === "forgot" && forgotSent) return `A reset link was sent to ${form.email}`;
     if (step === 1) return "Pick the hub that best describes your role in skills development";
     if (step === 2 && !showPractitionerPicker) return `Select your specific role within the ${currentHub?.label} Hub`;
     if (step === 4) return "Upload your documents now or skip — verify later from your profile";
