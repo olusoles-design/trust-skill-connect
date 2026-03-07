@@ -51,6 +51,10 @@ export type Capability =
   | "view_reports"
   | "audit_system"
   | "view_reports_seta"
+  // Phase 3 – Glue features
+  | "marketplace_discovery"  // Advanced search: find SDPs, facilitators, venues
+  | "workflow_engine"        // RFP→RFQ deal flow, learner registration, SETA packet
+  | "trust_ledger"           // Immutable audit ledger + QR verification
   // Admin
   | "platform_admin";
 
@@ -96,6 +100,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "document_vault",
     "availability_toggle",
     "smart_contracting",
+    "marketplace_discovery",
   ],
   employer: [
     "post_opportunities",
@@ -108,6 +113,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "tax_calculator",
     "wsp_reports",
     "tender_feed",
+    "workflow_engine",
+    "marketplace_discovery",
   ],
   provider: [
     "post_opportunities",
@@ -121,6 +128,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "outcome_tracking",
     "manage_procurement",
     "document_vault",
+    "marketplace_discovery",
+    "workflow_engine",
   ],
   sponsor: [
     "fund_learners",
@@ -134,6 +143,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "verify_documents",
     "manage_funding",
     "approve_payments",
+    "workflow_engine",
+    "marketplace_discovery",
   ],
   fundi: [
     "fund_learners",
@@ -141,9 +152,11 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports",
     "manage_funding",
     "approve_payments",
+    "marketplace_discovery",
   ],
   support_provider: [
     "marketplace_listing",
+    "marketplace_discovery",
     "tender_matching",
     "manage_procurement",
     "view_reports",
@@ -158,6 +171,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports_seta",
     "manage_learners",
     "audit_system",
+    "trust_ledger",
     "platform_admin",
   ],
   government: [
@@ -166,6 +180,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "verify_documents",
     "tender_matching",
     "audit_system",
+    "trust_ledger",
     "platform_admin",
     "document_vault",
   ],
@@ -197,6 +212,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports_seta",
     "audit_system",
     "marketplace_listing",
+    "marketplace_discovery",
     "tender_matching",
     "tender_feed",
     "learner_recruitment",
@@ -204,6 +220,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "procurement_alerts",
     "rfq_board",
     "facility_booking",
+    "workflow_engine",
+    "trust_ledger",
     "platform_admin",
   ],
 };
@@ -257,6 +275,10 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   view_reports:            { minPlan: "professional" },
   view_reports_seta:       { minPlan: "professional" },
   audit_system:            { minPlan: "professional" },
+  trust_ledger:            { minPlan: "professional" },
+  // Phase 3 – Glue
+  marketplace_discovery:   { minPlan: "starter" },
+  workflow_engine:         { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
 };
