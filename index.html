@@ -1,27 +1,60 @@
 <!doctype html>
-<html lang="en">
+<html lang="en-ZA">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <!-- TODO: Set the document title to the name of your application -->
-    <title>Lovable App</title>
-    <meta name="description" content="Lovable Generated Project">
-    <meta name="author" content="Lovable" />
 
-    <!-- TODO: Update og:title to match your application name -->
-    
-    
+    <!-- Mobile-first viewport — prevents zooming on input focus (iOS) -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+    <title>SkillsMark — South Africa's Skills Development Platform</title>
+    <meta name="description" content="Connect talent, business, and funding on South Africa's most trusted skills development platform. Learners, employers, SETAs, and funders — all on one platform." />
+    <meta name="author" content="SkillsMark" />
+    <meta name="keywords" content="skills development, SETA, learnerships, B-BBEE, South Africa, training, employment" />
+
+    <!-- PWA / mobile app meta -->
+    <meta name="theme-color" content="#159e8a" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="SkillsMark" />
+
+    <!-- Apple touch icons -->
+    <link rel="apple-touch-icon" href="/icons/pwa-192x192.png" />
+
+    <!-- Canonical -->
+    <link rel="canonical" href="https://trust-skill-connect.lovable.app/" />
+
+    <!-- Open Graph -->
     <meta property="og:type" content="website" />
-    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb325c66-24ac-437e-a913-36bdb78d63fd/id-preview-e7d5c84f--26dfa6ba-d117-403d-93e2-7e6850710cbb.lovable.app-1772564065614.png">
+    <meta property="og:url" content="https://trust-skill-connect.lovable.app/" />
+    <meta property="og:title" content="SkillsMark — South Africa's Skills Development Platform" />
+    <meta property="og:description" content="Connect talent, business, and funding on South Africa's most trusted skills development platform." />
+    <meta property="og:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb325c66-24ac-437e-a913-36bdb78d63fd/id-preview-e7d5c84f--26dfa6ba-d117-403d-93e2-7e6850710cbb.lovable.app-1772564065614.png" />
+    <meta property="og:locale" content="en_ZA" />
 
+    <!-- Twitter / X -->
     <meta name="twitter:card" content="summary_large_image" />
-    <meta name="twitter:site" content="@Lovable" />
-    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb325c66-24ac-437e-a913-36bdb78d63fd/id-preview-e7d5c84f--26dfa6ba-d117-403d-93e2-7e6850710cbb.lovable.app-1772564065614.png">
-    <meta property="og:title" content="Lovable App">
-  <meta name="twitter:title" content="Lovable App">
-  <meta property="og:description" content="Lovable Generated Project">
-  <meta name="twitter:description" content="Lovable Generated Project">
-</head>
+    <meta name="twitter:title" content="SkillsMark — South Africa's Skills Development Platform" />
+    <meta name="twitter:description" content="Connect talent, business, and funding on South Africa's most trusted skills development platform." />
+    <meta name="twitter:image" content="https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/cb325c66-24ac-437e-a913-36bdb78d63fd/id-preview-e7d5c84f--26dfa6ba-d117-403d-93e2-7e6850710cbb.lovable.app-1772564065614.png" />
+
+    <!-- JSON-LD structured data -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebApplication",
+      "name": "SkillsMark",
+      "description": "South Africa's trusted skills development platform connecting talent, employers, SETAs, and funders.",
+      "url": "https://trust-skill-connect.lovable.app",
+      "applicationCategory": "BusinessApplication",
+      "operatingSystem": "Any",
+      "offers": { "@type": "Offer", "price": "0", "priceCurrency": "ZAR" },
+      "areaServed": "ZA"
+    }
+    </script>
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+  </head>
 
   <body>
     <div id="root"></div>
