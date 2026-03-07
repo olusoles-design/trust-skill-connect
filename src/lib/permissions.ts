@@ -1,11 +1,5 @@
 /**
  * Capability-Based Permission System
- *
- * Instead of checking role names directly, features check for capabilities.
- * Each role is assigned a set of capabilities. Adding a new role = new entry in ROLE_CAPABILITIES.
- * Adding a new feature = new entry in CAPABILITY_FEATURE_MAP.
- *
- * Subscription tiers still gate premium capabilities via CAPABILITY_MIN_PLAN.
  */
 
 import type { Database } from "@/integrations/supabase/types";
@@ -16,34 +10,49 @@ export type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
 // ─── Core Capabilities ─────────────────────────────────────────────────────
 
 export type Capability =
-  // Talent
-  | "find_opportunities"       // Browse learnerships, jobs, gigs
-  | "apply_for_opportunities"  // Submit applications / bids
-  | "build_profile"            // Create CV / professional profile
-  | "track_progress"           // View learning progress & milestones
-  | "view_credentials"         // Digital badge & credential wallet
-  | "view_tasks"               // Micro-task board for immediate income
-  | "my_tasks"                 // My tasks history & earnings
-  | "document_vault"           // Secure compliance document vault
-  // Business
-  | "post_opportunities"       // Post jobs, programmes, gigs
-  | "post_tasks"               // Post micro-tasks & review submissions
-  | "manage_learners"          // Intake, tracking, reporting on learners
-  | "manage_procurement"       // RFQ management for support providers
-  | "view_reports_bbee"        // Real-time B-BBEE scorecard dashboard
-  | "marketplace_listing"      // List services in support marketplace
-  | "tender_matching"          // Match to government / corporate tenders
+  // Talent / Learner
+  | "find_opportunities"
+  | "apply_for_opportunities"
+  | "build_profile"
+  | "track_progress"
+  | "view_credentials"
+  | "view_tasks"
+  | "my_tasks"
+  | "document_vault"
+  // Practitioner
+  | "availability_toggle"      // Availability switch + reputation
+  | "smart_contracting"        // SLA templates + digital timesheets
+  // Business – Employer/Sponsor
+  | "post_opportunities"
+  | "post_tasks"
+  | "manage_learners"
+  | "learner_pipeline"         // Live learnership pipeline tracker
+  | "bbee_simulator"           // Interactive B-BBEE scorecard simulator
+  | "tax_calculator"           // Section 12H tax allowance calculator
+  | "wsp_reports"              // WSP/ATR one-click report generation
+  | "view_reports_bbee"
+  // Business – SDP (provider)
+  | "tender_feed"              // Live employer demand / bid feed
+  | "learner_recruitment"      // Unplaced candidate pool with filters
+  | "outcome_tracking"         // Pass/employment rate analytics
+  | "manage_procurement"
+  | "marketplace_listing"
+  | "tender_matching"
+  // Business – Support Provider
+  | "procurement_alerts"       // AI demand signal alerts
+  | "rfq_board"                // Real-time RFQ board
+  | "facility_booking"         // Venue availability calendar
   // Funding
-  | "fund_learners"            // Sponsor / finance skills development
-  | "manage_funding"           // Budget allocation & funding pool
-  | "approve_payments"         // Disbursement queue & payment approvals
+  | "fund_learners"
+  | "manage_funding"
+  | "approve_payments"
   // Oversight
-  | "verify_documents"         // Compliance checks, credential verification
-  | "view_reports"             // Access analytics, SARS/SETA, BEE reports
-  | "audit_system"             // Full compliance monitoring & audit trails
-  | "view_reports_seta"        // SETA-specific reporting & exports
+  | "verify_documents"
+  | "view_reports"
+  | "audit_system"
+  | "view_reports_seta"
   // Admin
-  | "platform_admin";          // Full platform oversight
+  | "platform_admin";
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
@@ -85,13 +94,20 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "my_tasks",
     "marketplace_listing",
     "document_vault",
+    "availability_toggle",
+    "smart_contracting",
   ],
   employer: [
     "post_opportunities",
     "post_tasks",
     "manage_learners",
+    "learner_pipeline",
     "view_reports",
     "view_reports_bbee",
+    "bbee_simulator",
+    "tax_calculator",
+    "wsp_reports",
+    "tender_feed",
   ],
   provider: [
     "post_opportunities",
@@ -100,12 +116,21 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports",
     "view_reports_bbee",
     "verify_documents",
+    "tender_feed",
+    "learner_recruitment",
+    "outcome_tracking",
+    "manage_procurement",
+    "document_vault",
   ],
   sponsor: [
     "fund_learners",
     "manage_learners",
+    "learner_pipeline",
     "view_reports",
     "view_reports_bbee",
+    "bbee_simulator",
+    "tax_calculator",
+    "wsp_reports",
     "verify_documents",
     "manage_funding",
     "approve_payments",
@@ -122,6 +147,10 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "tender_matching",
     "manage_procurement",
     "view_reports",
+    "procurement_alerts",
+    "rfq_board",
+    "facility_booking",
+    "document_vault",
   ],
   seta: [
     "verify_documents",
@@ -149,9 +178,15 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_tasks",
     "my_tasks",
     "document_vault",
+    "availability_toggle",
+    "smart_contracting",
     "post_opportunities",
     "post_tasks",
     "manage_learners",
+    "learner_pipeline",
+    "bbee_simulator",
+    "tax_calculator",
+    "wsp_reports",
     "manage_procurement",
     "view_reports_bbee",
     "fund_learners",
@@ -163,6 +198,12 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "audit_system",
     "marketplace_listing",
     "tender_matching",
+    "tender_feed",
+    "learner_recruitment",
+    "outcome_tracking",
+    "procurement_alerts",
+    "rfq_board",
+    "facility_booking",
     "platform_admin",
   ],
 };
@@ -184,14 +225,29 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   view_tasks:              { minPlan: "starter", limit: 5 },
   my_tasks:                { minPlan: "starter" },
   document_vault:          { minPlan: "starter" },
-  // Business
+  // Practitioner
+  availability_toggle:     { minPlan: "starter" },
+  smart_contracting:       { minPlan: "professional" },
+  // Business – Employer/Sponsor
   post_opportunities:      { minPlan: "starter", limit: 1 },
   post_tasks:              { minPlan: "starter", limit: 3 },
   manage_learners:         { minPlan: "professional" },
-  manage_procurement:      { minPlan: "professional" },
+  learner_pipeline:        { minPlan: "professional" },
+  bbee_simulator:          { minPlan: "starter" },
+  tax_calculator:          { minPlan: "professional" },
+  wsp_reports:             { minPlan: "professional" },
   view_reports_bbee:       { minPlan: "professional" },
+  // SDP
+  tender_feed:             { minPlan: "starter" },
+  learner_recruitment:     { minPlan: "professional" },
+  outcome_tracking:        { minPlan: "professional" },
+  manage_procurement:      { minPlan: "professional" },
   marketplace_listing:     { minPlan: "starter", limit: 1 },
   tender_matching:         { minPlan: "professional" },
+  // Support Provider
+  procurement_alerts:      { minPlan: "starter" },
+  rfq_board:               { minPlan: "starter" },
+  facility_booking:        { minPlan: "professional" },
   // Funding
   fund_learners:           { minPlan: "starter" },
   manage_funding:          { minPlan: "professional" },
@@ -223,7 +279,6 @@ export function roleHasCapability(role: AppRole | null, capability: Capability):
 // ─── Feature → capability map (backwards-compat bridge) ───────────────────
 
 export const FEATURE_CAPABILITY: Record<string, Capability> = {
-  // Learner
   "learner:browse_opportunities":       "find_opportunities",
   "learner:unlimited_opportunities":    "find_opportunities",
   "learner:digital_cv":                 "build_profile",
@@ -232,38 +287,41 @@ export const FEATURE_CAPABILITY: Record<string, Capability> = {
   "learner:my_tasks":                   "my_tasks",
   "learner:credentials":                "view_credentials",
   "learner:progress":                   "track_progress",
-  // Employer
   "employer:post_jobs":                 "post_opportunities",
   "employer:post_tasks":                "post_tasks",
   "employer:manage_candidates":         "manage_learners",
   "employer:reports":                   "view_reports",
   "employer:bbee":                      "view_reports_bbee",
-  // Sponsor
+  "employer:bbee_simulator":            "bbee_simulator",
+  "employer:tax_calculator":            "tax_calculator",
+  "employer:wsp_reports":               "wsp_reports",
   "sponsor:candidate_pipeline":         "manage_learners",
   "sponsor:bee_dashboard":              "view_reports_bbee",
-  "sponsor:tax_calculator":             "view_reports_bbee",
+  "sponsor:tax_calculator":             "tax_calculator",
   "sponsor:compliance_reports":         "view_reports",
   "sponsor:fund_learner":               "fund_learners",
   "sponsor:manage_funding":             "manage_funding",
-  // Provider (SDP)
   "provider:post_programmes":           "post_opportunities",
   "provider:unlimited_programmes":      "post_opportunities",
   "provider:learner_intake":            "manage_learners",
-  "provider:outcome_tracking":          "manage_learners",
-  // Practitioner
+  "provider:outcome_tracking":          "outcome_tracking",
+  "provider:tender_feed":               "tender_feed",
+  "provider:learner_recruitment":       "learner_recruitment",
   "practitioner:browse_gigs":           "find_opportunities",
   "practitioner:bid_contracts":         "apply_for_opportunities",
   "practitioner:verified_badge":        "build_profile",
-  // Support Provider
+  "practitioner:availability":          "availability_toggle",
+  "practitioner:smart_contracting":     "smart_contracting",
   "support_provider:listing":           "marketplace_listing",
   "support_provider:unlimited_listing": "marketplace_listing",
   "support_provider:tender_matching":   "tender_matching",
   "support_provider:procurement":       "manage_procurement",
-  // Fundi
+  "support_provider:alerts":            "procurement_alerts",
+  "support_provider:rfq":               "rfq_board",
+  "support_provider:booking":           "facility_booking",
   "fundi:fund_learner":                 "fund_learners",
   "fundi:reports":                      "view_reports",
   "fundi:manage_funding":               "manage_funding",
-  // Oversight
   "seta:verify":                        "verify_documents",
   "seta:reports":                       "view_reports_seta",
   "seta:audit":                         "audit_system",
