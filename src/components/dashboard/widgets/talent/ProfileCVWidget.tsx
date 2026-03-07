@@ -3,10 +3,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  User, Camera, Save, Loader2, AlertCircle, X, Plus,
-  Linkedin, Globe, MapPin, Phone, Briefcase, FileText
+  User, Camera, Save, Loader2, X, Plus,
+  Linkedin, Globe, MapPin, Phone, Briefcase, FileText,
+  GraduationCap, Cpu,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// ─── Practitioner sub-types ───────────────────────────────────────────────────
+
+const PRACTITIONER_TYPES = [
+  { key: "facilitator", label: "Facilitator",                  icon: GraduationCap, desc: "Delivers training programmes" },
+  { key: "assessor",    label: "Assessor",                     icon: FileText,      desc: "Assesses learner competence"  },
+  { key: "moderator",   label: "Moderator",                    icon: Briefcase,     desc: "Moderates assessment quality" },
+  { key: "sdf",         label: "Skills Development Facilitator (SDF)", icon: Cpu,   desc: "WSP/ATR & SETA liaison"       },
+] as const;
+
+type PractitionerTypeKey = (typeof PRACTITIONER_TYPES)[number]["key"];
 
 interface ProfileRow {
   id: string;
@@ -39,9 +51,18 @@ export function ProfileCVWidget() {
   const [form, setForm] = useState(BLANK_PROFILE);
   const [newSkill, setNewSkill] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [practitionerTypes, setPractitionerTypes] = useState<PractitionerTypeKey[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const qc = useQueryClient();
+
+  const isPractitioner = role === "practitioner";
+
+  const togglePractType = (key: PractitionerTypeKey) =>
+    setPractitionerTypes(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
@@ -189,6 +210,37 @@ export function ProfileCVWidget() {
           </div>
           <textarea {...field("bio")} placeholder="Short bio (2–3 sentences about yourself)" rows={3} className={`${INPUT} resize-none`} />
 
+          {/* Practitioner roles — only shown for practitioner role */}
+          {isPractitioner && (
+            <div className="space-y-2">
+              <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Practitioner Roles</p>
+              <div className="grid grid-cols-2 gap-2">
+                {PRACTITIONER_TYPES.map(pt => {
+                  const Icon = pt.icon;
+                  const active = practitionerTypes.includes(pt.key);
+                  return (
+                    <button
+                      key={pt.key}
+                      type="button"
+                      onClick={() => togglePractType(pt.key)}
+                      className={`text-left p-2.5 rounded-lg border-2 transition-all flex items-center gap-2 ${
+                        active ? "border-primary/40 bg-primary/5" : "border-border opacity-60 hover:opacity-80"
+                      }`}
+                    >
+                      <Icon className={`w-3.5 h-3.5 flex-shrink-0 ${active ? "text-primary" : "text-muted-foreground"}`} />
+                      <div className="min-w-0">
+                        <p className="text-[10px] font-semibold text-foreground">{pt.label}</p>
+                        <p className="text-[9px] text-muted-foreground">{pt.desc}</p>
+                      </div>
+                    </button>
+                  );
+                })}
+              </div>
+            </div>
+          )}
+
+
+
           {/* Skills */}
           <div className="space-y-2">
             <p className="text-xs font-medium text-muted-foreground uppercase tracking-wide">Skills</p>
@@ -272,6 +324,25 @@ export function ProfileCVWidget() {
                   <FileText className="w-3.5 h-3.5 text-primary" /> About
                 </h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{form.bio}</p>
+              </div>
+            )}
+            {/* Practitioner roles on CV */}
+            {isPractitioner && practitionerTypes.length > 0 && (
+              <div className="space-y-1.5">
+                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-primary" /> Practitioner Roles
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {practitionerTypes.map(key => {
+                    const pt = PRACTITIONER_TYPES.find(p => p.key === key)!;
+                    const Icon = pt.icon;
+                    return (
+                      <span key={key} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                        <Icon className="w-3 h-3" />{pt.label}
+                      </span>
+                    );
+                  })}
+                </div>
               </div>
             )}
             {(form.skills ?? []).length > 0 && (

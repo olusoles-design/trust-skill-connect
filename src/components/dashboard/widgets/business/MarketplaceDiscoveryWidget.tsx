@@ -25,10 +25,13 @@ interface ProviderListing {
 
 const SEARCH_MODES = [
   { key: "all",         label: "All",            placeholder: "Search providers, SDPs, practitioners…"               },
-  { key: "facilitator", label: "Facilitators",   placeholder: "e.g. isiXhosa speaker, Electrical Engineering…"       },
-  { key: "sdp",         label: "SDPs",           placeholder: "e.g. merSETA accredited, 20 learners, Durban…"        },
-  { key: "venue",       label: "Venues",          placeholder: "e.g. Cape Town, 30 seats, projector…"                },
-  { key: "material",    label: "Materials",       placeholder: "e.g. Learner Guides, welding consumables…"           },
+      { key: "facilitator", label: "Facilitators",   placeholder: "e.g. isiXhosa Facilitator, Electrical Engineering NQF4…"   },
+  { key: "assessor",    label: "Assessors",      placeholder: "e.g. Registered MICT SETA Assessor, NQF5…"                   },
+  { key: "moderator",   label: "Moderators",     placeholder: "e.g. merSETA Moderator, Construction NQF3…"                  },
+  { key: "sdf",         label: "SDFs",           placeholder: "e.g. Skills Development Facilitator, Gauteng B-BBEE…"        },
+  { key: "sdp",         label: "SDPs",           placeholder: "e.g. merSETA accredited SDP, 20 learners, Durban…"           },
+  { key: "venue",       label: "Venues",          placeholder: "e.g. Cape Town, 30 seats, projector…"                       },
+  { key: "material",    label: "Materials",       placeholder: "e.g. Learner Guides, welding consumables…"                  },
 ] as const;
 
 type SearchMode = (typeof SEARCH_MODES)[number]["key"];
