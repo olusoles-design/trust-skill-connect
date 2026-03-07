@@ -29,6 +29,7 @@ import {
   LogOut,
   User,
   Home,
+  Wallet,
 } from "lucide-react";
 import type { Capability } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
