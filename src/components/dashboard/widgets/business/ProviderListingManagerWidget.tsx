@@ -80,10 +80,10 @@ export function ProviderListingManagerWidget() {
         status: "active",
       };
       if (editing) {
-        const { error } = await supabase.from("provider_listings" as never).update(payload).eq("id", editing);
+        const { error } = await (supabase.from("provider_listings") as ReturnType<typeof supabase.from>).update(payload as never).eq("id", editing);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("provider_listings" as never).insert(payload);
+        const { error } = await (supabase.from("provider_listings") as ReturnType<typeof supabase.from>).insert(payload as never);
         if (error) throw error;
       }
     },
