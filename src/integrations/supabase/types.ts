@@ -234,6 +234,48 @@ export type Database = {
         }
         Relationships: []
       }
+      payment_transactions: {
+        Row: {
+          amount: number
+          created_at: string
+          currency: string
+          gateway: string
+          gateway_ref: string | null
+          id: string
+          metadata: Json | null
+          status: string
+          type: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          created_at?: string
+          currency?: string
+          gateway: string
+          gateway_ref?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string
+          type: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          created_at?: string
+          currency?: string
+          gateway?: string
+          gateway_ref?: string | null
+          id?: string
+          metadata?: Json | null
+          status?: string
+          type?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           availability: string | null
@@ -656,6 +698,87 @@ export type Database = {
         Update: {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
+          user_id?: string
+        }
+        Relationships: []
+      }
+      wallets: {
+        Row: {
+          balance: number
+          created_at: string
+          currency: string
+          escrow_balance: number
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          escrow_balance?: number
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          balance?: number
+          created_at?: string
+          currency?: string
+          escrow_balance?: number
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      withdrawal_requests: {
+        Row: {
+          account_holder: string | null
+          account_number: string | null
+          amount: number
+          bank_name: string | null
+          created_at: string
+          currency: string
+          id: string
+          method: string
+          mobile_number: string | null
+          processed_at: string | null
+          rejection_reason: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          account_holder?: string | null
+          account_number?: string | null
+          amount: number
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          method: string
+          mobile_number?: string | null
+          processed_at?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          account_holder?: string | null
+          account_number?: string | null
+          amount?: number
+          bank_name?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          method?: string
+          mobile_number?: string | null
+          processed_at?: string | null
+          rejection_reason?: string | null
+          status?: string
+          updated_at?: string
           user_id?: string
         }
         Relationships: []

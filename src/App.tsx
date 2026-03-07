@@ -8,6 +8,7 @@ import { PWAInstallBanner } from "@/components/pwa/PWAInstallBanner";
 import { OfflineBanner } from "@/components/pwa/OfflinePage";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Payments from "./pages/Payments";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
@@ -23,6 +24,7 @@ const App = () => (
           <Routes>
             <Route path="/" element={<Index />} />
             <Route path="/dashboard/*" element={<Dashboard />} />
+            <Route path="/dashboard/payments" element={<Payments />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
             <Route path="*" element={<NotFound />} />
           </Routes>
