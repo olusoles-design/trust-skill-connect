@@ -52,6 +52,47 @@ export type Database = {
           },
         ]
       }
+      match_results: {
+        Row: {
+          created_at: string
+          explanation: string | null
+          factors: Json | null
+          id: string
+          opportunity_id: string
+          score: number
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          explanation?: string | null
+          factors?: Json | null
+          id?: string
+          opportunity_id: string
+          score?: number
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          explanation?: string | null
+          factors?: Json | null
+          id?: string
+          opportunity_id?: string
+          score?: number
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "match_results_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       micro_tasks: {
         Row: {
           category: string | null
@@ -110,11 +151,14 @@ export type Database = {
           category: string | null
           closing_date: string | null
           created_at: string
+          demographics_target: Json | null
           description: string | null
           duration: string | null
           featured: boolean | null
           id: string
+          languages_required: string[] | null
           location: string | null
+          nqf_level_required: string | null
           organisation: string | null
           posted_by: string
           seta: string | null
@@ -133,11 +177,14 @@ export type Database = {
           category?: string | null
           closing_date?: string | null
           created_at?: string
+          demographics_target?: Json | null
           description?: string | null
           duration?: string | null
           featured?: boolean | null
           id?: string
+          languages_required?: string[] | null
           location?: string | null
+          nqf_level_required?: string | null
           organisation?: string | null
           posted_by: string
           seta?: string | null
@@ -156,11 +203,14 @@ export type Database = {
           category?: string | null
           closing_date?: string | null
           created_at?: string
+          demographics_target?: Json | null
           description?: string | null
           duration?: string | null
           featured?: boolean | null
           id?: string
+          languages_required?: string[] | null
           location?: string | null
+          nqf_level_required?: string | null
           organisation?: string | null
           posted_by?: string
           seta?: string | null
@@ -177,17 +227,21 @@ export type Database = {
       }
       profiles: {
         Row: {
+          availability: string | null
           avatar_url: string | null
           bio: string | null
           company_name: string | null
           created_at: string
+          demographics: Json | null
           first_name: string | null
           id: string
           id_number: string | null
           job_title: string | null
+          languages: string[] | null
           last_name: string | null
           linkedin_url: string | null
           location: string | null
+          nqf_level: string | null
           phone: string | null
           skills: string[] | null
           updated_at: string
@@ -196,17 +250,21 @@ export type Database = {
           website_url: string | null
         }
         Insert: {
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
           company_name?: string | null
           created_at?: string
+          demographics?: Json | null
           first_name?: string | null
           id?: string
           id_number?: string | null
           job_title?: string | null
+          languages?: string[] | null
           last_name?: string | null
           linkedin_url?: string | null
           location?: string | null
+          nqf_level?: string | null
           phone?: string | null
           skills?: string[] | null
           updated_at?: string
@@ -215,23 +273,230 @@ export type Database = {
           website_url?: string | null
         }
         Update: {
+          availability?: string | null
           avatar_url?: string | null
           bio?: string | null
           company_name?: string | null
           created_at?: string
+          demographics?: Json | null
           first_name?: string | null
           id?: string
           id_number?: string | null
           job_title?: string | null
+          languages?: string[] | null
           last_name?: string | null
           linkedin_url?: string | null
           location?: string | null
+          nqf_level?: string | null
           phone?: string | null
           skills?: string[] | null
           updated_at?: string
           user_id?: string
           username?: string | null
           website_url?: string | null
+        }
+        Relationships: []
+      }
+      provider_listings: {
+        Row: {
+          category: string
+          certifications: string[] | null
+          created_at: string
+          currency: string
+          description: string | null
+          id: string
+          location: string | null
+          portfolio_urls: string[] | null
+          price_from: number | null
+          price_to: number | null
+          pricing_model: string
+          rating_avg: number
+          review_count: number
+          services: string[] | null
+          status: string
+          title: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          category: string
+          certifications?: string[] | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          portfolio_urls?: string[] | null
+          price_from?: number | null
+          price_to?: number | null
+          pricing_model?: string
+          rating_avg?: number
+          review_count?: number
+          services?: string[] | null
+          status?: string
+          title: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          category?: string
+          certifications?: string[] | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          id?: string
+          location?: string | null
+          portfolio_urls?: string[] | null
+          price_from?: number | null
+          price_to?: number | null
+          pricing_model?: string
+          rating_avg?: number
+          review_count?: number
+          services?: string[] | null
+          status?: string
+          title?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      provider_reviews: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          listing_id: string
+          rating: number
+          reviewer_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          listing_id: string
+          rating: number
+          reviewer_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          listing_id?: string
+          rating?: number
+          reviewer_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "provider_reviews_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "provider_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfq_responses: {
+        Row: {
+          created_at: string
+          currency: string
+          id: string
+          listing_id: string | null
+          proposal: string | null
+          provider_id: string
+          quote_amount: number | null
+          rfq_id: string
+          status: string
+          timeline: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string | null
+          proposal?: string | null
+          provider_id: string
+          quote_amount?: number | null
+          rfq_id: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          currency?: string
+          id?: string
+          listing_id?: string | null
+          proposal?: string | null
+          provider_id?: string
+          quote_amount?: number | null
+          rfq_id?: string
+          status?: string
+          timeline?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "rfq_responses_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "provider_listings"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "rfq_responses_rfq_id_fkey"
+            columns: ["rfq_id"]
+            isOneToOne: false
+            referencedRelation: "rfqs"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      rfqs: {
+        Row: {
+          budget_from: number | null
+          budget_to: number | null
+          buyer_id: string
+          category: string | null
+          created_at: string
+          currency: string
+          deadline: string | null
+          description: string | null
+          id: string
+          requirements: Json | null
+          status: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          budget_from?: number | null
+          budget_to?: number | null
+          buyer_id: string
+          category?: string | null
+          created_at?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          requirements?: Json | null
+          status?: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          budget_from?: number | null
+          budget_to?: number | null
+          buyer_id?: string
+          category?: string | null
+          created_at?: string
+          currency?: string
+          deadline?: string | null
+          description?: string | null
+          id?: string
+          requirements?: Json | null
+          status?: string
+          title?: string
+          updated_at?: string
         }
         Relationships: []
       }
