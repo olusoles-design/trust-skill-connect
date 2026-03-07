@@ -326,6 +326,25 @@ export function ProfileCVWidget() {
                 <p className="text-sm text-muted-foreground leading-relaxed">{form.bio}</p>
               </div>
             )}
+            {/* Practitioner roles on CV */}
+            {isPractitioner && practitionerTypes.length > 0 && (
+              <div className="space-y-1.5">
+                <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
+                  <GraduationCap className="w-3.5 h-3.5 text-primary" /> Practitioner Roles
+                </h3>
+                <div className="flex flex-wrap gap-1.5">
+                  {practitionerTypes.map(key => {
+                    const pt = PRACTITIONER_TYPES.find(p => p.key === key)!;
+                    const Icon = pt.icon;
+                    return (
+                      <span key={key} className="flex items-center gap-1 px-2.5 py-1 rounded-full bg-primary/10 text-primary text-xs font-semibold">
+                        <Icon className="w-3 h-3" />{pt.label}
+                      </span>
+                    );
+                  })}
+                </div>
+              </div>
+            )}
             {(form.skills ?? []).length > 0 && (
               <div className="space-y-1.5">
                 <h3 className="text-xs font-bold text-foreground uppercase tracking-wider flex items-center gap-1.5">
