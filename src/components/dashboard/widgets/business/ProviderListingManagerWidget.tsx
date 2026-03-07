@@ -54,12 +54,12 @@ export function ProviderListingManagerWidget() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("provider_listings" as never)
+        .from("provider_listings")
         .select("id, title, category, description, pricing_model, price_from, price_to, currency, location, certifications, services, rating_avg, review_count, status")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Listing[];
+      return (data ?? []) as unknown as Listing[];
     },
   });
 

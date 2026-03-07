@@ -198,7 +198,7 @@ export function MatchedOpportunitiesWidget() {
       return (data ?? []).map((r: Record<string, unknown>) => {
         const opp = r.opportunities as Record<string, unknown>;
         return {
-          ...(opp as MatchedOpp),
+          ...(opp as unknown as MatchedOpp),
           match_score: r.score as number,
           match_factors: (r.factors as Record<string, number>) ?? {},
           match_explanation: (r.explanation as string) ?? "Based on your profile",
