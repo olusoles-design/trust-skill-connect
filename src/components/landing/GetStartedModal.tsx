@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback } from "react";
+import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Loader2, Upload, CheckCircle2, Plus, Trash2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ROLE_PERSONA } from "@/lib/permissions";
@@ -121,6 +121,24 @@ const PERSONA_GROUPS: {
     description: "Regulatory, compliance and platform administration",
     roles: [
       {
+        id: "seta",
+        emoji: "🏛️",
+        title: "SETA Official",
+        description: "Accreditation, verification & sector reporting",
+        borderClass: "border-destructive/30 hover:border-destructive",
+        bgClass: "hover:bg-destructive/5",
+        badgeClass: "bg-destructive/10 text-destructive",
+      },
+      {
+        id: "government",
+        emoji: "🏗️",
+        title: "Government",
+        description: "Tender oversight, skills reporting & policy",
+        borderClass: "border-destructive/30 hover:border-destructive",
+        bgClass: "hover:bg-destructive/5",
+        badgeClass: "bg-destructive/10 text-destructive",
+      },
+      {
         id: "admin",
         emoji: "🛡️",
         title: "Platform Admin",
@@ -140,6 +158,51 @@ const PRACTITIONER_ROLES = [
   { id: "sdf",         label: "Skills Development Facilitator", sub: "Strategic L&D advisor" },
   { id: "mentor",      label: "Mentor",                        sub: "Coaching & workplace guidance" },
 ];
+
+// ─── Document upload definitions ──────────────────────────────────────────────
+
+interface DocRequirement {
+  id: string;
+  label: string;
+  description: string;
+  required: boolean;
+}
+
+const ROLE_DOCUMENTS: Partial<Record<AppRole, DocRequirement[]>> = {
+  learner: [
+    { id: "id_document",   label: "South African ID / Passport",   description: "Clear copy, not expired", required: true },
+    { id: "matric",        label: "Matric Certificate",            description: "Grade 12 or equivalent",   required: false },
+    { id: "qualification", label: "Highest Qualification",         description: "If applicable",            required: false },
+  ],
+  practitioner: [
+    { id: "id_document",       label: "South African ID / Passport",    description: "Clear copy, not expired", required: true },
+    { id: "etdp_registration", label: "ETDP Registration Certificate",  description: "Assessor / Facilitator / Moderator", required: true },
+    { id: "qualification",     label: "Relevant Qualification",         description: "NQF level 5+",           required: false },
+  ],
+  provider: [
+    { id: "accreditation_cert", label: "SETA Accreditation Certificate", description: "Valid accreditation letter",    required: true },
+    { id: "company_reg",        label: "Company Registration (CIPC)",    description: "COR14.3 or similar",           required: true },
+    { id: "bbbee_cert",         label: "B-BBEE Certificate",             description: "Current level certificate",    required: false },
+  ],
+  employer: [
+    { id: "company_reg",  label: "Company Registration (CIPC)",  description: "COR14.3 or similar",        required: true },
+    { id: "bbbee_cert",   label: "B-BBEE Certificate",           description: "Current level certificate",  required: false },
+    { id: "levy_proof",   label: "SDL Levy Proof",               description: "SARS skills levy registration", required: false },
+  ],
+  sponsor: [
+    { id: "company_reg",  label: "Company Registration (CIPC)",  description: "COR14.3 or similar",        required: true },
+    { id: "bbbee_cert",   label: "B-BBEE Certificate",           description: "Current level certificate",  required: true },
+    { id: "mandate_letter", label: "Mandate / Board Resolution", description: "Authorising skills funding", required: false },
+  ],
+  seta: [
+    { id: "appointment_letter", label: "SETA Appointment Letter", description: "Official DHET / SETA letter",   required: true },
+    { id: "id_document",        label: "South African ID",         description: "Clear copy, not expired",      required: true },
+  ],
+  government: [
+    { id: "appointment_letter", label: "Government Appointment Letter", description: "Departmental authorisation", required: true },
+    { id: "id_document",        label: "South African ID",              description: "Clear copy, not expired",   required: true },
+  ],
+};
 
 // Role-specific extra fields shown in Step 2
 const ROLE_EXTRA_FIELDS: Partial<Record<AppRole, React.FC<{ form: FormState; onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void }>>> = {
@@ -205,6 +268,22 @@ const ROLE_EXTRA_FIELDS: Partial<Record<AppRole, React.FC<{ form: FormState; onC
       </select>
     </FieldRow>
   ),
+  seta: ({ form, onChange }) => (
+    <FieldRow label="SETA Name">
+      <select name="companyName" value={form.companyName} onChange={onChange} className={INPUT_CLS}>
+        <option value="" className="bg-navy">Select your SETA</option>
+        {["AGRISETA","BANKSETA","CHIETA","CTFL","CETA","ETDP SETA","FASSET","FOODBEV","HWSETA","INSETA","LGSETA","MERSETA","MICT SETA","MQA","POSHEITA","PSETA","SASSETA","SERVICES SETA","TETA","W&RSETA"].map(s => (
+          <option key={s} value={s} className="bg-navy">{s}</option>
+        ))}
+      </select>
+    </FieldRow>
+  ),
+  government: ({ form, onChange }) => (
+    <FieldRow label="Department / Entity">
+      <input name="companyName" value={form.companyName} onChange={onChange}
+        className={INPUT_CLS} placeholder="e.g. DHET, DPSA, COGTA" />
+    </FieldRow>
+  ),
 };
 
 // ─── Shared style constants ─────────────────────────────────────────────────
@@ -218,6 +297,100 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
     <div>
       <label className="text-xs font-medium text-white/60 block mb-1">{label}</label>
       {children}
+    </div>
+  );
+}
+
+function SummaryRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className="flex items-center justify-between">
+      <span className="text-xs text-white/40">{label}</span>
+      <span className={`text-xs font-semibold ${highlight ? "text-teal" : "text-white"}`}>{value}</span>
+    </div>
+  );
+}
+
+// ─── Document Upload Component ───────────────────────────────────────────────
+
+interface UploadedFile {
+  docId: string;
+  file: File;
+  preview?: string;
+}
+
+function DocumentUploader({
+  docs,
+  uploads,
+  onAdd,
+  onRemove,
+}: {
+  docs: DocRequirement[];
+  uploads: UploadedFile[];
+  onAdd: (docId: string, file: File) => void;
+  onRemove: (docId: string) => void;
+}) {
+  const inputRefs = useRef<Record<string, HTMLInputElement | null>>({});
+
+  return (
+    <div className="space-y-3">
+      {docs.map((doc) => {
+        const uploaded = uploads.find((u) => u.docId === doc.id);
+        return (
+          <div key={doc.id} className={`rounded-xl border p-4 flex items-start gap-3 transition-all ${
+            uploaded ? "border-teal/40 bg-teal/5" : "border-white/10 bg-white/3"
+          }`}>
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-semibold text-white">{doc.label}</span>
+                {doc.required && (
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded bg-destructive/20 text-destructive">Required</span>
+                )}
+                {uploaded && (
+                  <CheckCircle2 className="w-4 h-4 text-teal ml-auto flex-shrink-0" />
+                )}
+              </div>
+              <p className="text-xs text-white/40 mt-0.5">{doc.description}</p>
+              {uploaded && (
+                <p className="text-xs text-teal/70 mt-1 truncate">{uploaded.file.name}</p>
+              )}
+            </div>
+
+            <div className="flex gap-2 flex-shrink-0">
+              {uploaded ? (
+                <button
+                  onClick={() => onRemove(doc.id)}
+                  className="w-8 h-8 flex items-center justify-center rounded-lg bg-destructive/10 hover:bg-destructive/20 text-destructive/70 hover:text-destructive transition-all"
+                >
+                  <Trash2 className="w-3.5 h-3.5" />
+                </button>
+              ) : (
+                <button
+                  onClick={() => inputRefs.current[doc.id]?.click()}
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-white/10 hover:bg-white/15 text-white/70 hover:text-white text-xs font-medium transition-all"
+                >
+                  <Upload className="w-3 h-3" />
+                  Upload
+                </button>
+              )}
+              <input
+                ref={(el) => { inputRefs.current[doc.id] = el; }}
+                type="file"
+                accept=".pdf,.jpg,.jpeg,.png"
+                className="hidden"
+                onChange={(e) => {
+                  const file = e.target.files?.[0];
+                  if (file) onAdd(doc.id, file);
+                  e.target.value = "";
+                }}
+              />
+            </div>
+          </div>
+        );
+      })}
+
+      <p className="text-xs text-white/30 text-center pt-1">
+        Accepted formats: PDF, JPG, PNG · Max 10MB per file · Documents reviewed within 24h
+      </p>
     </div>
   );
 }
@@ -251,19 +424,43 @@ interface Props {
   initialRole?: Role;
 }
 
-// ─── Component ───────────────────────────────────────────────────────────────
+// ─── Persona helpers ─────────────────────────────────────────────────────────
+
+const PERSONA_LABELS: Record<string, string> = {
+  talent:    "Talent",
+  business:  "Business",
+  funding:   "Funding",
+  oversight: "Oversight",
+};
+
+const PERSONA_COLORS: Record<string, string> = {
+  talent:    "text-primary border-primary/30 bg-primary/10",
+  business:  "text-accent-foreground border-accent/30 bg-accent/10",
+  funding:   "text-gold border-gold/30 bg-gold/10",
+  oversight: "text-destructive border-destructive/30 bg-destructive/10",
+};
+
+// ─── Total steps (5) ─────────────────────────────────────────────────────────
+// 1 → Role selection
+// 2 → Profile form (+ practitioner sub-role picker)
+// 3 → Document upload
+// 4 → Plan selection
+// 5 → Confirmation
 
 export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
   const { toast } = useToast();
 
-  const [step, setStep]                       = useState(1);
-  const [selectedRole, setSelectedRole]       = useState<Role>(initialRole);
+  const [step, setStep]                         = useState(1);
+  const [selectedRole, setSelectedRole]         = useState<Role>(initialRole);
+  const [additionalRoles, setAdditionalRoles]   = useState<AppRole[]>([]);
   const [practitionerRole, setPractitionerRole] = useState<PractitionerRole>(null);
-  const [selectedPlan, setSelectedPlan]       = useState<PlanName>(null);
+  const [selectedPlan, setSelectedPlan]         = useState<PlanName>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showLogin, setShowLogin]             = useState(false);
-  const [submitting, setSubmitting]           = useState(false);
-  const [form, setForm]                       = useState<FormState>(EMPTY_FORM);
+  const [showLogin, setShowLogin]               = useState(false);
+  const [submitting, setSubmitting]             = useState(false);
+  const [form, setForm]                         = useState<FormState>(EMPTY_FORM);
+  const [uploads, setUploads]                   = useState<UploadedFile[]>([]);
+  const [userId, setUserId]                     = useState<string | null>(null);
 
   // Sync initial role when modal opens
   useEffect(() => {
@@ -288,8 +485,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
 
   const resetModal = useCallback(() => {
     setStep(1); setSelectedRole(null); setPractitionerRole(null);
-    setSelectedPlan(null); setShowConfirmation(false);
-    setShowLogin(false); setForm(EMPTY_FORM);
+    setAdditionalRoles([]); setSelectedPlan(null);
+    setShowConfirmation(false); setShowLogin(false);
+    setForm(EMPTY_FORM); setUploads([]); setUserId(null);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -302,10 +500,19 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const handleBack = () => {
     if (step === 2) { setStep(1); setSelectedRole(null); setPractitionerRole(null); }
     else if (step === 3) setStep(2);
+    else if (step === 4) setStep(3);
   };
 
   const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+
+  // Toggle an additional role
+  const toggleAdditionalRole = (role: AppRole) => {
+    if (role === selectedRole) return;
+    setAdditionalRoles(prev =>
+      prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]
+    );
+  };
 
   // ── Sign Up ──────────────────────────────────────────────────────────────
   const handleSignUp = async () => {
@@ -322,19 +529,26 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       });
       if (error) throw error;
 
-      const userId = data.user?.id;
-      if (userId) {
+      const uid = data.user?.id;
+      if (uid) {
+        setUserId(uid);
         await supabase.from("profiles").upsert({
-          user_id: userId,
+          user_id: uid,
           first_name: form.firstName || null,
           last_name:  form.lastName  || null,
           username:   form.username  || null,
           phone:      form.phone     || null,
         });
+        // Insert primary role
         if (selectedRole) {
-          await supabase.from("user_roles").upsert({ user_id: userId, role: selectedRole });
+          await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole });
+        }
+        // Insert additional roles
+        for (const role of additionalRoles) {
+          await supabase.from("user_roles").upsert({ user_id: uid, role });
         }
       }
+      // Move to document upload step
       setStep(3);
     } catch (err: unknown) {
       toast({ title: "Sign-up failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
@@ -363,12 +577,29 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     }
   };
 
+  // ── Document file handlers ────────────────────────────────────────────────
+  const handleAddFile = (docId: string, file: File) => {
+    setUploads(prev => {
+      const filtered = prev.filter(u => u.docId !== docId);
+      return [...filtered, { docId, file }];
+    });
+  };
+
+  const handleRemoveFile = (docId: string) => {
+    setUploads(prev => prev.filter(u => u.docId !== docId));
+  };
+
   // ── Derived ──────────────────────────────────────────────────────────────
-  const allRoles    = PERSONA_GROUPS.flatMap((g) => g.roles);
-  const roleData    = allRoles.find((r) => r.id === selectedRole);
-  const persona     = selectedRole ? ROLE_PERSONA[selectedRole] : null;
-  const stepLabel   = showLogin ? "Sign In" : `Step ${step} of 3`;
-  const ExtraFields = selectedRole ? ROLE_EXTRA_FIELDS[selectedRole] : null;
+  const allRoles       = PERSONA_GROUPS.flatMap((g) => g.roles);
+  const roleData       = allRoles.find((r) => r.id === selectedRole);
+  const persona        = selectedRole ? ROLE_PERSONA[selectedRole] : null;
+  const totalSteps     = 5;
+  const stepLabel      = showLogin ? "Sign In" : `Step ${step} of ${totalSteps - 1}`;
+  const ExtraFields    = selectedRole ? ROLE_EXTRA_FIELDS[selectedRole] : null;
+  const requiredDocs   = selectedRole ? ROLE_DOCUMENTS[selectedRole] ?? [] : [];
+  const uploadedCount  = uploads.length;
+  const requiredCount  = requiredDocs.filter(d => d.required).length;
+  const canSkipDocs    = requiredDocs.length === 0;
 
   // Show practitioner sub-role picker before the form
   const showPractitionerPicker =
@@ -376,20 +607,6 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
 
   const showRegistrationForm =
     !showLogin && step === 2 && (selectedRole !== "practitioner" || !!practitionerRole);
-
-  const PERSONA_LABELS: Record<string, string> = {
-    talent:    "Talent",
-    business:  "Business",
-    funding:   "Funding",
-    oversight: "Oversight",
-  };
-
-  const PERSONA_COLORS: Record<string, string> = {
-    talent:    "text-primary border-primary/30 bg-primary/10",
-    business:  "text-accent-foreground border-accent/30 bg-accent/10",
-    funding:   "text-gold border-gold/30 bg-gold/10",
-    oversight: "text-destructive border-destructive/30 bg-destructive/10",
-  };
 
   return (
     <AnimatePresence>
@@ -435,10 +652,15 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   {showLogin ? "Welcome back" :
                     step === 1 ? "Choose your path" :
                     showPractitionerPicker ? "Select your practitioner role" :
+                    step === 3 ? "Prepare your documents" :
+                    step === 4 ? "Choose your plan" :
                     `Set up your ${roleData?.title ?? ""} profile`}
                 </h2>
                 {!showLogin && step === 1 && (
                   <p className="text-white/50 text-sm mt-2">Select the role that best describes how you'll use SkillsMark</p>
+                )}
+                {!showLogin && step === 3 && (
+                  <p className="text-white/50 text-sm mt-2">Upload your documents now or skip — you can complete verification later</p>
                 )}
               </div>
 
@@ -458,7 +680,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                       </div>
 
                       {/* Role cards */}
-                      <div className={`grid gap-3 ${group.roles.length === 1 ? "grid-cols-1 sm:grid-cols-2" : group.roles.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"}`}>
+                      <div className={`grid gap-3 ${group.roles.length === 1 ? "grid-cols-1 sm:grid-cols-3" : group.roles.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"}`}>
                         {group.roles.map((role) => (
                           <button
                             key={role.id}
@@ -502,23 +724,55 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ─────────────────────────────────────────────────────────── */}
               {showRegistrationForm && (
                 <div className="space-y-4 max-w-lg mx-auto">
-                  {/* Progress */}
-                  <div className="flex gap-2 mb-6">
-                    {[1, 2, 3].map((s) => (
+                  {/* Progress bar */}
+                  <div className="flex gap-1.5 mb-6">
+                    {[1, 2, 3, 4].map((s) => (
                       <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-teal" : "bg-white/10"}`} />
                     ))}
                   </div>
 
-                  {/* Role badge reminder */}
+                  {/* Role badge + multi-role toggle */}
                   {roleData && (
-                    <div className="flex items-center gap-2 mb-2">
-                      <span className="text-xl">{roleData.emoji}</span>
-                      <span className="text-sm font-semibold text-white">{roleData.title}</span>
-                      {persona && (
-                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ml-auto ${PERSONA_COLORS[persona]}`}>
-                          {PERSONA_LABELS[persona]} Hub
-                        </span>
-                      )}
+                    <div className="space-y-3 mb-2">
+                      <div className="flex items-center gap-2">
+                        <span className="text-xl">{roleData.emoji}</span>
+                        <span className="text-sm font-semibold text-white">{roleData.title}</span>
+                        {persona && (
+                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ml-auto ${PERSONA_COLORS[persona]}`}>
+                            {PERSONA_LABELS[persona]} Hub
+                          </span>
+                        )}
+                      </div>
+
+                      {/* Multi-role addition */}
+                      <div className="p-3 rounded-xl border border-white/10 bg-white/3">
+                        <div className="flex items-center gap-2 mb-2">
+                          <Plus className="w-3 h-3 text-white/40" />
+                          <span className="text-xs font-medium text-white/50">Add additional roles (optional)</span>
+                        </div>
+                        <div className="flex flex-wrap gap-2">
+                          {allRoles
+                            .filter(r => r.id !== selectedRole)
+                            .map(r => {
+                              const isAdded = additionalRoles.includes(r.id);
+                              return (
+                                <button
+                                  key={r.id}
+                                  onClick={() => toggleAdditionalRole(r.id)}
+                                  className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                                    isAdded
+                                      ? "border-teal/50 bg-teal/15 text-teal"
+                                      : "border-white/10 bg-white/5 text-white/40 hover:text-white/60 hover:border-white/20"
+                                  }`}
+                                >
+                                  <span>{r.emoji}</span>
+                                  {r.title}
+                                  {isAdded && <CheckCircle2 className="w-3 h-3" />}
+                                </button>
+                              );
+                            })}
+                        </div>
+                      </div>
                     </div>
                   )}
 
@@ -561,7 +815,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <span className="text-teal text-sm mt-0.5">✦</span>
                     <p className="text-xs text-white/60">
                       SkillsMark is a <span className="text-teal font-semibold">subscription-based platform</span>.
-                      Your free trial includes full access for 30 days. Choose a plan in Step 3.
+                      Your free trial includes full access for 30 days. Choose a plan in the next step.
                     </p>
                   </div>
 
@@ -572,18 +826,75 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   >
                     {submitting
                       ? <Loader2 className="w-4 h-4 animate-spin" />
-                      : <>Continue to Step 3 <ArrowRight className="w-4 h-4" /></>}
+                      : <>Continue <ArrowRight className="w-4 h-4" /></>}
                   </button>
                 </div>
               )}
 
               {/* ─────────────────────────────────────────────────────────── */}
-              {/* STEP 3 — Plan selection                                    */}
+              {/* STEP 3 — Document upload                                   */}
               {/* ─────────────────────────────────────────────────────────── */}
-              {!showLogin && step === 3 && !showConfirmation && (
+              {!showLogin && step === 3 && (
+                <div className="max-w-lg mx-auto space-y-5">
+                  {/* Progress bar */}
+                  <div className="flex gap-1.5 mb-2">
+                    {[1, 2, 3, 4].map((s) => (
+                      <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-teal" : "bg-white/10"}`} />
+                    ))}
+                  </div>
+
+                  {requiredDocs.length > 0 ? (
+                    <>
+                      <DocumentUploader
+                        docs={requiredDocs}
+                        uploads={uploads}
+                        onAdd={handleAddFile}
+                        onRemove={handleRemoveFile}
+                      />
+
+                      {/* Upload summary */}
+                      {uploadedCount > 0 && (
+                        <div className="flex items-center gap-2 p-3 rounded-lg bg-teal/10 border border-teal/20">
+                          <CheckCircle2 className="w-4 h-4 text-teal flex-shrink-0" />
+                          <span className="text-xs text-white/70">
+                            {uploadedCount} document{uploadedCount !== 1 ? "s" : ""} ready to submit
+                            {requiredCount > 0 && uploadedCount < requiredCount && ` (${requiredCount - uploadedCount} required remaining)`}
+                          </span>
+                        </div>
+                      )}
+                    </>
+                  ) : (
+                    <div className="text-center py-8">
+                      <CheckCircle2 className="w-12 h-12 text-teal/40 mx-auto mb-3" />
+                      <p className="text-white/60 text-sm">No documents required for your role right now.</p>
+                      <p className="text-white/30 text-xs mt-1">You can upload supporting materials from your profile later.</p>
+                    </div>
+                  )}
+
+                  <div className="flex gap-3">
+                    <button
+                      onClick={() => setStep(4)}
+                      className="flex-1 py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/20 text-sm font-medium transition-all"
+                    >
+                      Skip for now
+                    </button>
+                    <button
+                      onClick={() => setStep(4)}
+                      className="flex-1 py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2"
+                    >
+                      Continue <ArrowRight className="w-4 h-4" />
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* STEP 4 — Plan selection                                    */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {!showLogin && step === 4 && !showConfirmation && (
                 <div className="max-w-2xl mx-auto">
-                  <div className="flex gap-2 mb-8">
-                    {[1, 2, 3].map((s) => (
+                  <div className="flex gap-1.5 mb-8">
+                    {[1, 2, 3, 4].map((s) => (
                       <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-teal" : "bg-white/10"}`} />
                     ))}
                   </div>
@@ -659,9 +970,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               )}
 
               {/* ─────────────────────────────────────────────────────────── */}
-              {/* STEP 3 — Confirmation                                      */}
+              {/* STEP 5 — Confirmation                                      */}
               {/* ─────────────────────────────────────────────────────────── */}
-              {!showLogin && step === 3 && showConfirmation && (
+              {!showLogin && step === 4 && showConfirmation && (
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -685,7 +996,13 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
 
                   {/* Summary */}
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 text-left space-y-2">
-                    <SummaryRow label="Role"    value={roleData?.title ?? String(selectedRole)} />
+                    <SummaryRow label="Primary Role"  value={roleData?.title ?? String(selectedRole)} />
+                    {additionalRoles.length > 0 && (
+                      <SummaryRow
+                        label="Additional Roles"
+                        value={additionalRoles.map(r => allRoles.find(x => x.id === r)?.title ?? r).join(", ")}
+                      />
+                    )}
                     {persona && (
                       <SummaryRow label="Hub" value={`${PERSONA_LABELS[persona]} Hub`} />
                     )}
@@ -694,6 +1011,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                       selectedPlan === "Starter" ? "Free for 30 days" :
                       selectedPlan === "Professional" ? "R499 / month" : "Custom"
                     } />
+                    {uploadedCount > 0 && (
+                      <SummaryRow label="Documents" value={`${uploadedCount} uploaded`} highlight />
+                    )}
                     {selectedPlan === "Professional" && (
                       <SummaryRow label="First charge" value="After 30-day trial" highlight />
                     )}
@@ -735,54 +1055,49 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   <button
                     onClick={handleSignIn}
                     disabled={submitting}
-                    className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+                    className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
                   >
-                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In"}
+                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Sign In →"}
+                  </button>
+                  <button
+                    onClick={() => setShowLogin(false)}
+                    className="w-full text-xs text-white/40 hover:text-white/70 transition-colors"
+                  >
+                    Don't have an account? Get Started
                   </button>
                 </div>
               )}
 
-              {/* ── Footer ─────────────────────────────────────────────── */}
-              <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-                {(step > 1 || showPractitionerPicker) && !showLogin ? (
-                  <button onClick={handleBack} className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors">
-                    <ArrowLeft className="w-4 h-4" /> Back
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* Footer nav                                                 */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              <div className="flex items-center justify-between mt-8 pt-6 border-t border-white/10">
+                {/* Back button */}
+                {!showLogin && step > 1 && !showConfirmation ? (
+                  <button
+                    onClick={handleBack}
+                    className="flex items-center gap-1.5 text-xs text-white/40 hover:text-white/70 transition-colors"
+                  >
+                    <ArrowLeft className="w-3.5 h-3.5" /> Back
                   </button>
-                ) : <div />}
+                ) : (
+                  <div />
+                )}
 
-                <p className="text-sm text-white/50">
-                  {showLogin ? (
-                    <>Don't have an account?{" "}
-                      <button className="text-teal font-semibold hover:underline"
-                        onClick={() => { setShowLogin(false); setStep(1); }}>
-                        Get Started Free
-                      </button>
-                    </>
-                  ) : (
-                    <>Already have an account?{" "}
-                      <button className="text-teal font-semibold hover:underline"
-                        onClick={() => setShowLogin(true)}>
-                        Sign In
-                      </button>
-                    </>
-                  )}
-                </p>
+                {/* Toggle sign-in / register */}
+                {!showConfirmation && (
+                  <button
+                    onClick={() => setShowLogin((v) => !v)}
+                    className="text-xs text-white/40 hover:text-teal transition-colors"
+                  >
+                    {showLogin ? "New here? Get Started" : "Already have an account? Sign In"}
+                  </button>
+                )}
               </div>
             </div>
           </motion.div>
         </div>
       )}
     </AnimatePresence>
-  );
-}
-
-// ─── Mini helpers ────────────────────────────────────────────────────────────
-
-function SummaryRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
-  return (
-    <div className="flex justify-between text-sm">
-      <span className="text-white/50">{label}</span>
-      <span className={highlight ? "text-teal font-medium" : "text-white font-medium"}>{value}</span>
-    </div>
   );
 }
