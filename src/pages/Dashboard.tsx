@@ -18,6 +18,7 @@ import { VerificationQueueWidget }    from "@/components/dashboard/widgets/overs
 import { ReportsAnalyticsWidget }     from "@/components/dashboard/widgets/oversight/ReportsAnalyticsWidget";
 import { MarketplaceListingWidget }   from "@/components/dashboard/widgets/business/MarketplaceListingWidget";
 import { TenderMatchingWidget }       from "@/components/dashboard/widgets/business/TenderMatchingWidget";
+import { PlatformAdminWidget }        from "@/components/dashboard/widgets/oversight/PlatformAdminWidget";
 import { DocumentVaultWidget }        from "@/components/dashboard/widgets/talent/DocumentVaultWidget";
 
 // ── Page wrapper (back button + title bar) ────────────────────────────────────
