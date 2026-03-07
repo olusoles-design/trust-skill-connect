@@ -20,6 +20,7 @@ import { MyApplicationsWidget }        from "./talent/MyApplicationsWidget";
 import { LearningProgressWidget }      from "./talent/LearningProgressWidget";
 import { CredentialWalletWidget }      from "./talent/CredentialWalletWidget";
 import { MicroTaskBoardWidget }        from "./talent/MicroTaskBoardWidget";
+import { MyTasksWidget }               from "./talent/MyTasksWidget";
 import { ProfileCVWidget }             from "./talent/ProfileCVWidget";
 
 // ─── Business
@@ -29,6 +30,7 @@ import { BEEEDashboardWidget }         from "./business/BEEEDashboardWidget";
 import { ProcurementDashboardWidget }  from "./business/ProcurementDashboardWidget";
 import { MarketplaceListingWidget }    from "./business/MarketplaceListingWidget";
 import { TenderMatchingWidget }        from "./business/TenderMatchingWidget";
+import { TaskPosterWidget }            from "./business/TaskPosterWidget";
 
 // ─── Funding
 import { FundingAllocationWidget }     from "./funding/FundingAllocationWidget";
@@ -123,8 +125,28 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     color:       "bg-primary/10",
     accentColor: "text-primary",
   },
+  my_tasks: {
+    component:   MyTasksWidget,
+    layout:      "half",
+    persona:     "talent",
+    title:       "My Tasks & Earnings",
+    description: "Track completed tasks, earnings history, and quality ratings.",
+    icon:        "Wallet",
+    color:       "bg-primary/10",
+    accentColor: "text-primary",
+  },
 
   // ── Business ───────────────────────────────────────────────────────────────
+  post_tasks: {
+    component:   TaskPosterWidget,
+    layout:      "half",
+    persona:     "business",
+    title:       "Task Poster",
+    description: "Post micro-tasks, review worker submissions, and manage payouts.",
+    icon:        "ListTodo",
+    color:       "bg-accent/20",
+    accentColor: "text-accent-foreground",
+  },
   post_opportunities: {
     component:   OpportunityManagerWidget,
     layout:      "full",

@@ -13,7 +13,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type AppRole = Database["public"]["Enums"]["app_role"];
 export type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
 
-// ─── 20 Core Capabilities ──────────────────────────────────────────────────
+// ─── 22 Core Capabilities ──────────────────────────────────────────────────
 
 export type Capability =
   // Talent
@@ -23,8 +23,10 @@ export type Capability =
   | "track_progress"           // View learning progress & milestones
   | "view_credentials"         // Digital badge & credential wallet
   | "view_tasks"               // Micro-task board for immediate income
+  | "my_tasks"                 // My tasks history & earnings
   // Business
   | "post_opportunities"       // Post jobs, programmes, gigs
+  | "post_tasks"               // Post micro-tasks & review submissions
   | "manage_learners"          // Intake, tracking, reporting on learners
   | "manage_procurement"       // RFQ management for support providers
   | "view_reports_bbee"        // Real-time B-BBEE scorecard dashboard
@@ -69,6 +71,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "track_progress",
     "view_credentials",
     "view_tasks",
+    "my_tasks",
   ],
   practitioner: [
     "find_opportunities",
@@ -77,16 +80,19 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "track_progress",
     "view_credentials",
     "view_tasks",
+    "my_tasks",
     "marketplace_listing",
   ],
   employer: [
     "post_opportunities",
+    "post_tasks",
     "manage_learners",
     "view_reports",
     "view_reports_bbee",
   ],
   provider: [
     "post_opportunities",
+    "post_tasks",
     "manage_learners",
     "view_reports",
     "view_reports_bbee",
@@ -137,7 +143,9 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "track_progress",
     "view_credentials",
     "view_tasks",
+    "my_tasks",
     "post_opportunities",
+    "post_tasks",
     "manage_learners",
     "manage_procurement",
     "view_reports_bbee",
@@ -169,8 +177,10 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   track_progress:          { minPlan: "starter" },
   view_credentials:        { minPlan: "starter" },
   view_tasks:              { minPlan: "starter", limit: 5 },
+  my_tasks:                { minPlan: "starter" },
   // Business
   post_opportunities:      { minPlan: "starter", limit: 1 },
+  post_tasks:              { minPlan: "starter", limit: 3 },
   manage_learners:         { minPlan: "professional" },
   manage_procurement:      { minPlan: "professional" },
   view_reports_bbee:       { minPlan: "professional" },
@@ -213,10 +223,12 @@ export const FEATURE_CAPABILITY: Record<string, Capability> = {
   "learner:digital_cv":                 "build_profile",
   "learner:priority_application":       "apply_for_opportunities",
   "learner:micro_tasks":                "view_tasks",
+  "learner:my_tasks":                   "my_tasks",
   "learner:credentials":                "view_credentials",
   "learner:progress":                   "track_progress",
   // Employer
   "employer:post_jobs":                 "post_opportunities",
+  "employer:post_tasks":                "post_tasks",
   "employer:manage_candidates":         "manage_learners",
   "employer:reports":                   "view_reports",
   "employer:bbee":                      "view_reports_bbee",

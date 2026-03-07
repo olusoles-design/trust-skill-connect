@@ -95,13 +95,16 @@ export type Database = {
       }
       micro_tasks: {
         Row: {
+          accepted_by: string | null
           category: string | null
           created_at: string
           description: string | null
           duration: string | null
           employer: string | null
+          escrow_held: number | null
           id: string
           location: string
+          max_workers: number
           pay: string | null
           posted_by: string
           skills: string[] | null
@@ -111,13 +114,16 @@ export type Database = {
           urgency: string
         }
         Insert: {
+          accepted_by?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
           duration?: string | null
           employer?: string | null
+          escrow_held?: number | null
           id?: string
           location?: string
+          max_workers?: number
           pay?: string | null
           posted_by: string
           skills?: string[] | null
@@ -127,13 +133,16 @@ export type Database = {
           urgency?: string
         }
         Update: {
+          accepted_by?: string | null
           category?: string | null
           created_at?: string
           description?: string | null
           duration?: string | null
           employer?: string | null
+          escrow_held?: number | null
           id?: string
           location?: string
+          max_workers?: number
           pay?: string | null
           posted_by?: string
           skills?: string[] | null
@@ -529,6 +538,109 @@ export type Database = {
           user_id?: string
         }
         Relationships: []
+      }
+      task_ratings: {
+        Row: {
+          comment: string | null
+          created_at: string
+          id: string
+          ratee_id: string
+          rater_id: string
+          rating: number
+          role: string
+          task_id: string
+        }
+        Insert: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ratee_id: string
+          rater_id: string
+          rating: number
+          role: string
+          task_id: string
+        }
+        Update: {
+          comment?: string | null
+          created_at?: string
+          id?: string
+          ratee_id?: string
+          rater_id?: string
+          rating?: number
+          role?: string
+          task_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_ratings_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "micro_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      task_submissions: {
+        Row: {
+          created_at: string
+          earnings: number | null
+          id: string
+          proof_text: string | null
+          proof_url: string | null
+          quality_score: number | null
+          reviewed_at: string | null
+          reviewer_note: string | null
+          started_at: string
+          status: string
+          submitted_at: string | null
+          task_id: string
+          timer_seconds: number
+          updated_at: string
+          worker_id: string
+        }
+        Insert: {
+          created_at?: string
+          earnings?: number | null
+          id?: string
+          proof_text?: string | null
+          proof_url?: string | null
+          quality_score?: number | null
+          reviewed_at?: string | null
+          reviewer_note?: string | null
+          started_at?: string
+          status?: string
+          submitted_at?: string | null
+          task_id: string
+          timer_seconds?: number
+          updated_at?: string
+          worker_id: string
+        }
+        Update: {
+          created_at?: string
+          earnings?: number | null
+          id?: string
+          proof_text?: string | null
+          proof_url?: string | null
+          quality_score?: number | null
+          reviewed_at?: string | null
+          reviewer_note?: string | null
+          started_at?: string
+          status?: string
+          submitted_at?: string | null
+          task_id?: string
+          timer_seconds?: number
+          updated_at?: string
+          worker_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "task_submissions_task_id_fkey"
+            columns: ["task_id"]
+            isOneToOne: false
+            referencedRelation: "micro_tasks"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       user_roles: {
         Row: {
