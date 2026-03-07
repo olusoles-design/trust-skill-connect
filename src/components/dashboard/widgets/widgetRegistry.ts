@@ -20,6 +20,7 @@ import { MyApplicationsWidget }        from "./talent/MyApplicationsWidget";
 import { LearningProgressWidget }      from "./talent/LearningProgressWidget";
 import { CredentialWalletWidget }      from "./talent/CredentialWalletWidget";
 import { MicroTaskBoardWidget }        from "./talent/MicroTaskBoardWidget";
+import { MyTasksWidget }               from "./talent/MyTasksWidget";
 import { ProfileCVWidget }             from "./talent/ProfileCVWidget";
 
 // ─── Business
@@ -29,6 +30,7 @@ import { BEEEDashboardWidget }         from "./business/BEEEDashboardWidget";
 import { ProcurementDashboardWidget }  from "./business/ProcurementDashboardWidget";
 import { MarketplaceListingWidget }    from "./business/MarketplaceListingWidget";
 import { TenderMatchingWidget }        from "./business/TenderMatchingWidget";
+import { TaskPosterWidget }            from "./business/TaskPosterWidget";
 
 // ─── Funding
 import { FundingAllocationWidget }     from "./funding/FundingAllocationWidget";
