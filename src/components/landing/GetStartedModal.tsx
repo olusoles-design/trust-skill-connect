@@ -1,84 +1,249 @@
 import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { X, ArrowLeft, ArrowRight, GraduationCap, Briefcase, School, Users, ShoppingBag, Loader2 } from "lucide-react";
+import { X, ArrowLeft, ArrowRight, Loader2 } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
+import { ROLE_PERSONA } from "@/lib/permissions";
+import type { AppRole } from "@/lib/permissions";
 
-type Role = "learner" | "sponsor" | "provider" | "practitioner" | "support_provider" | null;
+// ─── Types ──────────────────────────────────────────────────────────────────
+
+type Role = AppRole | null;
 type PractitionerRole = "facilitator" | "assessor" | "moderator" | "sdf" | "mentor" | null;
 type PlanName = "Starter" | "Professional" | "Enterprise" | null;
 
+// ─── Role definitions ────────────────────────────────────────────────────────
+
 interface RoleCard {
-  id: Role;
+  id: AppRole;
   emoji: string;
   title: string;
   description: string;
-  colorClass: string;
   borderClass: string;
   bgClass: string;
-  textClass: string;
+  badgeClass: string;
 }
 
-const ROLES: RoleCard[] = [
+// Grouped by persona for the selection grid
+const PERSONA_GROUPS: {
+  key: string;
+  label: string;
+  description: string;
+  roles: RoleCard[];
+}[] = [
   {
-    id: "learner",
-    emoji: "🎓",
-    title: "Learner",
-    description: "Seeking skills & jobs",
-    colorClass: "blue",
-    borderClass: "border-blue-500/40 hover:border-blue-500",
-    bgClass: "hover:bg-blue-500/5",
-    textClass: "text-blue-400",
+    key: "talent",
+    label: "Talent",
+    description: "Individuals seeking skills, work and growth",
+    roles: [
+      {
+        id: "learner",
+        emoji: "🎓",
+        title: "Learner",
+        description: "Seeking learnerships, bursaries & jobs",
+        borderClass: "border-primary/30 hover:border-primary",
+        bgClass: "hover:bg-primary/5",
+        badgeClass: "bg-primary/10 text-primary",
+      },
+      {
+        id: "practitioner",
+        emoji: "👨‍🏫",
+        title: "Practitioner",
+        description: "Facilitators, assessors, moderators & SDFs",
+        borderClass: "border-secondary/30 hover:border-secondary",
+        bgClass: "hover:bg-secondary/5",
+        badgeClass: "bg-secondary/10 text-secondary-foreground",
+      },
+    ],
   },
   {
-    id: "sponsor",
-    emoji: "💼",
-    title: "Sponsor",
-    description: "Funding & hiring",
-    colorClass: "green",
-    borderClass: "border-green-500/40 hover:border-green-500",
-    bgClass: "hover:bg-green-500/5",
-    textClass: "text-green-400",
+    key: "business",
+    label: "Business",
+    description: "Companies and service providers driving skills",
+    roles: [
+      {
+        id: "employer",
+        emoji: "🏢",
+        title: "Employer",
+        description: "Hiring talent and managing learner intakes",
+        borderClass: "border-accent/40 hover:border-accent",
+        bgClass: "hover:bg-accent/5",
+        badgeClass: "bg-accent/20 text-accent-foreground",
+      },
+      {
+        id: "provider",
+        emoji: "🏫",
+        title: "Training Provider",
+        description: "Accredited SDPs delivering programmes",
+        borderClass: "border-primary/30 hover:border-primary",
+        bgClass: "hover:bg-primary/5",
+        badgeClass: "bg-primary/10 text-primary",
+      },
+      {
+        id: "support_provider",
+        emoji: "🛠️",
+        title: "Support Provider",
+        description: "Materials, equipment & service suppliers",
+        borderClass: "border-secondary/30 hover:border-secondary",
+        bgClass: "hover:bg-secondary/5",
+        badgeClass: "bg-secondary/10 text-secondary-foreground",
+      },
+    ],
   },
   {
-    id: "provider",
-    emoji: "🏫",
-    title: "Provider",
-    description: "Training & skills",
-    colorClass: "orange",
-    borderClass: "border-orange-500/40 hover:border-orange-500",
-    bgClass: "hover:bg-orange-500/5",
-    textClass: "text-orange-400",
+    key: "funding",
+    label: "Funding",
+    description: "Entities that finance and track skills investment",
+    roles: [
+      {
+        id: "sponsor",
+        emoji: "💼",
+        title: "Sponsor",
+        description: "B-BBEE funding, hiring & learner pipelines",
+        borderClass: "border-accent/40 hover:border-accent",
+        bgClass: "hover:bg-accent/5",
+        badgeClass: "bg-accent/20 text-accent-foreground",
+      },
+      {
+        id: "fundi",
+        emoji: "💰",
+        title: "Fundi",
+        description: "Independent learner funders & bursary bodies",
+        borderClass: "border-primary/30 hover:border-primary",
+        bgClass: "hover:bg-primary/5",
+        badgeClass: "bg-primary/10 text-primary",
+      },
+    ],
   },
   {
-    id: "practitioner",
-    emoji: "👨‍🏫",
-    title: "Practitioner",
-    description: "Facilitating, assessing & mentoring",
-    colorClass: "purple",
-    borderClass: "border-purple-500/40 hover:border-purple-500",
-    bgClass: "hover:bg-purple-500/5",
-    textClass: "text-purple-400",
-  },
-  {
-    id: "support_provider",
-    emoji: "🛠️",
-    title: "Support Provider",
-    description: "Materials, equipment & services",
-    colorClass: "teal",
-    borderClass: "border-teal/40 hover:border-teal",
-    bgClass: "hover:bg-teal/5",
-    textClass: "text-teal",
+    key: "oversight",
+    label: "Oversight",
+    description: "Regulatory, compliance and platform administration",
+    roles: [
+      {
+        id: "admin",
+        emoji: "🛡️",
+        title: "Platform Admin",
+        description: "Full platform management & moderation",
+        borderClass: "border-destructive/30 hover:border-destructive",
+        bgClass: "hover:bg-destructive/5",
+        badgeClass: "bg-destructive/10 text-destructive",
+      },
+    ],
   },
 ];
 
 const PRACTITIONER_ROLES = [
-  { id: "facilitator", label: "Facilitator", sub: "Accredited SME" },
-  { id: "assessor", label: "Assessor", sub: "Accredited SME" },
-  { id: "moderator", label: "Moderator", sub: "Accredited SME" },
-  { id: "sdf", label: "Skills Development Facilitator", sub: null },
-  { id: "mentor", label: "Mentor", sub: null },
+  { id: "facilitator", label: "Facilitator",                   sub: "Delivers accredited training" },
+  { id: "assessor",    label: "Assessor",                      sub: "Evaluates learner competency" },
+  { id: "moderator",   label: "Moderator",                     sub: "Quality assures assessments" },
+  { id: "sdf",         label: "Skills Development Facilitator", sub: "Strategic L&D advisor" },
+  { id: "mentor",      label: "Mentor",                        sub: "Coaching & workplace guidance" },
 ];
+
+// Role-specific extra fields shown in Step 2
+const ROLE_EXTRA_FIELDS: Partial<Record<AppRole, React.FC<{ form: FormState; onChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void }>>> = {
+  sponsor: ({ form, onChange }) => (
+    <>
+      <FieldRow label="Company Name">
+        <input name="companyName" value={form.companyName} onChange={onChange}
+          className={INPUT_CLS} placeholder="Acme Corp (Pty) Ltd" />
+      </FieldRow>
+      <FieldRow label="Job Title">
+        <input name="jobTitle" value={form.jobTitle} onChange={onChange}
+          className={INPUT_CLS} placeholder="HR / L&D Manager" />
+      </FieldRow>
+    </>
+  ),
+  employer: ({ form, onChange }) => (
+    <>
+      <FieldRow label="Company Name">
+        <input name="companyName" value={form.companyName} onChange={onChange}
+          className={INPUT_CLS} placeholder="Company (Pty) Ltd" />
+      </FieldRow>
+      <FieldRow label="Job Title">
+        <input name="jobTitle" value={form.jobTitle} onChange={onChange}
+          className={INPUT_CLS} placeholder="HR Director" />
+      </FieldRow>
+    </>
+  ),
+  fundi: ({ form, onChange }) => (
+    <FieldRow label="Organisation / Fund Name">
+      <input name="companyName" value={form.companyName} onChange={onChange}
+        className={INPUT_CLS} placeholder="e.g. Ubuntu Bursary Trust" />
+    </FieldRow>
+  ),
+  provider: ({ form, onChange }) => (
+    <>
+      <FieldRow label="SDP / Institution Name">
+        <input name="sdpName" value={form.sdpName} onChange={onChange}
+          className={INPUT_CLS} placeholder="ABC Training Institute" />
+      </FieldRow>
+      <FieldRow label="SETA Accreditation Number">
+        <input name="accreditationNumber" value={form.accreditationNumber} onChange={onChange}
+          className={INPUT_CLS} placeholder="e.g. ETDP/ACC/0001/22" />
+      </FieldRow>
+    </>
+  ),
+  practitioner: ({ form, onChange }) => (
+    <FieldRow label="ETDP / Assessor Registration">
+      <input name="accreditationNumber" value={form.accreditationNumber} onChange={onChange}
+        className={INPUT_CLS} placeholder="Registration or certificate number" />
+    </FieldRow>
+  ),
+  support_provider: ({ form, onChange }) => (
+    <FieldRow label="Service Category">
+      <select name="serviceCategory" value={form.serviceCategory} onChange={onChange}
+        className={INPUT_CLS}>
+        <option value="" className="bg-navy">Select a category</option>
+        <option value="materials"    className="bg-navy">Learning Material Development</option>
+        <option value="furniture"    className="bg-navy">Furniture & Classroom Equipment</option>
+        <option value="reprographic" className="bg-navy">Reprographic & Printing Services</option>
+        <option value="equipment"    className="bg-navy">Training Equipment & Simulators</option>
+        <option value="venue"        className="bg-navy">Venue & Facility Rentals</option>
+        <option value="technology"   className="bg-navy">Technology & Software Solutions</option>
+      </select>
+    </FieldRow>
+  ),
+};
+
+// ─── Shared style constants ─────────────────────────────────────────────────
+
+const INPUT_CLS = "w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm";
+
+// ─── Sub-components ─────────────────────────────────────────────────────────
+
+function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+  return (
+    <div>
+      <label className="text-xs font-medium text-white/60 block mb-1">{label}</label>
+      {children}
+    </div>
+  );
+}
+
+// ─── Form state type ────────────────────────────────────────────────────────
+
+interface FormState {
+  username: string;
+  email: string;
+  password: string;
+  firstName: string;
+  lastName: string;
+  phone: string;
+  companyName: string;
+  jobTitle: string;
+  sdpName: string;
+  accreditationNumber: string;
+  serviceCategory: string;
+}
+
+const EMPTY_FORM: FormState = {
+  username: "", email: "", password: "", firstName: "", lastName: "", phone: "",
+  companyName: "", jobTitle: "", sdpName: "", accreditationNumber: "", serviceCategory: "",
+};
+
+// ─── Props ───────────────────────────────────────────────────────────────────
 
 interface Props {
   open: boolean;
@@ -86,69 +251,45 @@ interface Props {
   initialRole?: Role;
 }
 
+// ─── Component ───────────────────────────────────────────────────────────────
+
 export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
   const { toast } = useToast();
-  const [step, setStep] = useState(1);
-  const [selectedRole, setSelectedRole] = useState<Role>(initialRole);
+
+  const [step, setStep]                       = useState(1);
+  const [selectedRole, setSelectedRole]       = useState<Role>(initialRole);
   const [practitionerRole, setPractitionerRole] = useState<PractitionerRole>(null);
-  const [selectedPlan, setSelectedPlan] = useState<PlanName>(null);
+  const [selectedPlan, setSelectedPlan]       = useState<PlanName>(null);
   const [showConfirmation, setShowConfirmation] = useState(false);
-  const [showLogin, setShowLogin] = useState(false);
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState({
-    username: "",
-    email: "",
-    password: "",
-    firstName: "",
-    lastName: "",
-    phone: "",
-    // role-specific
-    companyName: "",
-    jobTitle: "",
-    sdpName: "",
-    accreditationNumber: "",
-    serviceCategory: "",
-  });
-  // Sync initialRole and auto-advance when modal opens
+  const [showLogin, setShowLogin]             = useState(false);
+  const [submitting, setSubmitting]           = useState(false);
+  const [form, setForm]                       = useState<FormState>(EMPTY_FORM);
+
+  // Sync initial role when modal opens
   useEffect(() => {
     if (open) {
-      if (initialRole) {
-        setSelectedRole(initialRole);
-        setStep(2);
-      } else {
-        setStep(1);
-        setSelectedRole(null);
-      }
+      if (initialRole) { setSelectedRole(initialRole); setStep(2); }
+      else             { setStep(1); setSelectedRole(null); }
     }
   }, [open, initialRole]);
 
-  // Close on ESC
+  // ESC to close
   useEffect(() => {
-    const handler = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
-    };
+    const handler = (e: KeyboardEvent) => { if (e.key === "Escape") onClose(); };
     if (open) window.addEventListener("keydown", handler);
     return () => window.removeEventListener("keydown", handler);
   }, [open, onClose]);
 
-  // Lock body scroll
+  // Body scroll lock
   useEffect(() => {
-    if (open) document.body.style.overflow = "hidden";
-    else document.body.style.overflow = "";
+    document.body.style.overflow = open ? "hidden" : "";
     return () => { document.body.style.overflow = ""; };
   }, [open]);
 
   const resetModal = useCallback(() => {
-    setStep(1);
-    setSelectedRole(null);
-    setPractitionerRole(null);
-    setSelectedPlan(null);
-    setShowConfirmation(false);
-    setShowLogin(false);
-    setForm({
-      username: "", email: "", password: "", firstName: "", lastName: "", phone: "",
-      companyName: "", jobTitle: "", sdpName: "", accreditationNumber: "", serviceCategory: "",
-    });
+    setStep(1); setSelectedRole(null); setPractitionerRole(null);
+    setSelectedPlan(null); setShowConfirmation(false);
+    setShowLogin(false); setForm(EMPTY_FORM);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -156,21 +297,17 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     setTimeout(resetModal, 300);
   }, [onClose, resetModal]);
 
-  const handleRoleSelect = (role: Role) => {
-    setSelectedRole(role);
-    setStep(2);
-  };
+  const handleRoleSelect = (role: AppRole) => { setSelectedRole(role); setStep(2); };
 
   const handleBack = () => {
     if (step === 2) { setStep(1); setSelectedRole(null); setPractitionerRole(null); }
     else if (step === 3) setStep(2);
   };
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
     setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
-  };
 
-  // Real Supabase sign-up
+  // ── Sign Up ──────────────────────────────────────────────────────────────
   const handleSignUp = async () => {
     if (!form.email || !form.password) {
       toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
@@ -181,20 +318,19 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       const { data, error } = await supabase.auth.signUp({
         email: form.email,
         password: form.password,
-        options: { emailRedirectTo: window.location.origin },
+        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
       });
       if (error) throw error;
+
       const userId = data.user?.id;
       if (userId) {
-        // Save profile
         await supabase.from("profiles").upsert({
           user_id: userId,
           first_name: form.firstName || null,
-          last_name: form.lastName || null,
-          username: form.username || null,
-          phone: form.phone || null,
+          last_name:  form.lastName  || null,
+          username:   form.username  || null,
+          phone:      form.phone     || null,
         });
-        // Save role
         if (selectedRole) {
           await supabase.from("user_roles").upsert({ user_id: userId, role: selectedRole });
         }
@@ -207,7 +343,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     }
   };
 
-  // Real Supabase sign-in
+  // ── Sign In ──────────────────────────────────────────────────────────────
   const handleSignIn = async () => {
     if (!form.email || !form.password) {
       toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
@@ -217,7 +353,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     try {
       const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
       if (error) throw error;
-      toast({ title: "Welcome back!", description: "You have signed in successfully." });
+      toast({ title: "Welcome back!", description: "Signed in successfully." });
       handleClose();
       window.location.href = "/dashboard";
     } catch (err: unknown) {
@@ -227,18 +363,41 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     }
   };
 
-  const roleData = ROLES.find(r => r.id === selectedRole);
-  const stepLabel = showLogin ? "Sign In" : `Step ${step} of 3`;
+  // ── Derived ──────────────────────────────────────────────────────────────
+  const allRoles    = PERSONA_GROUPS.flatMap((g) => g.roles);
+  const roleData    = allRoles.find((r) => r.id === selectedRole);
+  const persona     = selectedRole ? ROLE_PERSONA[selectedRole] : null;
+  const stepLabel   = showLogin ? "Sign In" : `Step ${step} of 3`;
+  const ExtraFields = selectedRole ? ROLE_EXTRA_FIELDS[selectedRole] : null;
+
+  // Show practitioner sub-role picker before the form
+  const showPractitionerPicker =
+    !showLogin && step === 2 && selectedRole === "practitioner" && !practitionerRole;
+
+  const showRegistrationForm =
+    !showLogin && step === 2 && (selectedRole !== "practitioner" || !!practitionerRole);
+
+  const PERSONA_LABELS: Record<string, string> = {
+    talent:    "Talent",
+    business:  "Business",
+    funding:   "Funding",
+    oversight: "Oversight",
+  };
+
+  const PERSONA_COLORS: Record<string, string> = {
+    talent:    "text-primary border-primary/30 bg-primary/10",
+    business:  "text-accent-foreground border-accent/30 bg-accent/10",
+    funding:   "text-gold border-gold/30 bg-gold/10",
+    oversight: "text-destructive border-destructive/30 bg-destructive/10",
+  };
 
   return (
     <AnimatePresence>
       {open && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-4">
-          {/* Overlay */}
+          {/* Backdrop */}
           <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
+            initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
             transition={{ duration: 0.2 }}
             className="absolute inset-0 bg-black/70 backdrop-blur-sm"
             onClick={handleClose}
@@ -250,10 +409,10 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative bg-navy border border-white/10 rounded-2xl shadow-2xl w-full max-w-[900px] max-h-[90vh] overflow-y-auto"
-            onClick={e => e.stopPropagation()}
+            className="relative bg-navy border border-white/10 rounded-2xl shadow-2xl w-full max-w-[960px] max-h-[92vh] overflow-y-auto"
+            onClick={(e) => e.stopPropagation()}
           >
-            {/* Close button */}
+            {/* Close */}
             <button
               onClick={handleClose}
               className="absolute right-4 top-4 z-10 w-9 h-9 flex items-center justify-center rounded-full bg-white/10 hover:bg-white/20 text-white/70 hover:text-white transition-all"
@@ -262,49 +421,75 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
             </button>
 
             <div className="p-6 sm:p-8">
-              {/* Header */}
+              {/* ── Header ─────────────────────────────────────────────── */}
               <div className="text-center mb-8">
-                <p className="text-xs font-semibold uppercase tracking-widest text-teal mb-2">{stepLabel}</p>
-                <h2 className="text-2xl sm:text-3xl font-bold text-white" style={{ fontFamily: 'Sora, sans-serif' }}>
-                  {showLogin ? "Welcome back" : step === 1 ? "Choose your path" : `Set up your ${roleData?.title} profile`}
+                <div className="flex items-center justify-center gap-2 mb-2">
+                  <p className="text-xs font-semibold uppercase tracking-widest text-teal">{stepLabel}</p>
+                  {persona && (
+                    <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ${PERSONA_COLORS[persona]}`}>
+                      {PERSONA_LABELS[persona]} Hub
+                    </span>
+                  )}
+                </div>
+                <h2 className="text-2xl sm:text-3xl font-bold text-white" style={{ fontFamily: "Sora, sans-serif" }}>
+                  {showLogin ? "Welcome back" :
+                    step === 1 ? "Choose your path" :
+                    showPractitionerPicker ? "Select your practitioner role" :
+                    `Set up your ${roleData?.title ?? ""} profile`}
                 </h2>
                 {!showLogin && step === 1 && (
-                  <p className="text-white/50 text-sm mt-2">Select how you'll use the platform to continue</p>
-                )}
-                {!showLogin && step === 2 && selectedRole === "practitioner" && !practitionerRole && (
-                  <p className="text-white/50 text-sm mt-2">Select your specific practitioner role</p>
+                  <p className="text-white/50 text-sm mt-2">Select the role that best describes how you'll use SkillsMark</p>
                 )}
               </div>
 
-              {/* STEP 1 - Role Selection */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* STEP 1 — Persona-grouped role selection                    */}
+              {/* ─────────────────────────────────────────────────────────── */}
               {!showLogin && step === 1 && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
-                  {ROLES.map((role) => (
-                    <button
-                      key={role.id}
-                      onClick={() => handleRoleSelect(role.id)}
-                      className={`group flex flex-col items-center text-center p-6 rounded-xl border bg-white/3 transition-all duration-200 hover:scale-[1.02] cursor-pointer ${role.borderClass} ${role.bgClass}`}
-                    >
-                      <span className="text-4xl mb-3 group-hover:scale-110 transition-transform duration-200">{role.emoji}</span>
-                      <span className={`font-bold text-base text-white mb-1`}>{role.title}</span>
-                      <span className="text-xs text-white/50">{role.description}</span>
-                    </button>
+                <div className="space-y-6">
+                  {PERSONA_GROUPS.map((group) => (
+                    <div key={group.key}>
+                      {/* Group header */}
+                      <div className="flex items-center gap-3 mb-3">
+                        <span className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1 rounded-full border ${PERSONA_COLORS[group.key]}`}>
+                          {group.label} Hub
+                        </span>
+                        <p className="text-xs text-white/40">{group.description}</p>
+                      </div>
+
+                      {/* Role cards */}
+                      <div className={`grid gap-3 ${group.roles.length === 1 ? "grid-cols-1 sm:grid-cols-2" : group.roles.length === 2 ? "grid-cols-2" : "grid-cols-2 sm:grid-cols-3"}`}>
+                        {group.roles.map((role) => (
+                          <button
+                            key={role.id}
+                            onClick={() => handleRoleSelect(role.id)}
+                            className={`group flex flex-col items-center text-center p-5 rounded-xl border bg-white/3 transition-all duration-200 hover:scale-[1.02] cursor-pointer ${role.borderClass} ${role.bgClass}`}
+                          >
+                            <span className="text-3xl mb-2 group-hover:scale-110 transition-transform duration-200">{role.emoji}</span>
+                            <span className="font-bold text-sm text-white mb-0.5">{role.title}</span>
+                            <span className="text-xs text-white/50 leading-snug">{role.description}</span>
+                          </button>
+                        ))}
+                      </div>
+                    </div>
                   ))}
                 </div>
               )}
 
-              {/* STEP 2 - Practitioner sub-role selection */}
-              {!showLogin && step === 2 && selectedRole === "practitioner" && !practitionerRole && (
-                <div className="space-y-3">
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* STEP 2 — Practitioner sub-role picker                      */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {showPractitionerPicker && (
+                <div className="space-y-2 max-w-lg mx-auto">
                   {PRACTITIONER_ROLES.map((r) => (
                     <button
                       key={r.id}
-                      onClick={() => { setPractitionerRole(r.id as PractitionerRole); }}
+                      onClick={() => setPractitionerRole(r.id as PractitionerRole)}
                       className="w-full flex items-center justify-between p-4 rounded-xl border border-white/20 bg-white/5 hover:bg-white/10 hover:border-white/40 transition-all text-left group"
                     >
                       <div>
-                        <div className="font-semibold text-white">{r.label}</div>
-                        {r.sub && <div className="text-xs text-teal mt-0.5">{r.sub}</div>}
+                        <div className="font-semibold text-white text-sm">{r.label}</div>
+                        <div className="text-xs text-teal mt-0.5">{r.sub}</div>
                       </div>
                       <ArrowRight className="w-4 h-4 text-white/30 group-hover:text-teal transition-colors" />
                     </button>
@@ -312,124 +497,70 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </div>
               )}
 
-              {/* STEP 2 - Registration Form */}
-              {!showLogin && step === 2 && (selectedRole !== "practitioner" || practitionerRole) && (
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* STEP 2 — Registration form                                 */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {showRegistrationForm && (
                 <div className="space-y-4 max-w-lg mx-auto">
                   {/* Progress */}
                   <div className="flex gap-2 mb-6">
-                    {[1, 2, 3].map(s => (
+                    {[1, 2, 3].map((s) => (
                       <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-teal" : "bg-white/10"}`} />
                     ))}
                   </div>
 
+                  {/* Role badge reminder */}
+                  {roleData && (
+                    <div className="flex items-center gap-2 mb-2">
+                      <span className="text-xl">{roleData.emoji}</span>
+                      <span className="text-sm font-semibold text-white">{roleData.title}</span>
+                      {persona && (
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full border ml-auto ${PERSONA_COLORS[persona]}`}>
+                          {PERSONA_LABELS[persona]} Hub
+                        </span>
+                      )}
+                    </div>
+                  )}
+
                   <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <label className="text-xs font-medium text-white/60 block mb-1">First Name</label>
+                    <FieldRow label="First Name">
                       <input name="firstName" value={form.firstName} onChange={handleFormChange}
-                        className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                        placeholder="Jane" />
-                    </div>
-                    <div>
-                      <label className="text-xs font-medium text-white/60 block mb-1">Last Name</label>
+                        className={INPUT_CLS} placeholder="Jane" />
+                    </FieldRow>
+                    <FieldRow label="Last Name">
                       <input name="lastName" value={form.lastName} onChange={handleFormChange}
-                        className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                        placeholder="Doe" />
-                    </div>
+                        className={INPUT_CLS} placeholder="Doe" />
+                    </FieldRow>
                   </div>
 
-                  <div>
-                    <label className="text-xs font-medium text-white/60 block mb-1">Username</label>
+                  <FieldRow label="Username">
                     <input name="username" value={form.username} onChange={handleFormChange}
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                      placeholder="@janedoe" />
-                  </div>
+                      className={INPUT_CLS} placeholder="@janedoe" />
+                  </FieldRow>
 
-                  <div>
-                    <label className="text-xs font-medium text-white/60 block mb-1">Email Address</label>
+                  <FieldRow label="Email Address">
                     <input name="email" type="email" value={form.email} onChange={handleFormChange}
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                      placeholder="jane@example.com" />
-                  </div>
+                      className={INPUT_CLS} placeholder="jane@example.com" />
+                  </FieldRow>
 
-                  <div>
-                    <label className="text-xs font-medium text-white/60 block mb-1">Phone Number</label>
+                  <FieldRow label="Phone Number">
                     <input name="phone" type="tel" value={form.phone} onChange={handleFormChange}
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                      placeholder="+27 xx xxx xxxx" />
-                  </div>
+                      className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
+                  </FieldRow>
 
-                  {/* Role-specific fields */}
-                  {(selectedRole === "sponsor") && (
-                    <>
-                      <div>
-                        <label className="text-xs font-medium text-white/60 block mb-1">Company Name</label>
-                        <input name="companyName" value={form.companyName} onChange={handleFormChange}
-                          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                          placeholder="Acme Corp (Pty) Ltd" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-white/60 block mb-1">Job Title</label>
-                        <input name="jobTitle" value={form.jobTitle} onChange={handleFormChange}
-                          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                          placeholder="HR Manager" />
-                      </div>
-                    </>
-                  )}
+                  {/* Role-specific extra fields */}
+                  {ExtraFields && <ExtraFields form={form} onChange={handleFormChange} />}
 
-                  {selectedRole === "provider" && (
-                    <>
-                      <div>
-                        <label className="text-xs font-medium text-white/60 block mb-1">SDP / Institution Name</label>
-                        <input name="sdpName" value={form.sdpName} onChange={handleFormChange}
-                          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                          placeholder="ABC Training Institute" />
-                      </div>
-                      <div>
-                        <label className="text-xs font-medium text-white/60 block mb-1">SETA Accreditation Number</label>
-                        <input name="accreditationNumber" value={form.accreditationNumber} onChange={handleFormChange}
-                          className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                          placeholder="e.g. ETDP/ACC/0001/22" />
-                      </div>
-                    </>
-                  )}
-
-                  {selectedRole === "practitioner" && practitionerRole && (
-                    <div>
-                      <label className="text-xs font-medium text-white/60 block mb-1">ETDP / Assessor Registration</label>
-                      <input name="accreditationNumber" value={form.accreditationNumber} onChange={handleFormChange}
-                        className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                        placeholder="Registration or certificate number" />
-                    </div>
-                  )}
-
-                  {selectedRole === "support_provider" && (
-                    <div>
-                      <label className="text-xs font-medium text-white/60 block mb-1">Service Category</label>
-                      <select name="serviceCategory" value={form.serviceCategory} onChange={handleFormChange}
-                        className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white focus:outline-none focus:border-teal/60 text-sm">
-                        <option value="" className="bg-navy">Select a category</option>
-                        <option value="materials" className="bg-navy">Learning Material Development</option>
-                        <option value="furniture" className="bg-navy">Furniture & Classroom Equipment</option>
-                        <option value="reprographic" className="bg-navy">Reprographic & Printing Services</option>
-                        <option value="equipment" className="bg-navy">Training Equipment & Simulators</option>
-                        <option value="venue" className="bg-navy">Venue & Facility Rentals</option>
-                        <option value="technology" className="bg-navy">Technology & Software Solutions</option>
-                      </select>
-                    </div>
-                  )}
-
-                  <div>
-                    <label className="text-xs font-medium text-white/60 block mb-1">Password</label>
+                  <FieldRow label="Password">
                     <input name="password" type="password" value={form.password} onChange={handleFormChange}
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                      placeholder="Create a secure password" />
-                  </div>
+                      className={INPUT_CLS} placeholder="Create a secure password" />
+                  </FieldRow>
 
-                  {/* Subscription notice */}
+                  {/* Trial notice */}
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-teal/10 border border-teal/20">
                     <span className="text-teal text-sm mt-0.5">✦</span>
                     <p className="text-xs text-white/60">
-                      SkillsMark is a <span className="text-teal font-semibold">subscription-based platform</span>. 
+                      SkillsMark is a <span className="text-teal font-semibold">subscription-based platform</span>.
                       Your free trial includes full access for 30 days. Choose a plan in Step 3.
                     </p>
                   </div>
@@ -439,57 +570,60 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     disabled={submitting}
                     className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all hover:scale-[1.01] flex items-center justify-center gap-2 disabled:opacity-60 disabled:cursor-not-allowed"
                   >
-                    {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : <>Continue to Step 3 <ArrowRight className="w-4 h-4" /></>}
+                    {submitting
+                      ? <Loader2 className="w-4 h-4 animate-spin" />
+                      : <>Continue to Step 3 <ArrowRight className="w-4 h-4" /></>}
                   </button>
                 </div>
               )}
 
-              {/* STEP 3 - Plan Selection */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* STEP 3 — Plan selection                                    */}
+              {/* ─────────────────────────────────────────────────────────── */}
               {!showLogin && step === 3 && !showConfirmation && (
                 <div className="max-w-2xl mx-auto">
                   <div className="flex gap-2 mb-8">
-                    {[1, 2, 3].map(s => (
-                      <div key={s} className={`h-1 flex-1 rounded-full transition-colors ${s <= step ? "bg-teal" : "bg-white/10"}`} />
+                    {[1, 2, 3].map((s) => (
+                      <div key={s} className={`h-1 flex-1 rounded-full ${s <= step ? "bg-teal" : "bg-white/10"}`} />
                     ))}
                   </div>
                   <p className="text-center text-white/50 text-sm mb-6">Choose the plan that fits your needs</p>
 
                   <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                    {([
-                      {
-                        name: "Starter" as PlanName,
-                        price: "Free",
-                        period: "30-day trial",
-                        features: ["3 opportunity posts", "Basic profile", "Email support"],
-                        highlight: false,
-                        badge: null,
-                        cta: "Start Free Trial",
-                      },
-                      {
-                        name: "Professional" as PlanName,
-                        price: "R499",
-                        period: "per month",
-                        features: ["Unlimited posts", "Priority matching", "BEE dashboard", "Dedicated support"],
-                        highlight: true,
-                        badge: "Most Popular",
-                        cta: "Subscribe Now",
-                      },
-                      {
-                        name: "Enterprise" as PlanName,
-                        price: "Custom",
-                        period: "pricing",
-                        features: ["Custom contracts", "API access", "Dedicated account manager", "SLA guarantee"],
-                        highlight: false,
-                        badge: null,
-                        cta: "Contact Sales",
-                      },
-                    ] as const).map(plan => (
+                    {(
+                      [
+                        {
+                          name: "Starter" as PlanName,
+                          price: "Free",
+                          period: "30-day trial",
+                          features: ["3 opportunity previews", "Basic profile", "Email support"],
+                          highlight: false,
+                          badge: null,
+                          cta: "Start Free Trial",
+                        },
+                        {
+                          name: "Professional" as PlanName,
+                          price: "R499",
+                          period: "per month",
+                          features: ["Unlimited access", "Priority matching", "B-BBEE dashboard", "Dedicated support"],
+                          highlight: true,
+                          badge: "Most Popular",
+                          cta: "Subscribe Now",
+                        },
+                        {
+                          name: "Enterprise" as PlanName,
+                          price: "Custom",
+                          period: "pricing",
+                          features: ["Custom contracts", "API access", "Dedicated account manager", "SLA guarantee"],
+                          highlight: false,
+                          badge: null,
+                          cta: "Contact Sales",
+                        },
+                      ] as const
+                    ).map((plan) => (
                       <button
                         key={plan.name}
-                        onClick={() => {
-                          setSelectedPlan(plan.name);
-                          setShowConfirmation(true);
-                        }}
+                        onClick={() => { setSelectedPlan(plan.name); setShowConfirmation(true); }}
                         className={`group flex flex-col p-5 rounded-xl border text-left transition-all duration-200 hover:scale-[1.02] cursor-pointer ${
                           plan.highlight
                             ? "border-teal bg-teal/10 shadow-teal"
@@ -505,7 +639,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                           <span className="text-xs text-white/40 ml-1">{plan.period}</span>
                         </div>
                         <ul className="space-y-1.5 flex-1">
-                          {plan.features.map(f => (
+                          {plan.features.map((f) => (
                             <li key={f} className="text-xs text-white/60 flex items-center gap-2">
                               <span className="text-teal text-sm">✓</span> {f}
                             </li>
@@ -524,7 +658,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </div>
               )}
 
-              {/* STEP 3 - Confirmation Screen */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* STEP 3 — Confirmation                                      */}
+              {/* ─────────────────────────────────────────────────────────── */}
               {!showLogin && step === 3 && showConfirmation && (
                 <motion.div
                   initial={{ opacity: 0, y: 12 }}
@@ -532,7 +668,6 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   transition={{ duration: 0.25 }}
                   className="max-w-md mx-auto text-center"
                 >
-                  {/* Success icon */}
                   <div className="w-16 h-16 rounded-full bg-teal/20 border border-teal/40 flex items-center justify-center mx-auto mb-5">
                     <span className="text-3xl">
                       {selectedPlan === "Starter" ? "🚀" : selectedPlan === "Professional" ? "⭐" : "🏢"}
@@ -543,50 +678,34 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     {selectedPlan === "Enterprise" ? "Let's talk!" : `${selectedPlan} plan selected`}
                   </h3>
                   <p className="text-white/50 text-sm mb-6">
-                    {selectedPlan === "Starter" && "Your 30-day free trial gives you full access to explore the platform."}
-                    {selectedPlan === "Professional" && "You're subscribing to Professional at R499/month. Billed monthly — cancel anytime."}
-                    {selectedPlan === "Enterprise" && "Our team will reach out within 1 business day to build a custom package for you."}
+                    {selectedPlan === "Starter"       && "Your 30-day free trial gives you full access to explore the platform."}
+                    {selectedPlan === "Professional"  && "You're subscribing to Professional at R499/month. Billed monthly — cancel anytime."}
+                    {selectedPlan === "Enterprise"    && "Our team will reach out within 1 business day to build a custom package for you."}
                   </p>
 
-                  {/* Summary card */}
+                  {/* Summary */}
                   <div className="bg-white/5 border border-white/10 rounded-xl p-4 mb-6 text-left space-y-2">
-                    <div className="flex justify-between text-sm">
-                      <span className="text-white/50">Role</span>
-                      <span className="text-white font-medium capitalize">{roleData?.title ?? selectedRole}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-white/50">Plan</span>
-                      <span className="text-white font-medium">{selectedPlan}</span>
-                    </div>
-                    <div className="flex justify-between text-sm">
-                      <span className="text-white/50">Billing</span>
-                      <span className="text-white font-medium">
-                        {selectedPlan === "Starter" ? "Free for 30 days" : selectedPlan === "Professional" ? "R499 / month" : "Custom"}
-                      </span>
-                    </div>
+                    <SummaryRow label="Role"    value={roleData?.title ?? String(selectedRole)} />
+                    {persona && (
+                      <SummaryRow label="Hub" value={`${PERSONA_LABELS[persona]} Hub`} />
+                    )}
+                    <SummaryRow label="Plan"    value={String(selectedPlan)} />
+                    <SummaryRow label="Billing" value={
+                      selectedPlan === "Starter" ? "Free for 30 days" :
+                      selectedPlan === "Professional" ? "R499 / month" : "Custom"
+                    } />
                     {selectedPlan === "Professional" && (
-                      <div className="flex justify-between text-sm">
-                        <span className="text-white/50">First charge</span>
-                        <span className="text-teal font-medium">After 30-day trial</span>
-                      </div>
+                      <SummaryRow label="First charge" value="After 30-day trial" highlight />
                     )}
                   </div>
 
-                  {selectedPlan === "Enterprise" ? (
-                    <button
-                      onClick={handleClose}
-                      className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all"
-                    >
-                      Request a Demo →
-                    </button>
-                  ) : (
-                    <button
-                      onClick={handleClose}
-                      className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all"
-                    >
-                      {selectedPlan === "Starter" ? "Activate Free Trial →" : "Confirm Subscription →"}
-                    </button>
-                  )}
+                  <button
+                    onClick={() => { handleClose(); window.location.href = "/dashboard"; }}
+                    className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all"
+                  >
+                    {selectedPlan === "Enterprise" ? "Request a Demo →" :
+                     selectedPlan === "Starter"    ? "Activate Free Trial →" : "Confirm Subscription →"}
+                  </button>
 
                   <button
                     onClick={() => setShowConfirmation(false)}
@@ -597,21 +716,19 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* SIGN IN */}
+              {/* ─────────────────────────────────────────────────────────── */}
+              {/* SIGN IN                                                    */}
+              {/* ─────────────────────────────────────────────────────────── */}
               {showLogin && (
                 <div className="space-y-4 max-w-sm mx-auto">
-                  <div>
-                    <label className="text-xs font-medium text-white/60 block mb-1">Email Address</label>
+                  <FieldRow label="Email Address">
                     <input name="email" type="email" value={form.email} onChange={handleFormChange}
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                      placeholder="you@example.com" />
-                  </div>
-                  <div>
-                    <label className="text-xs font-medium text-white/60 block mb-1">Password</label>
+                      className={INPUT_CLS} placeholder="you@example.com" />
+                  </FieldRow>
+                  <FieldRow label="Password">
                     <input name="password" type="password" value={form.password} onChange={handleFormChange}
-                      className="w-full px-4 py-2.5 rounded-lg bg-white/5 border border-white/10 text-white placeholder-white/30 focus:outline-none focus:border-teal/60 text-sm"
-                      placeholder="Your password" />
-                  </div>
+                      className={INPUT_CLS} placeholder="Your password" />
+                  </FieldRow>
                   <div className="text-right">
                     <button className="text-xs text-teal hover:underline">Forgot password?</button>
                   </div>
@@ -625,26 +742,26 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </div>
               )}
 
-              {/* Footer */}
+              {/* ── Footer ─────────────────────────────────────────────── */}
               <div className="mt-8 pt-6 border-t border-white/10 flex flex-col sm:flex-row items-center justify-between gap-3">
-                {/* Back button */}
-                {(step > 1 || (step === 2 && selectedRole === "practitioner" && !practitionerRole)) && !showLogin ? (
+                {(step > 1 || showPractitionerPicker) && !showLogin ? (
                   <button onClick={handleBack} className="flex items-center gap-1.5 text-sm text-white/50 hover:text-white transition-colors">
                     <ArrowLeft className="w-4 h-4" /> Back
                   </button>
                 ) : <div />}
 
-                {/* Sign in / Sign up toggle */}
                 <p className="text-sm text-white/50">
                   {showLogin ? (
                     <>Don't have an account?{" "}
-                      <button className="text-teal font-semibold hover:underline" onClick={() => { setShowLogin(false); setStep(1); }}>
+                      <button className="text-teal font-semibold hover:underline"
+                        onClick={() => { setShowLogin(false); setStep(1); }}>
                         Get Started Free
                       </button>
                     </>
                   ) : (
                     <>Already have an account?{" "}
-                      <button className="text-teal font-semibold hover:underline" onClick={() => setShowLogin(true)}>
+                      <button className="text-teal font-semibold hover:underline"
+                        onClick={() => setShowLogin(true)}>
                         Sign In
                       </button>
                     </>
@@ -656,5 +773,16 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
         </div>
       )}
     </AnimatePresence>
+  );
+}
+
+// ─── Mini helpers ────────────────────────────────────────────────────────────
+
+function SummaryRow({ label, value, highlight }: { label: string; value: string; highlight?: boolean }) {
+  return (
+    <div className="flex justify-between text-sm">
+      <span className="text-white/50">{label}</span>
+      <span className={highlight ? "text-teal font-medium" : "text-white font-medium"}>{value}</span>
+    </div>
   );
 }
