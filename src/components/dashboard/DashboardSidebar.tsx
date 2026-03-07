@@ -194,6 +194,18 @@ export function DashboardSidebar() {
             </SidebarMenuButton>
           </SidebarMenuItem>
           <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip={collapsed ? "Settings" : undefined}>
+              <NavLink
+                to="/dashboard/settings"
+                className="hover:bg-sidebar-accent text-sidebar-foreground"
+                activeClassName="bg-primary/10 text-primary font-medium"
+              >
+                <Settings className="w-4 h-4 flex-shrink-0" />
+                {!collapsed && <span>Settings</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
             <SidebarMenuButton
               onClick={signOut}
               className="hover:bg-destructive/10 hover:text-destructive text-muted-foreground cursor-pointer w-full"
