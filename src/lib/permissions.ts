@@ -283,6 +283,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   workflow_engine:         { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
+  portal_switcher:         { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
