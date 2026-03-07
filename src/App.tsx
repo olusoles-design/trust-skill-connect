@@ -39,30 +39,4 @@ const App = () => (
   </QueryClientProvider>
 );
 
-const queryClient = new QueryClient();
-
-const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <OfflineBanner />
-        <BrowserRouter>
-          <Routes>
-            <Route path="/" element={<Index />} />
-            <Route path="/dashboard/*" element={<Dashboard />} />
-            <Route path="/dashboard/payments" element={<Payments />} />
-            <Route path="/dashboard/settings" element={<Settings />} />
-            {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
-            <Route path="*" element={<NotFound />} />
-          </Routes>
-        </BrowserRouter>
-        <PWAInstallBanner />
-      </TooltipProvider>
-    </AuthProvider>
-  </QueryClientProvider>
-);
-
 export default App;
-
