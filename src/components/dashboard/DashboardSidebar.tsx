@@ -30,6 +30,7 @@ import {
   User,
   Home,
   Wallet,
+  Settings,
 } from "lucide-react";
 import type { Capability } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
@@ -189,6 +190,18 @@ export function DashboardSidebar() {
               >
                 <Wallet className="w-4 h-4 flex-shrink-0" />
                 {!collapsed && <span>Payments & Wallet</span>}
+              </NavLink>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+          <SidebarMenuItem>
+            <SidebarMenuButton asChild tooltip={collapsed ? "Settings" : undefined}>
+              <NavLink
+                to="/dashboard/settings"
+                className="hover:bg-sidebar-accent text-sidebar-foreground"
+                activeClassName="bg-primary/10 text-primary font-medium"
+              >
+                <Settings className="w-4 h-4 flex-shrink-0" />
+                {!collapsed && <span>Settings</span>}
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
