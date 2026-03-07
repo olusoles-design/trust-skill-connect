@@ -42,6 +42,7 @@ import { VerificationQueueWidget }    from "@/components/dashboard/widgets/overs
 import { ReportsAnalyticsWidget }     from "@/components/dashboard/widgets/oversight/ReportsAnalyticsWidget";
 import { PlatformAdminWidget }        from "@/components/dashboard/widgets/oversight/PlatformAdminWidget";
 import { TrustLedgerWidget }          from "@/components/dashboard/widgets/oversight/TrustLedgerWidget";
+import { PortalSwitcherWidget }       from "@/components/dashboard/widgets/oversight/PortalSwitcherWidget";
 
 function PageView({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   const navigate = useNavigate();
