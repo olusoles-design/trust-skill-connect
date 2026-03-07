@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowLeft, ArrowRight, Loader2, Upload, CheckCircle2, Plus, Trash2, LogIn, UserPlus, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ROLE_PERSONA } from "@/lib/permissions";
@@ -326,6 +327,7 @@ function Stepper({ current, total }: { current: number; total: number }) {
 
 export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
   const { toast } = useToast();
+  const navigate = useNavigate();
 
   // Mode: "entry" | "login" | "register"
   const [mode, setMode]                         = useState<"entry" | "login" | "register">("entry");
@@ -403,7 +405,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       if (error) throw error;
       toast({ title: "Welcome back!", description: "Signed in successfully." });
       handleClose();
-      window.location.href = "/dashboard";
+      navigate("/dashboard");
     } catch (err: unknown) {
       toast({ title: "Sign-in failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
     } finally {
@@ -417,6 +419,10 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
       return;
     }
+    if (form.password.length < 6) {
+      toast({ title: "Password too short", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -424,16 +430,34 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
         options: { emailRedirectTo: `${window.location.origin}/dashboard` },
       });
       if (error) throw error;
+
       const uid = data.user?.id;
-      if (uid) {
+      const hasSession = !!data.session; // auto-confirm gives a session immediately
+
+      if (uid && hasSession) {
+        // User is immediately authenticated — safe to write profile & role
         await supabase.from("profiles").upsert({
-          user_id: uid, first_name: form.firstName || null, last_name: form.lastName || null,
-          username: form.username || null, phone: form.phone || null,
+          user_id: uid,
+          first_name: form.firstName || null,
+          last_name: form.lastName || null,
+          username: form.username || null,
+          phone: form.phone || null,
         });
-        if (selectedRole) await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole });
-        for (const role of additionalRoles) await supabase.from("user_roles").upsert({ user_id: uid, role });
+        if (selectedRole) {
+          await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole });
+        }
+        for (const role of additionalRoles) {
+          await supabase.from("user_roles").upsert({ user_id: uid, role });
+        }
+        setStep(4);
+      } else {
+        // Email confirmation required — show a friendly message
+        toast({
+          title: "Check your email!",
+          description: "We sent a confirmation link. Click it to activate your account.",
+        });
+        handleClose();
       }
-      setStep(4);
     } catch (err: unknown) {
       toast({ title: "Sign-up failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
     } finally {
@@ -835,7 +859,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <SummaryRow label="Billing" value={selectedPlan === "Starter" ? "Free for 30 days" : selectedPlan === "Professional" ? "R499 / month" : "Custom"} />
                     {uploadedCount > 0 && <SummaryRow label="Documents" value={`${uploadedCount} uploaded`} highlight />}
                   </div>
-                  <button onClick={() => { handleClose(); window.location.href = "/dashboard"; }}
+                  <button onClick={() => { handleClose(); navigate("/dashboard"); }}
                     className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all">
                     {selectedPlan === "Enterprise" ? "Request a Demo →" : selectedPlan === "Starter" ? "Activate Free Trial →" : "Confirm Subscription →"}
                   </button>
