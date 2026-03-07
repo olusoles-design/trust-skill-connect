@@ -100,6 +100,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "document_vault",
     "availability_toggle",
     "smart_contracting",
+    "marketplace_discovery",
   ],
   employer: [
     "post_opportunities",
@@ -112,6 +113,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "tax_calculator",
     "wsp_reports",
     "tender_feed",
+    "workflow_engine",
+    "marketplace_discovery",
   ],
   provider: [
     "post_opportunities",
