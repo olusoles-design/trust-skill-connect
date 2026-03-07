@@ -56,7 +56,8 @@ export type Capability =
   | "workflow_engine"        // RFP→RFQ deal flow, learner registration, SETA packet
   | "trust_ledger"           // Immutable audit ledger + QR verification
   // Admin
-  | "platform_admin";
+  | "platform_admin"
+  | "portal_switcher";
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
@@ -185,6 +186,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "document_vault",
   ],
   admin: [
+    "portal_switcher",
     "find_opportunities",
     "apply_for_opportunities",
     "build_profile",
@@ -281,6 +283,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   workflow_engine:         { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
+  portal_switcher:         { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────

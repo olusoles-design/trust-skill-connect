@@ -13,6 +13,13 @@ interface AuthContextValue {
   allRoles: AppRole[];
   /** Switch the active role to a different one the user owns */
   switchRole: (role: AppRole) => void;
+  /**
+   * Admin-only: temporarily preview any role without owning it.
+   * Pass null to exit preview and return to the real active role.
+   */
+  previewRole: (role: AppRole | null) => void;
+  /** The role the admin is currently previewing (null when not previewing) */
+  previewingAs: AppRole | null;
   plan: SubscriptionPlan | null;
   persona: Persona | null;
   capabilities: Capability[];
@@ -29,6 +36,8 @@ const AuthContext = createContext<AuthContextValue>({
   role: null,
   allRoles: [],
   switchRole: () => {},
+  previewRole: () => {},
+  previewingAs: null,
   plan: null,
   persona: null,
   capabilities: [],
@@ -44,6 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [allRoles, setAllRoles] = useState<AppRole[]>([]);
   const [activeRole, setActiveRole] = useState<AppRole | null>(null);
+  const [previewingAs, setPreviewingAs] = useState<AppRole | null>(null);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
@@ -75,6 +85,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } else {
         setAllRoles([]);
         setActiveRole(null);
+        setPreviewingAs(null);
         setPlan(null);
         setTrialEndsAt(null);
       }
@@ -93,11 +104,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const switchRole = (newRole: AppRole) => {
     if (!allRoles.includes(newRole)) return;
+    setPreviewingAs(null); // exit any preview when explicitly switching
     setActiveRole(newRole);
     if (user) localStorage.setItem(`skillsmark_active_role_${user.id}`, newRole);
   };
 
-  const role = activeRole;
+  const previewRole = (role: AppRole | null) => {
+    // Only admins can preview
+    if (!allRoles.includes("admin")) return;
+    setPreviewingAs(role);
+  };
+
+  // The effective role: use previewingAs if set, otherwise the real active role
+  const role = previewingAs ?? activeRole;
 
   const isTrialActive = plan === "starter" && !!trialEndsAt && new Date(trialEndsAt) > new Date();
   const capabilities: Capability[] = role ? ROLE_CAPABILITIES[role] ?? [] : [];
@@ -116,6 +135,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         role,
         allRoles,
         switchRole,
+        previewRole,
+        previewingAs,
         plan,
         persona,
         capabilities,

@@ -49,6 +49,7 @@ import { SETAReportingWidget }         from "./oversight/SETAReportingWidget";
 import { ComplianceMonitorWidget }     from "./oversight/ComplianceMonitorWidget";
 import { PlatformAdminWidget }         from "./oversight/PlatformAdminWidget";
 import { TrustLedgerWidget }           from "./oversight/TrustLedgerWidget";
+import { PortalSwitcherWidget }        from "./oversight/PortalSwitcherWidget";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -253,6 +254,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     component: PlatformAdminWidget, layout: "full", persona: "oversight",
     title: "Platform Administration", description: "Users, content moderation and system settings.",
     icon: "Settings", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  portal_switcher: {
+    component: PortalSwitcherWidget, layout: "full", persona: "oversight",
+    title: "Portal Switcher", description: "Preview any role's dashboard without switching accounts.",
+    icon: "Eye", color: "bg-secondary/10", accentColor: "text-secondary",
   },
 
   // ── Phase 3 – Glue ─────────────────────────────────────────────────────────

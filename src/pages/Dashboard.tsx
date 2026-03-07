@@ -42,6 +42,7 @@ import { VerificationQueueWidget }    from "@/components/dashboard/widgets/overs
 import { ReportsAnalyticsWidget }     from "@/components/dashboard/widgets/oversight/ReportsAnalyticsWidget";
 import { PlatformAdminWidget }        from "@/components/dashboard/widgets/oversight/PlatformAdminWidget";
 import { TrustLedgerWidget }          from "@/components/dashboard/widgets/oversight/TrustLedgerWidget";
+import { PortalSwitcherWidget }       from "@/components/dashboard/widgets/oversight/PortalSwitcherWidget";
 
 function PageView({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -122,6 +123,7 @@ export default function Dashboard() {
               <Route path="reports" element={<PageView title="Reports & Analytics" description="SETA, SARS, B-BBEE and operational dashboards."><ReportsAnalyticsWidget /></PageView>} />
               <Route path="ledger"  element={<PageView title="Trust Ledger" description="Immutable audit trail with QR verification for B-BBEE audits."><TrustLedgerWidget /></PageView>} />
               <Route path="admin"   element={<PageView title="Platform Administration" description="Users, content moderation and system settings."><PlatformAdminWidget /></PageView>} />
+              <Route path="portals" element={<PageView title="Portal Switcher" description="Preview any role's dashboard without switching accounts."><PortalSwitcherWidget /></PageView>} />
 
               <Route path="*" element={<WidgetGrid />} />
             </Routes>
