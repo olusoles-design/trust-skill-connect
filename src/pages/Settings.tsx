@@ -129,17 +129,6 @@ export default function Settings() {
   }
   if (!user) return <Navigate to="/" replace />;
 
-  const isAdmin = role === "admin";
-
-  const filteredItems = useMemo(() => {
-    if (!searchQuery.trim()) return null;
-    return ALL_ITEMS.filter(
-      (item) =>
-        item.label.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        item.description.toLowerCase().includes(searchQuery.toLowerCase())
-    );
-  }, [searchQuery]);
-
   const toggleGroup = (key: string) =>
     setExpandedGroups((prev) => ({ ...prev, [key]: !prev[key] }));
 
