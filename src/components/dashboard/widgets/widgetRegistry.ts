@@ -20,6 +20,7 @@ import { MyApplicationsWidget }        from "./talent/MyApplicationsWidget";
 import { LearningProgressWidget }      from "./talent/LearningProgressWidget";
 import { CredentialWalletWidget }      from "./talent/CredentialWalletWidget";
 import { MicroTaskBoardWidget }        from "./talent/MicroTaskBoardWidget";
+import { ProfileCVWidget }             from "./talent/ProfileCVWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";
@@ -83,11 +84,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     accentColor: "text-primary",
   },
   build_profile: {
-    component:   BrowseOpportunitiesWidget, // placeholder until Profile widget exists
+    component:   ProfileCVWidget,
     layout:      "half",
     persona:     "talent",
     title:       "Profile & Digital CV",
-    description: "Build a verified professional profile.",
+    description: "Build a verified professional profile and preview your digital CV.",
     icon:        "FileText",
     color:       "bg-primary/10",
     accentColor: "text-primary",
