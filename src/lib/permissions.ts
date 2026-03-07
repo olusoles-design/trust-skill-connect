@@ -165,6 +165,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports_seta",
     "manage_learners",
     "audit_system",
+    "trust_ledger",
     "platform_admin",
   ],
   government: [
@@ -173,6 +174,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "verify_documents",
     "tender_matching",
     "audit_system",
+    "trust_ledger",
     "platform_admin",
     "document_vault",
   ],
@@ -204,6 +206,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports_seta",
     "audit_system",
     "marketplace_listing",
+    "marketplace_discovery",
     "tender_matching",
     "tender_feed",
     "learner_recruitment",
@@ -211,6 +214,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "procurement_alerts",
     "rfq_board",
     "facility_booking",
+    "workflow_engine",
+    "trust_ledger",
     "platform_admin",
   ],
 };
