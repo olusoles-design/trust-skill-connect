@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { X, ArrowLeft, ArrowRight, Loader2, Upload, CheckCircle2, Plus, Trash2, LogIn, UserPlus, ChevronRight } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 import { supabase } from "@/integrations/supabase/client";
 import { useToast } from "@/hooks/use-toast";
 import { ROLE_PERSONA } from "@/lib/permissions";
