@@ -99,7 +99,7 @@ export function ProviderListingManagerWidget() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("provider_listings" as never).delete().eq("id", id);
+      const { error } = await supabase.from("provider_listings").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
