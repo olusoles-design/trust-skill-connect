@@ -13,6 +13,13 @@ interface AuthContextValue {
   allRoles: AppRole[];
   /** Switch the active role to a different one the user owns */
   switchRole: (role: AppRole) => void;
+  /**
+   * Admin-only: temporarily preview any role without owning it.
+   * Pass null to exit preview and return to the real active role.
+   */
+  previewRole: (role: AppRole | null) => void;
+  /** The role the admin is currently previewing (null when not previewing) */
+  previewingAs: AppRole | null;
   plan: SubscriptionPlan | null;
   persona: Persona | null;
   capabilities: Capability[];
