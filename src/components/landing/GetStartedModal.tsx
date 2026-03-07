@@ -329,8 +329,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Mode: "entry" | "login" | "register"
-  const [mode, setMode]                         = useState<"entry" | "login" | "register">("entry");
+  // Mode: "entry" | "login" | "register" | "forgot"
+  const [mode, setMode]                         = useState<"entry" | "login" | "register" | "forgot">("entry");
+  const [forgotSent, setForgotSent]             = useState(false);
 
   // Register sub-steps: 1=hub, 2=role, 3=form, 4=docs, 5=plan, 6=confirm
   const [step, setStep]                         = useState(1);
