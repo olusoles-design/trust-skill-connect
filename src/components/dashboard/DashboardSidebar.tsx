@@ -65,7 +65,7 @@ const PERSONA_LABELS: Record<string, string> = {
 };
 
 const PERSONA_CAPABILITIES: Record<string, Capability[]> = {
-  talent:   ["find_opportunities", "apply_for_opportunities", "build_profile"],
+  talent:   ["find_opportunities", "apply_for_opportunities", "build_profile", "document_vault"],
   business: ["post_opportunities", "manage_learners", "marketplace_listing", "tender_matching"],
   funding:  ["fund_learners", "manage_learners"],
   oversight:["verify_documents", "view_reports", "platform_admin"],
