@@ -66,7 +66,7 @@ export function ProviderListingManagerWidget() {
 
   const save = useMutation({
     mutationFn: async () => {
-      const payload = {
+      const payload: TablesInsert<"provider_listings"> = {
         user_id: user!.id,
         title: form.title,
         category: form.category,
@@ -81,10 +81,10 @@ export function ProviderListingManagerWidget() {
         status: "active",
       };
       if (editing) {
-        const { error } = await (supabase.from("provider_listings") as ReturnType<typeof supabase.from>).update(payload as never).eq("id", editing);
+        const { error } = await supabase.from("provider_listings").update(payload).eq("id", editing);
         if (error) throw error;
       } else {
-        const { error } = await (supabase.from("provider_listings") as ReturnType<typeof supabase.from>).insert(payload as never);
+        const { error } = await supabase.from("provider_listings").insert(payload);
         if (error) throw error;
       }
     },
