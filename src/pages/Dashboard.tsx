@@ -32,13 +32,16 @@ import { RFQBoardWidget }             from "@/components/dashboard/widgets/busin
 import { FacilityBookingWidget }      from "@/components/dashboard/widgets/business/FacilityBookingWidget";
 // Shared
 import { MarketplaceListingWidget }   from "@/components/dashboard/widgets/business/MarketplaceListingWidget";
+import { MarketplaceDiscoveryWidget } from "@/components/dashboard/widgets/business/MarketplaceDiscoveryWidget";
 import { TenderMatchingWidget }       from "@/components/dashboard/widgets/business/TenderMatchingWidget";
+import { WorkflowEngineWidget }       from "@/components/dashboard/widgets/business/WorkflowEngineWidget";
 // Funding
 import { FundingAllocationWidget }    from "@/components/dashboard/widgets/funding/FundingAllocationWidget";
 // Oversight
 import { VerificationQueueWidget }    from "@/components/dashboard/widgets/oversight/VerificationQueueWidget";
 import { ReportsAnalyticsWidget }     from "@/components/dashboard/widgets/oversight/ReportsAnalyticsWidget";
 import { PlatformAdminWidget }        from "@/components/dashboard/widgets/oversight/PlatformAdminWidget";
+import { TrustLedgerWidget }          from "@/components/dashboard/widgets/oversight/TrustLedgerWidget";
 
 function PageView({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   const navigate = useNavigate();
