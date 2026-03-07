@@ -3,10 +3,22 @@ import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import {
-  User, Camera, Save, Loader2, AlertCircle, X, Plus,
-  Linkedin, Globe, MapPin, Phone, Briefcase, FileText
+  User, Camera, Save, Loader2, X, Plus,
+  Linkedin, Globe, MapPin, Phone, Briefcase, FileText,
+  GraduationCap, Cpu,
 } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+
+// ─── Practitioner sub-types ───────────────────────────────────────────────────
+
+const PRACTITIONER_TYPES = [
+  { key: "facilitator", label: "Facilitator",                  icon: GraduationCap, desc: "Delivers training programmes" },
+  { key: "assessor",    label: "Assessor",                     icon: FileText,      desc: "Assesses learner competence"  },
+  { key: "moderator",   label: "Moderator",                    icon: Briefcase,     desc: "Moderates assessment quality" },
+  { key: "sdf",         label: "Skills Development Facilitator (SDF)", icon: Cpu,   desc: "WSP/ATR & SETA liaison"       },
+] as const;
+
+type PractitionerTypeKey = (typeof PRACTITIONER_TYPES)[number]["key"];
 
 interface ProfileRow {
   id: string;
