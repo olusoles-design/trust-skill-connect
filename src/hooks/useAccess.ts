@@ -60,6 +60,11 @@ export function useAccess(featureOrCapability: string): AccessResult {
     };
   }
 
+  // Admins bypass all subscription plan gating
+  if (role === "admin") {
+    return { allowed: true };
+  }
+
   const effectivePlan: SubscriptionPlan = plan ?? "starter";
   const planRank = PLAN_RANK[effectivePlan];
   const requiredRank = PLAN_RANK[gate.minPlan];
