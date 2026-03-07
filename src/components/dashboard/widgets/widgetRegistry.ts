@@ -136,6 +136,16 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     color:       "bg-primary/10",
     accentColor: "text-primary",
   },
+  document_vault: {
+    component:   DocumentVaultWidget,
+    layout:      "half",
+    persona:     "talent",
+    title:       "Document Vault",
+    description: "Secure storage for compliance documents — SETA accreditation, B-BBEE, Tax Clearance.",
+    icon:        "ShieldCheck",
+    color:       "bg-primary/10",
+    accentColor: "text-primary",
+  },
 
   // ── Business ───────────────────────────────────────────────────────────────
   post_tasks: {

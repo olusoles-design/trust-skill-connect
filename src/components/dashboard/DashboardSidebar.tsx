@@ -46,6 +46,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Browse Opportunities",  url: "/dashboard/opportunities",  icon: Search,      capability: "find_opportunities" },
   { title: "My Applications",       url: "/dashboard/applications",   icon: Send,        capability: "apply_for_opportunities" },
   { title: "My Profile / CV",       url: "/dashboard/profile",        icon: FileText,    capability: "build_profile" },
+  { title: "Document Vault",        url: "/dashboard/vault",          icon: ShieldCheck, capability: "document_vault" },
   { title: "Post Opportunities",    url: "/dashboard/post",           icon: Briefcase,   capability: "post_opportunities" },
   { title: "Manage Learners",       url: "/dashboard/learners",       icon: Users,       capability: "manage_learners" },
   { title: "Fund Learners",         url: "/dashboard/funding",        icon: DollarSign,  capability: "fund_learners" },
