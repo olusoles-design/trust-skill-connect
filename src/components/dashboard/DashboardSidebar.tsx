@@ -19,7 +19,7 @@ import {
   DollarSign, Store, Crosshair, ShieldCheck, LogOut, User, Home,
   Wallet, Settings, Lock, ToggleRight, FileSignature, TrendingUp,
   Calculator, Rss, UserSearch, BarChart2, ShoppingCart, Bell,
-  ClipboardList, CalendarCheck, Activity,
+  ClipboardList, CalendarCheck, Activity, GitBranch, Link2,
 } from "lucide-react";
 import type { Capability } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
@@ -58,10 +58,13 @@ const ALL_NAV_ITEMS: NavItem[] = [
   // Shared Business
   { title: "Fund Learners",             url: "/dashboard/funding",         icon: DollarSign,    capability: "fund_learners"           },
   { title: "Marketplace Listing",       url: "/dashboard/marketplace",     icon: Store,         capability: "marketplace_listing"     },
+  { title: "Marketplace Discovery",     url: "/dashboard/discovery",       icon: Search,        capability: "marketplace_discovery"   },
   { title: "Tender Matching",           url: "/dashboard/tenders",         icon: Crosshair,     capability: "tender_matching"         },
+  { title: "Workflow Engine",           url: "/dashboard/workflow",        icon: GitBranch,     capability: "workflow_engine"         },
   // Oversight
   { title: "Verify Documents",          url: "/dashboard/verify",          icon: BadgeCheck,    capability: "verify_documents"        },
   { title: "Reports & Analytics",       url: "/dashboard/reports",         icon: BarChart3,     capability: "view_reports"            },
+  { title: "Trust Ledger",              url: "/dashboard/ledger",          icon: Link2,         capability: "trust_ledger"            },
   { title: "Platform Admin",            url: "/dashboard/admin",           icon: ShieldCheck,   capability: "platform_admin"          },
 ];
 
