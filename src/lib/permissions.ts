@@ -73,6 +73,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_credentials",
     "view_tasks",
     "my_tasks",
+    "document_vault",
   ],
   practitioner: [
     "find_opportunities",
@@ -83,6 +84,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_tasks",
     "my_tasks",
     "marketplace_listing",
+    "document_vault",
+  ],
   ],
   employer: [
     "post_opportunities",
@@ -179,6 +182,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   view_credentials:        { minPlan: "starter" },
   view_tasks:              { minPlan: "starter", limit: 5 },
   my_tasks:                { minPlan: "starter" },
+  document_vault:          { minPlan: "starter" },
   // Business
   post_opportunities:      { minPlan: "starter", limit: 1 },
   post_tasks:              { minPlan: "starter", limit: 3 },
