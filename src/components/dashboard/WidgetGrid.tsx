@@ -1,10 +1,12 @@
+import { useState } from "react";
 import { useAuth } from "@/contexts/AuthContext";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import {
   Search, Send, FileText, Briefcase, Users,
-  DollarSign, BadgeCheck, BarChart3, Store, Crosshair, ShieldCheck,
+  DollarSign, BadgeCheck, BarChart3, Store, Crosshair, ShieldCheck, ArrowLeft,
 } from "lucide-react";
 import type { Capability } from "@/lib/permissions";
+import { BrowseOpportunitiesWidget } from "./widgets/BrowseOpportunitiesWidget";
 
 interface WidgetDef {
   capability: Capability;
