@@ -46,10 +46,10 @@ const DOC_TYPES = [
 ];
 
 const STATUS_CONFIG: Record<DocStatus, { label: string; icon: React.ElementType; color: string; bg: string }> = {
-  pending:  { label: "Pending Review", icon: Clock,        color: "text-amber-600",  bg: "bg-amber-500/10 border-amber-500/20" },
-  verified: { label: "Verified",       icon: CheckCircle2, color: "text-green-600",  bg: "bg-green-500/10 border-green-500/20" },
+  pending:  { label: "Pending Review", icon: Clock,        color: "text-yellow-600 dark:text-yellow-400",  bg: "bg-yellow-500/10 border-yellow-500/20" },
+  verified: { label: "Verified",       icon: CheckCircle2, color: "text-emerald-600 dark:text-emerald-400", bg: "bg-emerald-500/10 border-emerald-500/20" },
   rejected: { label: "Rejected",       icon: XCircle,      color: "text-destructive", bg: "bg-destructive/10 border-destructive/20" },
-  expired:  { label: "Expired",        icon: AlertTriangle, color: "text-orange-600", bg: "bg-orange-500/10 border-orange-500/20" },
+  expired:  { label: "Expired",        icon: AlertTriangle, color: "text-orange-600 dark:text-orange-400", bg: "bg-orange-500/10 border-orange-500/20" },
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
