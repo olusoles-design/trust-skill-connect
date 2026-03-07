@@ -8,6 +8,7 @@ import { PWAInstallBanner } from "@/components/pwa/PWAInstallBanner";
 import { OfflineBanner } from "@/components/pwa/OfflinePage";
 import Index from "./pages/Index";
 import Dashboard from "./pages/Dashboard";
+import Payments from "./pages/Payments";
 import NotFound from "./pages/NotFound";
 
 const queryClient = new QueryClient();
