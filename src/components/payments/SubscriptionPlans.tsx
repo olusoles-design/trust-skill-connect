@@ -61,7 +61,7 @@ export function SubscriptionPlans() {
             >
               {/* Header */}
               <div className={`p-5 ${p.headerColor}`}>
-                {p.popular && (
+                {"popular" in p && p.popular && (
                   <span className="text-xs font-semibold px-2 py-0.5 rounded-full bg-primary text-primary-foreground mb-3 inline-block">
                     Most Popular
                   </span>
