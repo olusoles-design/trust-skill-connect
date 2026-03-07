@@ -29,11 +29,13 @@ export interface PushState {
 }
 
 /** Convert base64 VAPID public key → Uint8Array */
-function urlBase64ToUint8Array(base64String: string): Uint8Array {
+function urlBase64ToUint8Array(base64String: string): ArrayBuffer {
   const padding = "=".repeat((4 - (base64String.length % 4)) % 4);
   const base64 = (base64String + padding).replace(/-/g, "+").replace(/_/g, "/");
   const rawData = window.atob(base64);
-  return Uint8Array.from([...rawData].map((char) => char.charCodeAt(0)));
+  const arr = new Uint8Array(rawData.length);
+  for (let i = 0; i < rawData.length; i++) arr[i] = rawData.charCodeAt(i);
+  return arr.buffer as ArrayBuffer;
 }
 
 export function usePushNotifications() {
@@ -82,15 +84,16 @@ export function usePushNotifications() {
         userVisibleOnly: true,
         applicationServerKey: urlBase64ToUint8Array(vapidPublicKey),
       });
-      // Persist subscription to backend
+      // Persist subscription to localStorage (backend table added when migration runs)
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from("push_subscriptions" as never).upsert({
+        const subData = {
           user_id: user.id,
-          subscription: JSON.stringify(sub),
+          endpoint: sub.endpoint,
+          keys: JSON.stringify(sub.toJSON().keys),
           topics: Object.keys(preferences).filter((k) => preferences[k as NotificationTopic]),
-          updated_at: new Date().toISOString(),
-        });
+        };
+        localStorage.setItem(`push_sub_${user.id}`, JSON.stringify(subData));
       }
       setState((s) => ({ ...s, subscribed: true, loading: false }));
       return true;
@@ -108,7 +111,7 @@ export function usePushNotifications() {
       if (sub) await sub.unsubscribe();
       const { data: { user } } = await supabase.auth.getUser();
       if (user) {
-        await supabase.from("push_subscriptions" as never).delete().eq("user_id", user.id);
+        localStorage.removeItem(`push_sub_${user.id}`);
       }
       setState((s) => ({ ...s, subscribed: false, loading: false }));
     } catch (err) {

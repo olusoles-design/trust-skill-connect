@@ -53,13 +53,6 @@ export default defineConfig(({ mode }) => ({
             },
           },
         ],
-        // Background sync for offline document uploads
-        backgroundSync: {
-          name: "document-upload-queue",
-          options: {
-            maxRetentionTime: 24 * 60, // Retry for up to 24 hours
-          },
-        },
       },
       manifest: {
         name: "SkillsMark",
