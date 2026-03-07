@@ -52,6 +52,60 @@ export type Database = {
           },
         ]
       }
+      document_vault: {
+        Row: {
+          created_at: string
+          doc_type: string
+          expires_at: string | null
+          file_name: string
+          file_size: number | null
+          file_url: string
+          id: string
+          label: string
+          mime_type: string | null
+          reviewed_at: string | null
+          reviewed_by: string | null
+          reviewer_note: string | null
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          doc_type: string
+          expires_at?: string | null
+          file_name: string
+          file_size?: number | null
+          file_url: string
+          id?: string
+          label: string
+          mime_type?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_note?: string | null
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          doc_type?: string
+          expires_at?: string | null
+          file_name?: string
+          file_size?: number | null
+          file_url?: string
+          id?: string
+          label?: string
+          mime_type?: string | null
+          reviewed_at?: string | null
+          reviewed_by?: string | null
+          reviewer_note?: string | null
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       match_results: {
         Row: {
           created_at: string

@@ -7,7 +7,12 @@ import { ROLE_CAPABILITIES, ROLE_PERSONA, roleHasCapability } from "@/lib/permis
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
+  /** The currently active role (the "hat" the user is wearing) */
   role: AppRole | null;
+  /** All roles this user holds */
+  allRoles: AppRole[];
+  /** Switch the active role to a different one the user owns */
+  switchRole: (role: AppRole) => void;
   plan: SubscriptionPlan | null;
   persona: Persona | null;
   capabilities: Capability[];
@@ -22,6 +27,8 @@ const AuthContext = createContext<AuthContextValue>({
   user: null,
   session: null,
   role: null,
+  allRoles: [],
+  switchRole: () => {},
   plan: null,
   persona: null,
   capabilities: [],
@@ -35,17 +42,26 @@ const AuthContext = createContext<AuthContextValue>({
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [session, setSession] = useState<Session | null>(null);
-  const [role, setRole] = useState<AppRole | null>(null);
+  const [allRoles, setAllRoles] = useState<AppRole[]>([]);
+  const [activeRole, setActiveRole] = useState<AppRole | null>(null);
   const [plan, setPlan] = useState<SubscriptionPlan | null>(null);
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
   async function loadUserData(userId: string) {
     const [rolesRes, subRes] = await Promise.all([
-      supabase.from("user_roles").select("role").eq("user_id", userId).maybeSingle(),
+      supabase.from("user_roles").select("role").eq("user_id", userId),
       supabase.from("subscriptions").select("plan, trial_ends_at").eq("user_id", userId).maybeSingle(),
     ]);
-    setRole(rolesRes.data?.role ?? null);
+
+    const roles = (rolesRes.data ?? []).map((r) => r.role as AppRole);
+    setAllRoles(roles);
+
+    // Restore previously chosen role from localStorage, else default to first role
+    const stored = localStorage.getItem(`skillsmark_active_role_${userId}`) as AppRole | null;
+    const chosen = stored && roles.includes(stored) ? stored : (roles[0] ?? null);
+    setActiveRole(chosen);
+
     setPlan(subRes.data?.plan ?? "starter");
     setTrialEndsAt(subRes.data?.trial_ends_at ?? null);
   }
@@ -57,7 +73,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (sess?.user) {
         setTimeout(() => loadUserData(sess.user.id), 0);
       } else {
-        setRole(null);
+        setAllRoles([]);
+        setActiveRole(null);
         setPlan(null);
         setTrialEndsAt(null);
       }
@@ -74,12 +91,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return () => subscription.unsubscribe();
   }, []);
 
-  const isTrialActive = plan === "starter" && !!trialEndsAt && new Date(trialEndsAt) > new Date();
+  const switchRole = (newRole: AppRole) => {
+    if (!allRoles.includes(newRole)) return;
+    setActiveRole(newRole);
+    if (user) localStorage.setItem(`skillsmark_active_role_${user.id}`, newRole);
+  };
 
-  // Derived from role — no extra state needed
+  const role = activeRole;
+
+  const isTrialActive = plan === "starter" && !!trialEndsAt && new Date(trialEndsAt) > new Date();
   const capabilities: Capability[] = role ? ROLE_CAPABILITIES[role] ?? [] : [];
   const persona: Persona | null = role ? ROLE_PERSONA[role] ?? null : null;
-
   const hasCapability = (cap: Capability): boolean => roleHasCapability(role, cap);
 
   const signOut = async () => {
@@ -92,6 +114,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         user,
         session,
         role,
+        allRoles,
+        switchRole,
         plan,
         persona,
         capabilities,

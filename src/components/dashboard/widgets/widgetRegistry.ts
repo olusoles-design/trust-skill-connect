@@ -22,6 +22,7 @@ import { CredentialWalletWidget }      from "./talent/CredentialWalletWidget";
 import { MicroTaskBoardWidget }        from "./talent/MicroTaskBoardWidget";
 import { MyTasksWidget }               from "./talent/MyTasksWidget";
 import { ProfileCVWidget }             from "./talent/ProfileCVWidget";
+import { DocumentVaultWidget }         from "./talent/DocumentVaultWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";
@@ -132,6 +133,16 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title:       "My Tasks & Earnings",
     description: "Track completed tasks, earnings history, and quality ratings.",
     icon:        "Wallet",
+    color:       "bg-primary/10",
+    accentColor: "text-primary",
+  },
+  document_vault: {
+    component:   DocumentVaultWidget,
+    layout:      "half",
+    persona:     "talent",
+    title:       "Document Vault",
+    description: "Secure storage for compliance documents — SETA accreditation, B-BBEE, Tax Clearance.",
+    icon:        "ShieldCheck",
     color:       "bg-primary/10",
     accentColor: "text-primary",
   },

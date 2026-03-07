@@ -13,7 +13,7 @@ import type { Database } from "@/integrations/supabase/types";
 export type AppRole = Database["public"]["Enums"]["app_role"];
 export type SubscriptionPlan = Database["public"]["Enums"]["subscription_plan"];
 
-// ─── 22 Core Capabilities ──────────────────────────────────────────────────
+// ─── Core Capabilities ─────────────────────────────────────────────────────
 
 export type Capability =
   // Talent
@@ -24,6 +24,7 @@ export type Capability =
   | "view_credentials"         // Digital badge & credential wallet
   | "view_tasks"               // Micro-task board for immediate income
   | "my_tasks"                 // My tasks history & earnings
+  | "document_vault"           // Secure compliance document vault
   // Business
   | "post_opportunities"       // Post jobs, programmes, gigs
   | "post_tasks"               // Post micro-tasks & review submissions
@@ -72,6 +73,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_credentials",
     "view_tasks",
     "my_tasks",
+    "document_vault",
   ],
   practitioner: [
     "find_opportunities",
@@ -82,6 +84,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_tasks",
     "my_tasks",
     "marketplace_listing",
+    "document_vault",
   ],
   employer: [
     "post_opportunities",
@@ -135,6 +138,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "tender_matching",
     "audit_system",
     "platform_admin",
+    "document_vault",
   ],
   admin: [
     "find_opportunities",
@@ -144,6 +148,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_credentials",
     "view_tasks",
     "my_tasks",
+    "document_vault",
     "post_opportunities",
     "post_tasks",
     "manage_learners",
@@ -178,6 +183,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   view_credentials:        { minPlan: "starter" },
   view_tasks:              { minPlan: "starter", limit: 5 },
   my_tasks:                { minPlan: "starter" },
+  document_vault:          { minPlan: "starter" },
   // Business
   post_opportunities:      { minPlan: "starter", limit: 1 },
   post_tasks:              { minPlan: "starter", limit: 3 },
