@@ -128,6 +128,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "outcome_tracking",
     "manage_procurement",
     "document_vault",
+    "marketplace_discovery",
+    "workflow_engine",
   ],
   sponsor: [
     "fund_learners",
@@ -141,6 +143,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "verify_documents",
     "manage_funding",
     "approve_payments",
+    "workflow_engine",
+    "marketplace_discovery",
   ],
   fundi: [
     "fund_learners",
@@ -148,9 +152,11 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_reports",
     "manage_funding",
     "approve_payments",
+    "marketplace_discovery",
   ],
   support_provider: [
     "marketplace_listing",
+    "marketplace_discovery",
     "tender_matching",
     "manage_procurement",
     "view_reports",
