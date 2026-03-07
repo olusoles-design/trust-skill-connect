@@ -329,8 +329,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const { toast } = useToast();
   const navigate = useNavigate();
 
-  // Mode: "entry" | "login" | "register"
-  const [mode, setMode]                         = useState<"entry" | "login" | "register">("entry");
+  // Mode: "entry" | "login" | "register" | "forgot"
+  const [mode, setMode]                         = useState<"entry" | "login" | "register" | "forgot">("entry");
+  const [forgotSent, setForgotSent]             = useState(false);
 
   // Register sub-steps: 1=hub, 2=role, 3=form, 4=docs, 5=plan, 6=confirm
   const [step, setStep]                         = useState(1);
@@ -377,7 +378,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const resetModal = useCallback(() => {
     setMode("entry"); setStep(1); setSelectedHub(null); setSelectedRole(null);
     setPractitionerRole(null); setAdditionalRoles([]); setSelectedPlan(null);
-    setForm(EMPTY_FORM); setUploads([]);
+    setForm(EMPTY_FORM); setUploads([]); setForgotSent(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -391,6 +392,26 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const toggleAdditionalRole = (role: AppRole) => {
     if (role === selectedRole) return;
     setAdditionalRoles(prev => prev.includes(role) ? prev.filter(r => r !== role) : [...prev, role]);
+  };
+
+  // ── Forgot Password ───────────────────────────────────────────────────────
+  const handleForgotPassword = async () => {
+    if (!form.email) {
+      toast({ title: "Email required", description: "Enter your email address.", variant: "destructive" });
+      return;
+    }
+    setSubmitting(true);
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+        redirectTo: `${window.location.origin}/reset-password`,
+      });
+      if (error) throw error;
+      setForgotSent(true);
+    } catch (err: unknown) {
+      toast({ title: "Error", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
+    } finally {
+      setSubmitting(false);
+    }
   };
 
   // ── Sign In ───────────────────────────────────────────────────────────────
@@ -480,6 +501,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   // ── Modal header config ───────────────────────────────────────────────────
   const modalTitle = (() => {
     if (mode === "login") return "Welcome back";
+    if (mode === "forgot") return forgotSent ? "Check your inbox" : "Reset password";
     if (mode === "entry") return "Join SkillsMark";
     if (step === 1) return "Choose your hub";
     if (step === 2 && !showPractitionerPicker) return `${currentHub?.label ?? ""} roles`;
@@ -493,6 +515,8 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const modalSubtitle = (() => {
     if (mode === "entry") return "Select how you'd like to get started";
     if (mode === "login") return "Sign in to your SkillsMark account";
+    if (mode === "forgot" && !forgotSent) return "We'll send a reset link to your email";
+    if (mode === "forgot" && forgotSent) return `A reset link was sent to ${form.email}`;
     if (step === 1) return "Pick the hub that best describes your role in skills development";
     if (step === 2 && !showPractitionerPicker) return `Select your specific role within the ${currentHub?.label} Hub`;
     if (step === 4) return "Upload your documents now or skip — verify later from your profile";
@@ -601,7 +625,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password" />
                   </FieldRow>
                   <div className="text-right">
-                    <button className="text-xs text-teal hover:underline">Forgot password?</button>
+                    <button onClick={() => { setForgotSent(false); setMode("forgot"); }} className="text-xs text-teal hover:underline transition-colors">Forgot password?</button>
                   </div>
                   <button onClick={handleSignIn} disabled={submitting}
                     className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
@@ -613,6 +637,41 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                       Create one free
                     </button>
                   </p>
+                </motion.div>
+              )}
+
+              {/* ═══════════════════════════════════════════════════════════ */}
+              {/* FORGOT PASSWORD                                            */}
+              {/* ═══════════════════════════════════════════════════════════ */}
+              {mode === "forgot" && (
+                <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
+                  className="space-y-5 max-w-sm mx-auto">
+                  {forgotSent ? (
+                    <div className="text-center py-4 space-y-4">
+                      <div className="w-16 h-16 rounded-full bg-teal/20 border border-teal/40 flex items-center justify-center mx-auto">
+                        <span className="text-3xl">📬</span>
+                      </div>
+                      <p className="text-white/60 text-sm leading-relaxed">
+                        Check <span className="text-teal font-semibold">{form.email}</span> for a reset link. It may take a minute to arrive.
+                      </p>
+                      <button onClick={() => setMode("login")} className="w-full py-3 rounded-xl bg-white/5 border border-white/10 text-white/60 hover:text-white hover:border-white/20 text-sm font-medium transition-all">
+                        ← Back to Sign In
+                      </button>
+                    </div>
+                  ) : (
+                    <>
+                      <FieldRow label="Email Address">
+                        <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus />
+                      </FieldRow>
+                      <button onClick={handleForgotPassword} disabled={submitting}
+                        className="w-full py-3 rounded-xl gradient-teal text-white font-semibold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60">
+                        {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Send Reset Link"}
+                      </button>
+                      <button onClick={() => setMode("login")} className="w-full text-center text-xs text-white/40 hover:text-white/70 transition-colors">
+                        ← Back to Sign In
+                      </button>
+                    </>
+                  )}
                 </motion.div>
               )}
 
