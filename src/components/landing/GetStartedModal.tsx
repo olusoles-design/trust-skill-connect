@@ -417,6 +417,10 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
       return;
     }
+    if (form.password.length < 6) {
+      toast({ title: "Password too short", description: "Password must be at least 6 characters.", variant: "destructive" });
+      return;
+    }
     setSubmitting(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -424,16 +428,34 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
         options: { emailRedirectTo: `${window.location.origin}/dashboard` },
       });
       if (error) throw error;
+
       const uid = data.user?.id;
-      if (uid) {
+      const hasSession = !!data.session; // auto-confirm gives a session immediately
+
+      if (uid && hasSession) {
+        // User is immediately authenticated — safe to write profile & role
         await supabase.from("profiles").upsert({
-          user_id: uid, first_name: form.firstName || null, last_name: form.lastName || null,
-          username: form.username || null, phone: form.phone || null,
+          user_id: uid,
+          first_name: form.firstName || null,
+          last_name: form.lastName || null,
+          username: form.username || null,
+          phone: form.phone || null,
         });
-        if (selectedRole) await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole });
-        for (const role of additionalRoles) await supabase.from("user_roles").upsert({ user_id: uid, role });
+        if (selectedRole) {
+          await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole });
+        }
+        for (const role of additionalRoles) {
+          await supabase.from("user_roles").upsert({ user_id: uid, role });
+        }
+        setStep(4);
+      } else {
+        // Email confirmation required — show a friendly message
+        toast({
+          title: "Check your email!",
+          description: "We sent a confirmation link. Click it to activate your account.",
+        });
+        handleClose();
       }
-      setStep(4);
     } catch (err: unknown) {
       toast({ title: "Sign-up failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
     } finally {
