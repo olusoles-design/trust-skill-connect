@@ -14,39 +14,224 @@ export type Database = {
   }
   public: {
     Tables: {
+      applications: {
+        Row: {
+          applicant_id: string
+          cover_note: string | null
+          created_at: string
+          id: string
+          opportunity_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          applicant_id: string
+          cover_note?: string | null
+          created_at?: string
+          id?: string
+          opportunity_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          applicant_id?: string
+          cover_note?: string | null
+          created_at?: string
+          id?: string
+          opportunity_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "applications_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      micro_tasks: {
+        Row: {
+          category: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          employer: string | null
+          id: string
+          location: string
+          pay: string | null
+          posted_by: string
+          skills: string[] | null
+          status: string
+          title: string
+          updated_at: string
+          urgency: string
+        }
+        Insert: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          employer?: string | null
+          id?: string
+          location?: string
+          pay?: string | null
+          posted_by: string
+          skills?: string[] | null
+          status?: string
+          title: string
+          updated_at?: string
+          urgency?: string
+        }
+        Update: {
+          category?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          employer?: string | null
+          id?: string
+          location?: string
+          pay?: string | null
+          posted_by?: string
+          skills?: string[] | null
+          status?: string
+          title?: string
+          updated_at?: string
+          urgency?: string
+        }
+        Relationships: []
+      }
+      opportunities: {
+        Row: {
+          applications: number
+          bbee_points: boolean | null
+          category: string | null
+          closing_date: string | null
+          created_at: string
+          description: string | null
+          duration: string | null
+          featured: boolean | null
+          id: string
+          location: string | null
+          organisation: string | null
+          posted_by: string
+          seta: string | null
+          status: string
+          stipend: string | null
+          tags: string[] | null
+          title: string
+          type: string
+          updated_at: string
+          verified: boolean | null
+          views: number
+        }
+        Insert: {
+          applications?: number
+          bbee_points?: boolean | null
+          category?: string | null
+          closing_date?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          featured?: boolean | null
+          id?: string
+          location?: string | null
+          organisation?: string | null
+          posted_by: string
+          seta?: string | null
+          status?: string
+          stipend?: string | null
+          tags?: string[] | null
+          title: string
+          type?: string
+          updated_at?: string
+          verified?: boolean | null
+          views?: number
+        }
+        Update: {
+          applications?: number
+          bbee_points?: boolean | null
+          category?: string | null
+          closing_date?: string | null
+          created_at?: string
+          description?: string | null
+          duration?: string | null
+          featured?: boolean | null
+          id?: string
+          location?: string | null
+          organisation?: string | null
+          posted_by?: string
+          seta?: string | null
+          status?: string
+          stipend?: string | null
+          tags?: string[] | null
+          title?: string
+          type?: string
+          updated_at?: string
+          verified?: boolean | null
+          views?: number
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           avatar_url: string | null
+          bio: string | null
+          company_name: string | null
           created_at: string
           first_name: string | null
           id: string
+          id_number: string | null
+          job_title: string | null
           last_name: string | null
+          linkedin_url: string | null
+          location: string | null
           phone: string | null
+          skills: string[] | null
           updated_at: string
           user_id: string
           username: string | null
+          website_url: string | null
         }
         Insert: {
           avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
           created_at?: string
           first_name?: string | null
           id?: string
+          id_number?: string | null
+          job_title?: string | null
           last_name?: string | null
+          linkedin_url?: string | null
+          location?: string | null
           phone?: string | null
+          skills?: string[] | null
           updated_at?: string
           user_id: string
           username?: string | null
+          website_url?: string | null
         }
         Update: {
           avatar_url?: string | null
+          bio?: string | null
+          company_name?: string | null
           created_at?: string
           first_name?: string | null
           id?: string
+          id_number?: string | null
+          job_title?: string | null
           last_name?: string | null
+          linkedin_url?: string | null
+          location?: string | null
           phone?: string | null
+          skills?: string[] | null
           updated_at?: string
           user_id?: string
           username?: string | null
+          website_url?: string | null
         }
         Relationships: []
       }
