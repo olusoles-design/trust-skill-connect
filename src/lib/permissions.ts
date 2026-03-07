@@ -51,6 +51,10 @@ export type Capability =
   | "view_reports"
   | "audit_system"
   | "view_reports_seta"
+  // Phase 3 – Glue features
+  | "marketplace_discovery"  // Advanced search: find SDPs, facilitators, venues
+  | "workflow_engine"        // RFP→RFQ deal flow, learner registration, SETA packet
+  | "trust_ledger"           // Immutable audit ledger + QR verification
   // Admin
   | "platform_admin";
 
