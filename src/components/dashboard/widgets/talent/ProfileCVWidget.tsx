@@ -51,9 +51,18 @@ export function ProfileCVWidget() {
   const [form, setForm] = useState(BLANK_PROFILE);
   const [newSkill, setNewSkill] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [practitionerTypes, setPractitionerTypes] = useState<PractitionerTypeKey[]>([]);
   const fileRef = useRef<HTMLInputElement>(null);
   const { toast } = useToast();
   const qc = useQueryClient();
+
+  const isPractitioner = role === "practitioner";
+
+  const togglePractType = (key: PractitionerTypeKey) =>
+    setPractitionerTypes(prev =>
+      prev.includes(key) ? prev.filter(k => k !== key) : [...prev, key]
+    );
+
 
   const { data: profile, isLoading } = useQuery({
     queryKey: ["profile", user?.id],
