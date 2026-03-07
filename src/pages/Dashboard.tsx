@@ -86,6 +86,11 @@ export default function Dashboard() {
                   <ProfileCVWidget />
                 </PageView>
               } />
+              <Route path="vault" element={
+                <PageView title="Document Vault" description="Securely store and manage your compliance documents — SETA accreditation, B-BBEE, Tax Clearance.">
+                  <DocumentVaultWidget />
+                </PageView>
+              } />
 
               {/* Business Hub */}
               <Route path="post" element={
