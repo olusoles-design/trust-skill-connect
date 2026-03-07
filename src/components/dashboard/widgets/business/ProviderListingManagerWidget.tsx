@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
+import type { TablesInsert } from "@/integrations/supabase/types";
 import { useAuth } from "@/contexts/AuthContext";
 import {
   Store, Plus, Save, X, Edit2, Trash2, Loader2, AlertCircle, Star,
@@ -54,18 +55,18 @@ export function ProviderListingManagerWidget() {
     enabled: !!user,
     queryFn: async () => {
       const { data, error } = await supabase
-        .from("provider_listings" as never)
+        .from("provider_listings")
         .select("id, title, category, description, pricing_model, price_from, price_to, currency, location, certifications, services, rating_avg, review_count, status")
         .eq("user_id", user!.id)
         .order("created_at", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as Listing[];
+      return (data ?? []) as unknown as Listing[];
     },
   });
 
   const save = useMutation({
     mutationFn: async () => {
-      const payload = {
+      const payload: TablesInsert<"provider_listings"> = {
         user_id: user!.id,
         title: form.title,
         category: form.category,
@@ -80,10 +81,10 @@ export function ProviderListingManagerWidget() {
         status: "active",
       };
       if (editing) {
-        const { error } = await supabase.from("provider_listings" as never).update(payload).eq("id", editing);
+        const { error } = await supabase.from("provider_listings").update(payload).eq("id", editing);
         if (error) throw error;
       } else {
-        const { error } = await supabase.from("provider_listings" as never).insert(payload);
+        const { error } = await supabase.from("provider_listings").insert(payload);
         if (error) throw error;
       }
     },
@@ -99,7 +100,7 @@ export function ProviderListingManagerWidget() {
 
   const remove = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await supabase.from("provider_listings" as never).delete().eq("id", id);
+      const { error } = await supabase.from("provider_listings").delete().eq("id", id);
       if (error) throw error;
     },
     onSuccess: () => {
