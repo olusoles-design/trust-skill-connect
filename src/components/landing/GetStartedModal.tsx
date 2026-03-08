@@ -433,31 +433,46 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     try {
       const { data, error } = await supabase.auth.signUp({
         email: form.email, password: form.password,
-        options: { emailRedirectTo: `${window.location.origin}/dashboard` },
+        options: {
+          data: {
+            first_name: form.firstName || null,
+            last_name: form.lastName || null,
+          },
+          emailRedirectTo: `${window.location.origin}/dashboard`,
+        },
       });
       if (error) throw error;
 
       const uid = data.user?.id;
       const hasSession = !!data.session;
 
-      if (uid && hasSession) {
+      // Save profile & roles if we have a live session (auto-confirm enabled)
+      if (uid) {
         await supabase.from("profiles").upsert({
           user_id: uid,
           first_name: form.firstName || null,
           last_name: form.lastName || null,
           username: form.username || null,
           phone: form.phone || null,
+          company_name: form.companyName || null,
+          job_title: form.jobTitle || null,
         });
         if (selectedRole) {
-          await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole });
+          await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole }, { onConflict: "user_id,role" });
         }
         for (const role of additionalRoles) {
-          await supabase.from("user_roles").upsert({ user_id: uid, role });
+          await supabase.from("user_roles").upsert({ user_id: uid, role }, { onConflict: "user_id,role" });
         }
+      }
+
+      if (hasSession) {
+        // Auto-confirmed: move to documents step
         setStep(4);
       } else {
-        toast({ title: "Check your email!", description: "We sent a confirmation link." });
+        // Email confirmation required
+        toast({ title: "Check your email!", description: "We sent you a confirmation link to activate your account." });
         handleClose();
+        navigate("/dashboard");
       }
     } catch (err: unknown) {
       toast({ title: "Sign-up failed", description: err instanceof Error ? err.message : "Please try again.", variant: "destructive" });
