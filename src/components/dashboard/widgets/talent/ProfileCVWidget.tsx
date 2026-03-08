@@ -35,6 +35,7 @@ interface ProfileRow {
   linkedin_url: string | null;
   website_url: string | null;
   avatar_url: string | null;
+  demographics: Record<string, unknown> | null;
 }
 
 const BLANK_PROFILE: Partial<ProfileRow> = {
@@ -78,7 +79,7 @@ export function ProfileCVWidget() {
     },
   });
 
-  // Sync form when profile loads
+  // Sync form when profile loads — also restore saved practitioner types from demographics
   useEffect(() => {
     if (profile) {
       setForm({
@@ -93,14 +94,21 @@ export function ProfileCVWidget() {
         linkedin_url: profile.linkedin_url ?? "",
         website_url: profile.website_url ?? "",
       });
+      // Restore practitioner_types stored in demographics JSONB
+      const demo = profile.demographics as Record<string, unknown> | null;
+      if (demo?.practitioner_types && Array.isArray(demo.practitioner_types)) {
+        setPractitionerTypes(demo.practitioner_types as PractitionerTypeKey[]);
+      }
     }
   }, [profile]);
 
   const save = useMutation({
     mutationFn: async () => {
+      // Save practitioner_types into the demographics JSONB field
+      const currentDemo = (profile?.demographics ?? {}) as Record<string, unknown>;
       const { error } = await supabase
         .from("profiles")
-        .update(form)
+        .update({ ...form, demographics: { ...currentDemo, practitioner_types: practitionerTypes } as any })
         .eq("user_id", user!.id);
       if (error) throw error;
     },

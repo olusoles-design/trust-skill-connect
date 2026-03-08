@@ -14,6 +14,7 @@ import { ProfileCVWidget }            from "@/components/dashboard/widgets/talen
 import { DocumentVaultWidget }        from "@/components/dashboard/widgets/talent/DocumentVaultWidget";
 import { AvailabilityToggleWidget }   from "@/components/dashboard/widgets/talent/AvailabilityToggleWidget";
 import { SmartContractingWidget }     from "@/components/dashboard/widgets/talent/SmartContractingWidget";
+import { PractitionerAccreditationsWidget } from "@/components/dashboard/widgets/talent/PractitionerAccreditationsWidget";
 // Business – Employer/Sponsor
 import { OpportunityManagerWidget }   from "@/components/dashboard/widgets/business/OpportunityManagerWidget";
 import { TeamRosterWidget }           from "@/components/dashboard/widgets/business/TeamRosterWidget";
@@ -90,7 +91,8 @@ export default function Dashboard() {
               <Route path="profile"       element={<PageView title="Profile & Digital CV" description="Build a verified professional profile."><ProfileCVWidget /></PageView>} />
               <Route path="vault"         element={<PageView title="Document Vault" description="Securely store compliance documents with expiry tracking."><DocumentVaultWidget /></PageView>} />
               <Route path="availability"  element={<PageView title="Availability & Contracts" description="Toggle availability, view contracts and reputation score."><AvailabilityToggleWidget /></PageView>} />
-              <Route path="contracting"   element={<PageView title="Smart Contracting" description="Digital timesheets, geo clock-in/out and SLA templates."><SmartContractingWidget /></PageView>} />
+              <Route path="contracting"      element={<PageView title="Smart Contracting" description="Digital timesheets, geo clock-in/out and SLA templates."><SmartContractingWidget /></PageView>} />
+              <Route path="accreditations"   element={<PageView title="Practitioner Accreditations" description="Manage statutory documents per practitioner role."><PractitionerAccreditationsWidget /></PageView>} />
 
               {/* Employer/Sponsor */}
               <Route path="post"      element={<PageView title="Opportunity Manager" description="Create and manage job, learnership and programme listings."><OpportunityManagerWidget /></PageView>} />

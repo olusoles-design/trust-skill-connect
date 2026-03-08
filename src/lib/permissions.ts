@@ -22,6 +22,7 @@ export type Capability =
   // Practitioner
   | "availability_toggle"      // Availability switch + reputation
   | "smart_contracting"        // SLA templates + digital timesheets
+  | "practitioner_accreditations" // Statutory accreditation docs per role
   // Business – Employer/Sponsor
   | "post_opportunities"
   | "post_tasks"
@@ -103,6 +104,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "availability_toggle",
     "smart_contracting",
     "marketplace_discovery",
+    "practitioner_accreditations",
   ],
   employer: [
     "post_opportunities",
@@ -249,8 +251,9 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   my_tasks:                { minPlan: "starter" },
   document_vault:          { minPlan: "starter" },
   // Practitioner
-  availability_toggle:     { minPlan: "starter" },
-  smart_contracting:       { minPlan: "professional" },
+  availability_toggle:          { minPlan: "starter" },
+  smart_contracting:            { minPlan: "professional" },
+  practitioner_accreditations:  { minPlan: "starter" },
   // Business – Employer/Sponsor
   post_opportunities:      { minPlan: "starter", limit: 1 },
   post_tasks:              { minPlan: "starter", limit: 3 },
