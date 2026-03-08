@@ -104,9 +104,11 @@ export function ProfileCVWidget() {
 
   const save = useMutation({
     mutationFn: async () => {
+      // Save practitioner_types into the demographics JSONB field
+      const currentDemo = (profile?.demographics ?? {}) as Record<string, unknown>;
       const { error } = await supabase
         .from("profiles")
-        .update(form)
+        .update({ ...form, demographics: { ...currentDemo, practitioner_types: practitionerTypes } as any })
         .eq("user_id", user!.id);
       if (error) throw error;
     },
