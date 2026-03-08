@@ -61,7 +61,8 @@ export type Capability =
   | "multi_company_sponsorship" // Lead/Host/Funder company management + B-BBEE allocation
   // Admin
   | "platform_admin"
-  | "portal_switcher";
+  | "portal_switcher"
+  | "upload_accreditation";  // AI-powered accreditation letter extraction
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
