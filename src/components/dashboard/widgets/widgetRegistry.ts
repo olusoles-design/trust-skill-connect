@@ -43,6 +43,8 @@ import { MultiCompanySponsorshipWidget } from "./business/MultiCompanySponsorshi
 // ─── Funding
 import { FundingAllocationWidget }     from "./funding/FundingAllocationWidget";
 import { DisbursementQueueWidget }     from "./funding/DisbursementQueueWidget";
+import { SponsorOpportunityWidget }    from "./funding/SponsorOpportunityWidget";
+import { FundingOpportunitiesWidget }  from "./business/FundingOpportunitiesWidget";
 
 // ─── Oversight
 import { VerificationQueueWidget }     from "./oversight/VerificationQueueWidget";
