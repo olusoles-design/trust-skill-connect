@@ -244,6 +244,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title: "Post Funding Briefs", description: "Advertise learnership, internship and bursary programmes. Receive and evaluate provider EOIs.",
     icon: "Megaphone", color: "bg-primary/10", accentColor: "text-primary",
   },
+  post_programme_opportunities: {
+    component: SponsorProgrammeWidget, layout: "full", persona: "funding",
+    title: "List Sponsored Programmes", description: "Publish learnerships, bursaries and internships to the main feed — learners apply directly, SDPs submit delivery EOIs.",
+    icon: "GraduationCap", color: "bg-primary/10", accentColor: "text-primary",
+  },
   browse_funding_opportunities: {
     component: FundingOpportunitiesWidget, layout: "full", persona: "business",
     title: "Sponsor Funding Briefs", description: "Discover sponsor-funded programmes and express interest in delivering them.",
