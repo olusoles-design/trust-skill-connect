@@ -48,6 +48,7 @@ const AuthContext = createContext<AuthContextValue>({
   loading: true,
   hasCapability: () => false,
   signOut: async () => {},
+  refreshUserData: async () => {},
 });
 
 export function AuthProvider({ children }: { children: ReactNode }) {
