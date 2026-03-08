@@ -5,12 +5,16 @@ import { useQueryClient } from "@tanstack/react-query";
 import { useToast } from "@/hooks/use-toast";
 import {
   Upload, FileText, Loader2, CheckCircle2, AlertCircle,
-  Award, Building2, Hash, Calendar, BookOpen, ChevronRight,
-  Edit3, Save, Trash2, Sparkles,
+  Save, RotateCcw, Sparkles,
 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Badge } from "@/components/ui/badge";
+
+interface ExtractedQualification {
+  saqa_id: string;
+  title: string;
+  nqf_level: string;
+  credits: number;
+}
 
 interface ExtractedData {
   practitioner_name: string;
@@ -20,12 +24,9 @@ interface ExtractedData {
   role_type: string;
   valid_from: string | null;
   valid_to: string | null;
-  qualifications: Array<{
-    saqa_id: string;
-    title: string;
-    nqf_level: string;
-    credits: number;
-  }>;
+  qualifications: ExtractedQualification[];
+  evaluator_name?: string;
+  senior_manager_name?: string;
   raw_notes?: string;
 }
 
@@ -62,7 +63,7 @@ async function readPDFAsText(file: File): Promise<string> {
           }
         }
         const extracted = textParts.join(" ");
-        resolve(extracted.length > 100 ? extracted.substring(0, 8000) : raw.substring(0, 8000));
+        resolve(extracted.length > 100 ? extracted.substring(0, 12000) : raw.substring(0, 12000));
       } catch (err) {
         reject(err);
       }
@@ -83,13 +84,11 @@ export function AccreditationUploaderWidget() {
   const [uploadedFile, setUploadedFile] = useState<File | null>(null);
   const [documentUrl, setDocumentUrl] = useState<string>("");
   const [draft, setDraft] = useState<ExtractedData | null>(null);
-  const [editMode, setEditMode] = useState(false);
+  const [dragOver, setDragOver] = useState(false);
 
   if (!user) return null;
 
-  async function handleFileSelect(e: React.ChangeEvent<HTMLInputElement>) {
-    const file = e.target.files?.[0];
-    if (!file) return;
+  async function processFile(file: File) {
     if (file.type !== "application/pdf") {
       toast({ title: "PDF only", description: "Please upload a PDF accreditation letter.", variant: "destructive" });
       return;
@@ -98,11 +97,13 @@ export function AccreditationUploaderWidget() {
       toast({ title: "File too large", description: "Maximum 10MB allowed.", variant: "destructive" });
       return;
     }
+
     setUploadedFile(file);
     setStep("uploading");
     setErrorMsg("");
 
     try {
+      // 1. Upload to storage
       const path = `${user.id}/accreditations/${Date.now()}_${file.name}`;
       const { error: uploadErr } = await supabase.storage.from("documents").upload(path, file);
       if (uploadErr) throw uploadErr;
@@ -110,9 +111,11 @@ export function AccreditationUploaderWidget() {
       const { data: urlData } = supabase.storage.from("documents").getPublicUrl(path);
       setDocumentUrl(urlData?.publicUrl ?? "");
 
+      // 2. Extract text from PDF
       setStep("extracting");
       const pdfText = await readPDFAsText(file);
 
+      // 3. Call AI edge function
       const { data: fnData, error: fnErr } = await supabase.functions.invoke("extract-accreditation", {
         body: { pdfText },
       });
@@ -121,7 +124,7 @@ export function AccreditationUploaderWidget() {
       if (fnData?.error) throw new Error(fnData.error);
 
       const result = fnData.data as ExtractedData;
-      setDraft({ ...result });
+      setDraft(result);
       setStep("review");
     } catch (err) {
       console.error(err);
@@ -139,14 +142,14 @@ export function AccreditationUploaderWidget() {
         .insert({
           user_id: user.id,
           seta_body: draft.seta_body,
-          role_type: draft.role_type.toLowerCase(),
+          role_type: draft.role_type?.toLowerCase() ?? "assessor",
           registration_number: draft.registration_number || null,
           id_number: draft.id_number || null,
           valid_from: draft.valid_from || null,
           valid_to: draft.valid_to || null,
           status: "active",
           document_url: documentUrl,
-          raw_extracted: draft,
+          raw_extracted: draft as any,
         })
         .select("id")
         .single();
@@ -172,7 +175,7 @@ export function AccreditationUploaderWidget() {
 
       toast({
         title: "Accreditation saved!",
-        description: `${ROLE_LABELS[draft.role_type] ?? draft.role_type} from ${draft.seta_body} added to your profile.`,
+        description: `${draft.qualifications?.length ?? 0} qualifications added to your profile.`,
       });
       setStep("done");
     } catch (err) {
@@ -188,61 +191,56 @@ export function AccreditationUploaderWidget() {
     setUploadedFile(null);
     setDocumentUrl("");
     setErrorMsg("");
-    setEditMode(false);
     if (fileRef.current) fileRef.current.value = "";
   }
 
-  function updateDraftQual(idx: number, field: string, value: string) {
-    if (!draft) return;
-    const quals = [...draft.qualifications];
-    quals[idx] = { ...quals[idx], [field]: value };
-    setDraft({ ...draft, qualifications: quals });
-  }
-
-  function removeQual(idx: number) {
-    if (!draft) return;
-    setDraft({ ...draft, qualifications: draft.qualifications.filter((_, i) => i !== idx) });
-  }
-
-  // ─── IDLE / ERROR ──────────────────────────────────────────────────────────
-  if (step === "idle" || step === "error") {
+  // ─── IDLE ──────────────────────────────────────────────────────────────────
+  if (step === "idle") {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-2">
-          <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center">
-            <Sparkles className="w-4 h-4 text-primary" />
-          </div>
-          <div>
-            <p className="text-sm font-semibold text-foreground">Upload Accreditation Letter</p>
-            <p className="text-xs text-muted-foreground">AI extracts all details automatically</p>
-          </div>
+      <div
+        className={`border-2 border-dashed rounded-xl p-8 text-center cursor-pointer transition-all group ${
+          dragOver
+            ? "border-primary bg-primary/10"
+            : "border-border hover:border-primary/50 hover:bg-primary/5"
+        }`}
+        onClick={() => fileRef.current?.click()}
+        onDragOver={(e) => { e.preventDefault(); setDragOver(true); }}
+        onDragLeave={() => setDragOver(false)}
+        onDrop={(e) => {
+          e.preventDefault();
+          setDragOver(false);
+          const f = e.dataTransfer.files[0];
+          if (f) processFile(f);
+        }}
+      >
+        <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center mx-auto mb-3">
+          <Sparkles className="w-5 h-5 text-primary" />
         </div>
+        <p className="text-sm font-semibold text-foreground mb-1">Drop your SETA Accreditation Letter here</p>
+        <p className="text-xs text-muted-foreground">AI will extract all qualifications, registration number &amp; dates automatically</p>
+        <p className="text-xs text-muted-foreground mt-1">PDF only · Max 10MB</p>
+        <input
+          ref={fileRef}
+          type="file"
+          accept=".pdf,application/pdf"
+          className="hidden"
+          onChange={(e) => { const f = e.target.files?.[0]; if (f) processFile(f); }}
+        />
+      </div>
+    );
+  }
 
-        {step === "error" && (
-          <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
-            <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
-            <p className="text-xs text-destructive">{errorMsg}</p>
-          </div>
-        )}
-
-        <div
-          className="border-2 border-dashed border-border rounded-xl p-8 text-center cursor-pointer hover:border-primary/50 hover:bg-primary/5 transition-all group"
-          onClick={() => fileRef.current?.click()}
-        >
-          <Upload className="w-8 h-8 mx-auto mb-3 text-muted-foreground group-hover:text-primary transition-colors" />
-          <p className="text-sm font-medium text-foreground mb-1">Drop your PDF letter here</p>
-          <p className="text-xs text-muted-foreground">SETA, ETQA, professional body letters accepted</p>
-          <p className="text-xs text-muted-foreground mt-1">Max 10MB · PDF only</p>
-          <input ref={fileRef} type="file" accept=".pdf,application/pdf" className="hidden" onChange={handleFileSelect} />
+  // ─── ERROR ─────────────────────────────────────────────────────────────────
+  if (step === "error") {
+    return (
+      <div className="space-y-3">
+        <div className="flex items-start gap-2 p-3 rounded-lg bg-destructive/10 border border-destructive/20">
+          <AlertCircle className="w-4 h-4 text-destructive flex-shrink-0 mt-0.5" />
+          <p className="text-xs text-destructive">{errorMsg}</p>
         </div>
-
-        <div className="grid grid-cols-2 gap-2">
-          {["MICT SETA", "SERVICES SETA", "MERSETA", "ETDP SETA", "HWSETA", "CATHSSETA"].map((body) => (
-            <div key={body} className="flex items-center gap-1.5 p-2 rounded-lg bg-muted/50 text-xs text-muted-foreground">
-              <Building2 className="w-3 h-3 flex-shrink-0" /> {body}
-            </div>
-          ))}
-        </div>
+        <Button size="sm" variant="outline" onClick={reset} className="w-full gap-1.5">
+          <RotateCcw className="w-3.5 h-3.5" /> Try Again
+        </Button>
       </div>
     );
   }
@@ -250,29 +248,28 @@ export function AccreditationUploaderWidget() {
   // ─── UPLOADING / EXTRACTING ────────────────────────────────────────────────
   if (step === "uploading" || step === "extracting") {
     return (
-      <div className="space-y-4">
-        <div className="flex items-center gap-3 p-4 rounded-xl bg-muted/50">
-          <FileText className="w-8 h-8 text-primary flex-shrink-0" />
+      <div className="space-y-3">
+        <div className="flex items-center gap-3 p-3 rounded-lg bg-muted/50">
+          <FileText className="w-6 h-6 text-primary flex-shrink-0" />
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-foreground truncate">{uploadedFile?.name}</p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-xs font-medium text-foreground truncate">{uploadedFile?.name}</p>
+            <p className="text-[10px] text-muted-foreground">
               {uploadedFile && uploadedFile.size > 1024 * 1024
                 ? `${(uploadedFile.size / 1024 / 1024).toFixed(1)} MB`
                 : `${Math.round((uploadedFile?.size ?? 0) / 1024)} KB`}
             </p>
           </div>
         </div>
-
-        <div className="flex items-center gap-3 p-3 rounded-lg bg-primary/10">
+        <div className="flex items-center gap-2.5 p-3 rounded-lg bg-primary/10">
           <Loader2 className="w-4 h-4 text-primary animate-spin flex-shrink-0" />
           <div>
-            <p className="text-xs font-medium text-foreground">
-              {step === "uploading" ? "Uploading document securely..." : "AI extracting accreditation data..."}
+            <p className="text-xs font-semibold text-foreground">
+              {step === "uploading" ? "Uploading document…" : "Extracting accreditation data with AI…"}
             </p>
-            <p className="text-xs text-muted-foreground">
+            <p className="text-[10px] text-muted-foreground">
               {step === "uploading"
-                ? "Storing in your private document vault"
-                : "Analysing SETA registration, qualifications & dates"}
+                ? "Storing securely in your document vault"
+                : "Reading qualifications, registration number & validity dates"}
             </p>
           </div>
         </div>
@@ -283,144 +280,104 @@ export function AccreditationUploaderWidget() {
   // ─── DONE ──────────────────────────────────────────────────────────────────
   if (step === "done") {
     return (
-      <div className="flex flex-col items-center text-center py-6 space-y-3">
-        <div className="w-14 h-14 rounded-full bg-emerald-500/15 flex items-center justify-center">
-          <CheckCircle2 className="w-7 h-7 text-emerald-600" />
+      <div className="flex flex-col items-center text-center py-4 space-y-3">
+        <div className="w-12 h-12 rounded-full bg-emerald-500/15 flex items-center justify-center">
+          <CheckCircle2 className="w-6 h-6 text-emerald-600" />
         </div>
         <div>
           <p className="text-sm font-bold text-foreground">Accreditation Saved!</p>
-          <p className="text-xs text-muted-foreground mt-1">Your credentials are now live on your profile</p>
+          <p className="text-xs text-muted-foreground mt-0.5">{draft?.qualifications?.length ?? 0} qualifications added to your profile</p>
         </div>
         <Button size="sm" variant="outline" onClick={reset}>Upload Another Letter</Button>
       </div>
     );
   }
 
-  // ─── REVIEW / SAVING ───────────────────────────────────────────────────────
+  // ─── REVIEW ────────────────────────────────────────────────────────────────
   if ((step === "review" || step === "saving") && draft) {
-    const roleLabel = ROLE_LABELS[draft.role_type] ?? draft.role_type;
-    const isExpired = draft.valid_to ? new Date(draft.valid_to) < new Date() : false;
+    const roleLabel = ROLE_LABELS[draft.role_type?.toLowerCase()] ?? draft.role_type;
 
     return (
       <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <div className="w-8 h-8 rounded-lg bg-emerald-500/15 flex items-center justify-center">
-              <CheckCircle2 className="w-4 h-4 text-emerald-600" />
-            </div>
-            <div>
-              <p className="text-sm font-semibold text-foreground">Review Extracted Data</p>
-              <p className="text-xs text-muted-foreground">{draft.qualifications?.length ?? 0} qualifications found</p>
-            </div>
+        {/* Extracted summary header */}
+        <div className="flex items-center gap-2 p-3 rounded-lg bg-emerald-500/10 border border-emerald-500/20">
+          <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
+          <div className="flex-1 min-w-0">
+            <p className="text-xs font-bold text-emerald-700">
+              AI extracted {draft.qualifications?.length ?? 0} qualifications
+            </p>
+            <p className="text-[10px] text-emerald-600/80">Review below then confirm to save</p>
           </div>
-          <button
-            onClick={() => setEditMode(!editMode)}
-            className="text-xs text-primary flex items-center gap-1 hover:underline"
-          >
-            <Edit3 className="w-3 h-3" /> {editMode ? "Done" : "Edit"}
-          </button>
         </div>
 
-        {/* Registration card */}
-        <div className="rounded-xl border border-border bg-gradient-to-br from-primary/10 to-primary/5 p-4 space-y-3">
-          <div className="flex items-start justify-between gap-2">
-            <div>
-              <p className="text-sm font-bold text-foreground">{draft.practitioner_name || "—"}</p>
-              <Badge className="mt-1 text-[10px]" variant="secondary">{roleLabel}</Badge>
-            </div>
-            <div className="text-right">
-              <p className="text-[10px] text-muted-foreground">Issuing Body</p>
-              <p className="text-xs font-bold text-foreground">{draft.seta_body}</p>
-            </div>
+        {/* Key details */}
+        <div className="grid grid-cols-2 gap-2 text-xs">
+          <div className="p-2.5 rounded-lg bg-muted/50 space-y-0.5">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Practitioner</p>
+            <p className="font-semibold text-foreground truncate">{draft.practitioner_name || "—"}</p>
           </div>
-
-          <div className="grid grid-cols-2 gap-2">
-            <div className="flex items-center gap-1.5">
-              <Hash className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-              {editMode ? (
-                <Input
-                  value={draft.registration_number ?? ""}
-                  onChange={(e) => setDraft({ ...draft, registration_number: e.target.value })}
-                  className="h-6 text-xs px-1.5"
-                  placeholder="Reg number"
-                />
-              ) : (
-                <span className="text-xs text-foreground font-medium">{draft.registration_number || "—"}</span>
-              )}
-            </div>
-            <div className="flex items-center gap-1.5">
-              <Hash className="w-3 h-3 text-muted-foreground flex-shrink-0" />
-              <span className="text-xs text-muted-foreground">ID: {draft.id_number || "—"}</span>
-            </div>
+          <div className="p-2.5 rounded-lg bg-muted/50 space-y-0.5">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Registration No.</p>
+            <p className="font-bold text-primary truncate">{draft.registration_number || "—"}</p>
           </div>
-
-          {(draft.valid_from || draft.valid_to) && (
-            <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
-              <Calendar className="w-3 h-3 flex-shrink-0" />
-              {draft.valid_from && <span>{draft.valid_from}</span>}
-              {draft.valid_from && draft.valid_to && <span>→</span>}
-              {draft.valid_to && (
-                <span className={isExpired ? "text-destructive font-medium" : "text-foreground font-medium"}>
-                  {draft.valid_to}{isExpired && " (Expired)"}
-                </span>
-              )}
+          <div className="p-2.5 rounded-lg bg-muted/50 space-y-0.5">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Role</p>
+            <p className="font-semibold text-foreground truncate">{roleLabel}</p>
+          </div>
+          <div className="p-2.5 rounded-lg bg-muted/50 space-y-0.5">
+            <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Issuing Body</p>
+            <p className="font-semibold text-foreground truncate">{draft.seta_body || "—"}</p>
+          </div>
+          {draft.valid_from && (
+            <div className="p-2.5 rounded-lg bg-muted/50 space-y-0.5">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Valid From</p>
+              <p className="font-semibold text-foreground">{draft.valid_from}</p>
+            </div>
+          )}
+          {draft.valid_to && (
+            <div className="p-2.5 rounded-lg bg-muted/50 space-y-0.5">
+              <p className="text-[10px] text-muted-foreground uppercase tracking-wide">Valid To</p>
+              <p className={`font-semibold ${new Date(draft.valid_to) < new Date() ? "text-destructive" : "text-foreground"}`}>
+                {draft.valid_to}
+              </p>
             </div>
           )}
         </div>
 
-        {/* Qualifications list */}
+        {/* Qualifications preview */}
         {draft.qualifications?.length > 0 && (
-          <div className="space-y-2">
-            <div className="flex items-center gap-1.5">
-              <BookOpen className="w-3.5 h-3.5 text-muted-foreground" />
-              <p className="text-xs font-bold text-foreground uppercase tracking-wider">
-                Qualifications ({draft.qualifications.length})
-              </p>
+          <div className="rounded-lg border border-border overflow-hidden">
+            <div className="bg-muted/50 px-3 py-2 text-[10px] font-bold uppercase tracking-wider text-muted-foreground">
+              Qualifications ({draft.qualifications.length})
             </div>
-            <div className="space-y-1.5 max-h-48 overflow-y-auto pr-0.5">
-              {draft.qualifications.map((q, idx) => (
-                <div key={idx} className="flex items-start gap-2 p-2.5 rounded-lg bg-muted/50 border border-border">
-                  <ChevronRight className="w-3 h-3 text-primary flex-shrink-0 mt-0.5" />
-                  <div className="flex-1 min-w-0">
-                    {editMode ? (
-                      <Input
-                        value={q.title}
-                        onChange={(e) => updateDraftQual(idx, "title", e.target.value)}
-                        className="h-6 text-xs mb-1"
-                      />
-                    ) : (
-                      <p className="text-xs font-medium text-foreground leading-snug">{q.title}</p>
+            <div className="divide-y divide-border max-h-52 overflow-y-auto">
+              {draft.qualifications.map((q, i) => (
+                <div key={i} className="flex items-start gap-2.5 px-3 py-2">
+                  <span className="text-[10px] font-mono text-muted-foreground mt-0.5 w-12 flex-shrink-0">{q.saqa_id}</span>
+                  <p className="text-xs text-foreground flex-1 leading-snug">{q.title}</p>
+                  <div className="flex items-center gap-1.5 flex-shrink-0">
+                    {q.nqf_level && (
+                      <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium whitespace-nowrap">{q.nqf_level}</span>
                     )}
-                    <div className="flex gap-2 mt-0.5 flex-wrap">
-                      {q.saqa_id && <span className="text-[10px] text-muted-foreground">SAQA {q.saqa_id}</span>}
-                      {q.nqf_level && (
-                        <span className="text-[10px] px-1.5 py-0.5 rounded bg-primary/10 text-primary font-medium">
-                          {q.nqf_level}
-                        </span>
-                      )}
-                      {q.credits && <span className="text-[10px] text-muted-foreground">{q.credits} credits</span>}
-                    </div>
+                    {q.credits && (
+                      <span className="text-[10px] text-muted-foreground whitespace-nowrap">{q.credits}cr</span>
+                    )}
                   </div>
-                  {editMode && (
-                    <button onClick={() => removeQual(idx)} className="text-destructive hover:opacity-80 flex-shrink-0">
-                      <Trash2 className="w-3 h-3" />
-                    </button>
-                  )}
                 </div>
               ))}
             </div>
           </div>
         )}
 
-        <div className="flex gap-2 pt-1">
+        <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={reset} disabled={step === "saving"} className="flex-1">
             Cancel
           </Button>
-          <Button size="sm" onClick={handleSave} disabled={step === "saving"} className="flex-1">
+          <Button size="sm" onClick={handleSave} disabled={step === "saving"} className="flex-1 gap-1.5">
             {step === "saving" ? (
-              <><Loader2 className="w-3.5 h-3.5 mr-1.5 animate-spin" />Saving...</>
+              <><Loader2 className="w-3.5 h-3.5 animate-spin" />Saving…</>
             ) : (
-              <><Save className="w-3.5 h-3.5 mr-1.5" />Confirm & Save</>
+              <><Save className="w-3.5 h-3.5" />Confirm & Save</>
             )}
           </Button>
         </div>
