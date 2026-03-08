@@ -214,7 +214,7 @@ export function FundingOpportunitiesWidget() {
                         {PROG_LABELS[opp.programme_type] ?? opp.programme_type}
                       </span>
                       {isUrgent && (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-500/15 text-amber-700">Closing Soon</span>
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-destructive/10 text-destructive">Closing Soon</span>
                       )}
                     </div>
 
