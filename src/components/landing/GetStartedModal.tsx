@@ -617,13 +617,15 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "login" && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="space-y-4 max-w-sm mx-auto">
-                  <FieldRow label="Email Address">
-                    <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus />
-                  </FieldRow>
-                  <FieldRow label="Password">
-                    <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password" />
-                  </FieldRow>
+                  className="space-y-4 max-w-xl mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FieldRow label="Email Address">
+                      <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus />
+                    </FieldRow>
+                    <FieldRow label="Password">
+                      <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password" />
+                    </FieldRow>
+                  </div>
                   <div className="text-right">
                     <button onClick={() => { setForgotSent(false); setMode("forgot"); }} className="text-xs text-teal hover:underline transition-colors">Forgot password?</button>
                   </div>
