@@ -28,6 +28,8 @@ interface AuthContextValue {
   loading: boolean;
   hasCapability: (cap: Capability) => boolean;
   signOut: () => Promise<void>;
+  /** Re-fetch roles & subscription for the current user (call after role assignment) */
+  refreshUserData: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextValue>({
