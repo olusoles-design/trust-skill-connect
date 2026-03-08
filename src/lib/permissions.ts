@@ -282,6 +282,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   // Phase 3 – Glue
   marketplace_discovery:   { minPlan: "starter" },
   workflow_engine:         { minPlan: "professional" },
+  multi_company_sponsorship: { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
   portal_switcher:         { minPlan: "starter" },
