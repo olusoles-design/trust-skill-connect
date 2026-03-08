@@ -133,6 +133,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "multi_company_sponsorship",
     "marketplace_discovery",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   provider: [
     "post_opportunities",
