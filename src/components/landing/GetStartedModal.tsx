@@ -217,11 +217,19 @@ const ROLE_EXTRA_FIELDS: Partial<Record<AppRole, React.FC<{ form: FormState; onC
 const INPUT_CLS =
   "w-full px-3.5 py-2.5 rounded-lg bg-muted/50 border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-background text-sm transition-colors";
 
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+const INPUT_ERROR_CLS =
+  "w-full px-3.5 py-2.5 rounded-lg bg-destructive/5 border border-destructive text-foreground placeholder-muted-foreground focus:outline-none focus:border-destructive focus:bg-background text-sm transition-colors";
+
+function FieldRow({ label, children, error }: { label: string; children: React.ReactNode; error?: string }) {
   return (
     <div>
       <label className="text-xs font-medium text-muted-foreground block mb-1.5">{label}</label>
       {children}
+      {error && (
+        <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+          <span>⚠</span> {error}
+        </p>
+      )}
     </div>
   );
 }
@@ -333,6 +341,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const [selectedPlan, setSelectedPlan] = useState<PlanName>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [uploads, setUploads] = useState<UploadedFile[]>([]);
 
   useEffect(() => {
@@ -366,7 +375,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const resetModal = useCallback(() => {
     setMode("entry"); setStep(1); setSelectedHub(null); setSelectedRole(null);
     setPractitionerRole(null); setAdditionalRoles([]); setSelectedPlan(null);
-    setForm(EMPTY_FORM); setUploads([]); setForgotSent(false);
+    setForm(EMPTY_FORM); setFieldErrors({}); setUploads([]); setForgotSent(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -374,8 +383,34 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     setTimeout(resetModal, 300);
   }, [onClose, resetModal]);
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    // Clear the error for this field as the user types
+    setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+  };
+
+  const validateProfileForm = (): boolean => {
+    const errors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      errors.email = "Enter a valid email address.";
+    }
+    if (!form.password) {
+      errors.password = "Password is required.";
+    } else if (form.password.length < 6) {
+      errors.password = "Minimum 6 characters.";
+    }
+    if (form.firstName && form.firstName.length > 60) {
+      errors.firstName = "First name is too long.";
+    }
+    if (form.lastName && form.lastName.length > 60) {
+      errors.lastName = "Last name is too long.";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const toggleAdditionalRole = (role: AppRole) => {
     if (role === selectedRole) return;
@@ -421,14 +456,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   };
 
   const handleSignUp = async () => {
-    if (!form.email || !form.password) {
-      toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
-      return;
-    }
-    if (form.password.length < 6) {
-      toast({ title: "Password too short", description: "Minimum 6 characters.", variant: "destructive" });
-      return;
-    }
+    if (!validateProfileForm()) return;
     setSubmitting(true);
     try {
       const { data, error } = await supabase.auth.signUp({
@@ -786,17 +814,21 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   )}
 
                   <div className="grid grid-cols-2 gap-4">
-                    <FieldRow label="First Name">
-                      <input name="firstName" value={form.firstName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Jane" />
+                    <FieldRow label="First Name" error={fieldErrors.firstName}>
+                      <input name="firstName" value={form.firstName} onChange={handleFormChange}
+                        className={fieldErrors.firstName ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="Jane" />
                     </FieldRow>
-                    <FieldRow label="Last Name">
-                      <input name="lastName" value={form.lastName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Doe" />
+                    <FieldRow label="Last Name" error={fieldErrors.lastName}>
+                      <input name="lastName" value={form.lastName} onChange={handleFormChange}
+                        className={fieldErrors.lastName ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="Doe" />
                     </FieldRow>
-                    <FieldRow label="Email">
-                      <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="jane@example.com" />
+                    <FieldRow label="Email *" error={fieldErrors.email}>
+                      <input name="email" type="email" value={form.email} onChange={handleFormChange}
+                        className={fieldErrors.email ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="jane@example.com" />
                     </FieldRow>
                     <FieldRow label="Phone">
-                      <input name="phone" type="tel" value={form.phone} onChange={handleFormChange} className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
+                      <input name="phone" type="tel" value={form.phone} onChange={handleFormChange}
+                        className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
                     </FieldRow>
                     {ExtraFields && (
                       <div className="col-span-2 grid grid-cols-2 gap-4">
@@ -804,8 +836,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                       </div>
                     )}
                     <div className="col-span-2">
-                      <FieldRow label="Password">
-                        <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Min. 6 characters" />
+                      <FieldRow label="Password *" error={fieldErrors.password}>
+                        <input name="password" type="password" value={form.password} onChange={handleFormChange}
+                          className={fieldErrors.password ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="Min. 6 characters" />
                       </FieldRow>
                     </div>
                   </div>
