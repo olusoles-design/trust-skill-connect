@@ -16,6 +16,7 @@ import { ProfileCVWidget }             from "./talent/ProfileCVWidget";
 import { DocumentVaultWidget }         from "./talent/DocumentVaultWidget";
 import { AvailabilityToggleWidget }    from "./talent/AvailabilityToggleWidget";
 import { SmartContractingWidget }      from "./talent/SmartContractingWidget";
+import { PractitionerAccreditationsWidget } from "./talent/PractitionerAccreditationsWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";
