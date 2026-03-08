@@ -82,7 +82,7 @@ const PERSONA_LABELS: Record<string, string> = {
 };
 
 const PERSONA_CAPABILITIES: Record<string, Capability[]> = {
-  talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations","browse_practitioner_directory"],
+  talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations","browse_practitioner_directory","view_tasks","my_tasks"],
   business: ["post_opportunities","manage_learners","learner_pipeline","bbee_simulator","tax_calculator","wsp_reports","tender_feed","learner_recruitment","outcome_tracking","manage_procurement","marketplace_listing","marketplace_discovery","tender_matching","procurement_alerts","rfq_board","facility_booking","workflow_engine"],
   funding:  ["fund_learners","manage_funding","approve_payments"],
   oversight:["verify_documents","view_reports","trust_ledger","platform_admin","portal_switcher"],
