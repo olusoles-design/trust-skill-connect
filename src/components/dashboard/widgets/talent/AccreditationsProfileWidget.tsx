@@ -111,7 +111,7 @@ function PractitionerCard({
   return (
     <div className="rounded-xl border border-border bg-card overflow-hidden">
       {/* Header gradient band */}
-      <div className={`h-2 w-full ${acc.role_type === "assessor" ? "bg-gradient-to-r from-blue-500 to-blue-400" : acc.role_type === "facilitator" ? "bg-gradient-to-r from-primary to-primary/70" : acc.role_type === "moderator" ? "bg-gradient-to-r from-purple-500 to-purple-400" : "bg-gradient-to-r from-orange-500 to-orange-400"}`} />
+      <div className={`h-2 w-full bg-gradient-to-r ${cfg.color.replace("text-", "from-")} to-primary/30`} />
 
       <div className="p-5 space-y-5">
         {/* Top row: avatar + name + status */}
