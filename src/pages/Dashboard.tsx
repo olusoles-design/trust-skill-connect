@@ -97,6 +97,8 @@ export default function Dashboard() {
               <Route path="contracting"      element={<PageView title="Smart Contracting" description="Digital timesheets, geo clock-in/out and SLA templates."><SmartContractingWidget /></PageView>} />
               <Route path="accreditations"   element={<PageView title="Practitioner Accreditations" description="Manage statutory documents per practitioner role."><PractitionerAccreditationsWidget /></PageView>} />
               <Route path="practitioners"    element={<PageView title="Practitioner Directory" description="Find registered facilitators, assessors, moderators and SDFs."><PractitionerDirectoryWidget /></PageView>} />
+              <Route path="gigs"             element={<PageView title="Gigs & Micro-tasks" description="Earn income now — complete short tasks and build your Trust Score."><MicroTaskBoardWidget /></PageView>} />
+              <Route path="my-tasks"         element={<PageView title="My Earnings & Tasks" description="Track completed tasks, earnings, quality scores and competency badges."><MyTasksWidget /></PageView>} />
 
               {/* Employer/Sponsor */}
               <Route path="post"      element={<PageView title="Opportunity Manager" description="Create and manage job, learnership and programme listings."><OpportunityManagerWidget /></PageView>} />
