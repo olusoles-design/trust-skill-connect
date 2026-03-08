@@ -94,6 +94,7 @@ export default function Dashboard() {
               <Route path="availability"  element={<PageView title="Availability & Contracts" description="Toggle availability, view contracts and reputation score."><AvailabilityToggleWidget /></PageView>} />
               <Route path="contracting"      element={<PageView title="Smart Contracting" description="Digital timesheets, geo clock-in/out and SLA templates."><SmartContractingWidget /></PageView>} />
               <Route path="accreditations"   element={<PageView title="Practitioner Accreditations" description="Manage statutory documents per practitioner role."><PractitionerAccreditationsWidget /></PageView>} />
+              <Route path="practitioners"    element={<PageView title="Practitioner Directory" description="Find registered facilitators, assessors, moderators and SDFs."><PractitionerDirectoryWidget /></PageView>} />
 
               {/* Employer/Sponsor */}
               <Route path="post"      element={<PageView title="Opportunity Manager" description="Create and manage job, learnership and programme listings."><OpportunityManagerWidget /></PageView>} />
