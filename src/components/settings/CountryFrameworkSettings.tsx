@@ -111,7 +111,7 @@ export function CountryFrameworkSettings() {
                 <CardTitle className="text-base flex items-center gap-2">
                   <Icon className={`w-4 h-4 ${meta.color}`} />
                   {meta.label} Bodies
-                  <Badge variant="outline" className="ml-auto text-[10px]">{group.filter(b => activeIds.has(b.id)).length}/{group.length} active</Badge>
+                  <Badge variant="outline" className="ml-auto text-[10px]">{group.filter(b => effectiveActive.has(b.id)).length}/{group.length} active</Badge>
                 </CardTitle>
                 <CardDescription>
                   {type === "seta" && "Levy-funded sector bodies — govern WSP/ATR reporting and discretionary grants"}
@@ -123,7 +123,7 @@ export function CountryFrameworkSettings() {
               </CardHeader>
               <CardContent className="space-y-2">
                 {group.map(body => {
-                  const active = activeIds.has(body.id);
+                  const active = effectiveActive.has(body.id);
                   const formats = (body.reporting_formats as string[]).slice(0, 3);
                   return (
                     <div key={body.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/20 transition-colors border border-border">
