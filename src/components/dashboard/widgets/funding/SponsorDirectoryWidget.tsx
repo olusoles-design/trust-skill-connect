@@ -60,9 +60,9 @@ function SponsorCard({ sponsor }: { sponsor: SponsorProfile }) {
             <Building2 className="w-5 h-5 text-primary" />
           </div>
           <div>
-            <div className="flex items-center gap-1.5">
+          <div className="flex items-center gap-1.5">
               <p className="text-sm font-bold text-foreground">{sponsor.company_name}</p>
-              {sponsor.verified && <BadgeCheck className="w-4 h-4 text-primary" title="Verified Sponsor" />}
+              {sponsor.verified && <BadgeCheck className="w-4 h-4 text-primary" aria-label="Verified Sponsor" />}
             </div>
             {sponsor.tagline && (
               <p className="text-xs text-muted-foreground mt-0.5">{sponsor.tagline}</p>
