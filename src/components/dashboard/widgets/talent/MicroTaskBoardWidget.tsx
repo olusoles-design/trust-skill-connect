@@ -366,6 +366,16 @@ export function MicroTaskBoardWidget() {
   const pendingCount   = mySubmissions.filter(s => s.status === "in_progress" || s.status === "submitted").length;
   const totalEarnings  = mySubmissions.reduce((sum, s) => sum + (s.earnings ?? 0), 0);
 
+  // ── Trust Score: average quality score of approved tasks (0–100), default 50 for new learners ──
+  const approvedSubs   = mySubmissions.filter(s => s.status === "approved" && s.quality_score !== null);
+  const rawTrust       = approvedSubs.length > 0
+    ? Math.round(approvedSubs.reduce((sum, s) => sum + (s.quality_score ?? 0), 0) / approvedSubs.length)
+    : approvedCount > 0 ? 65 : 50;
+  const trustScore     = Math.min(100, rawTrust + approvedCount * 2);
+  const trustLabel     = trustScore >= 90 ? "Elite" : trustScore >= 75 ? "Trusted" : trustScore >= 55 ? "Rising" : "New";
+  const trustColor     = trustScore >= 90 ? "text-emerald-600" : trustScore >= 75 ? "text-primary" : trustScore >= 55 ? "text-amber-600" : "text-muted-foreground";
+  const trustBg        = trustScore >= 90 ? "from-emerald-500/20 to-emerald-500/5" : trustScore >= 75 ? "from-primary/20 to-primary/5" : "from-muted to-muted/30";
+
   // ── Active task workspace ──
   if (activeTask) {
     return (
