@@ -205,6 +205,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "trust_ledger",
     "platform_admin",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   government: [
     "view_reports",
