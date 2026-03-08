@@ -602,6 +602,125 @@ export type Database = {
         }
         Relationships: []
       }
+      practitioner_listing_accreds: {
+        Row: {
+          created_at: string
+          id: string
+          listing_id: string
+          reg_number: string | null
+          role_type: string
+          seta_body: string
+          status: string
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          listing_id: string
+          reg_number?: string | null
+          role_type: string
+          seta_body: string
+          status?: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          listing_id?: string
+          reg_number?: string | null
+          role_type?: string
+          seta_body?: string
+          status?: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "practitioner_listing_accreds_listing_id_fkey"
+            columns: ["listing_id"]
+            isOneToOne: false
+            referencedRelation: "practitioner_listings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      practitioner_listings: {
+        Row: {
+          availability: string | null
+          avatar_url: string | null
+          bio: string | null
+          created_at: string
+          email: string | null
+          first_name: string
+          id: string
+          is_featured: boolean
+          is_verified: boolean
+          job_title: string | null
+          languages: string[] | null
+          last_name: string
+          linkedin_url: string | null
+          location: string | null
+          nqf_level: string | null
+          phone: string | null
+          province: string | null
+          skills: string[] | null
+          status: string
+          updated_at: string
+          user_id: string | null
+          years_exp: number | null
+        }
+        Insert: {
+          availability?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          first_name: string
+          id?: string
+          is_featured?: boolean
+          is_verified?: boolean
+          job_title?: string | null
+          languages?: string[] | null
+          last_name: string
+          linkedin_url?: string | null
+          location?: string | null
+          nqf_level?: string | null
+          phone?: string | null
+          province?: string | null
+          skills?: string[] | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          years_exp?: number | null
+        }
+        Update: {
+          availability?: string | null
+          avatar_url?: string | null
+          bio?: string | null
+          created_at?: string
+          email?: string | null
+          first_name?: string
+          id?: string
+          is_featured?: boolean
+          is_verified?: boolean
+          job_title?: string | null
+          languages?: string[] | null
+          last_name?: string
+          linkedin_url?: string | null
+          location?: string | null
+          nqf_level?: string | null
+          phone?: string | null
+          province?: string | null
+          skills?: string[] | null
+          status?: string
+          updated_at?: string
+          user_id?: string | null
+          years_exp?: number | null
+        }
+        Relationships: []
+      }
       profiles: {
         Row: {
           availability: string | null
