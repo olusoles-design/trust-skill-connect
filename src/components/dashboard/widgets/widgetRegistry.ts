@@ -273,4 +273,9 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title: "Workflow Engine", description: "RFP → bid → award → learner registration → SETA submission in one flow.",
     icon: "GitBranch", color: "bg-primary/10", accentColor: "text-primary",
   },
+  multi_company_sponsorship: {
+    component: MultiCompanySponsorshipWidget, layout: "full", persona: "business",
+    title: "Multi-Company Sponsorship", description: "Manage Lead, Host & Funder companies with cost-sharing and B-BBEE allocation.",
+    icon: "Building2", color: "bg-primary/10", accentColor: "text-primary",
+  },
 };

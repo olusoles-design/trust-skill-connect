@@ -55,6 +55,7 @@ export type Capability =
   | "marketplace_discovery"  // Advanced search: find SDPs, facilitators, venues
   | "workflow_engine"        // RFP→RFQ deal flow, learner registration, SETA packet
   | "trust_ledger"           // Immutable audit ledger + QR verification
+  | "multi_company_sponsorship" // Lead/Host/Funder company management + B-BBEE allocation
   // Admin
   | "platform_admin"
   | "portal_switcher";
