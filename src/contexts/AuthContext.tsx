@@ -130,9 +130,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     await supabase.auth.signOut();
   };
 
+  const refreshUserData = async () => {
+    const { data: { session: sess } } = await supabase.auth.getSession();
+    if (sess?.user) await loadUserData(sess.user.id);
+  };
+
   return (
     <AuthContext.Provider
       value={{
+        user,
+        session,
+        role,
+        allRoles,
+        switchRole,
+        previewRole,
+        previewingAs,
+        plan,
+        persona,
+        capabilities,
+        trialEndsAt,
+        isTrialActive,
+        loading,
+        hasCapability,
+        signOut,
+        refreshUserData,
+      }}
+    >
         user,
         session,
         role,
