@@ -456,14 +456,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   };
 
   const handleSignUp = async () => {
-    if (!form.email || !form.password) {
-      toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
-      return;
-    }
-    if (form.password.length < 6) {
-      toast({ title: "Password too short", description: "Minimum 6 characters.", variant: "destructive" });
-      return;
-    }
+    if (!validateProfileForm()) return;
     setSubmitting(true);
     try {
       const { data, error } = await supabase.auth.signUp({
