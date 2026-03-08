@@ -246,7 +246,7 @@ export function FundingOpportunitiesWidget() {
                   {/* Action button */}
                   <div className="flex-shrink-0">
                     {myStatus ? (
-                      <div className="flex items-center gap-1.5 text-xs font-semibold text-green-600 bg-green-500/10 px-3 py-1.5 rounded-lg">
+                      <div className="flex items-center gap-1.5 text-xs font-semibold text-foreground bg-muted px-3 py-1.5 rounded-lg">
                         <CheckCircle className="w-3.5 h-3.5" />
                         {myStatus === "shortlisted" ? "Shortlisted" :
                          myStatus === "awarded"     ? "Awarded" :
