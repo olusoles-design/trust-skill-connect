@@ -39,7 +39,8 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Document Vault",            url: "/dashboard/vault",           icon: Lock,          capability: "document_vault"          },
   { title: "Availability & Contracts",  url: "/dashboard/availability",    icon: ToggleRight,   capability: "availability_toggle"           },
   { title: "Smart Contracting",         url: "/dashboard/contracting",     icon: FileSignature, capability: "smart_contracting"             },
-  { title: "Practitioner Accreditations", url: "/dashboard/accreditations", icon: Award,        capability: "practitioner_accreditations"   },
+  { title: "Practitioner Accreditations", url: "/dashboard/accreditations",   icon: Award,        capability: "practitioner_accreditations"   },
+  { title: "Practitioner Directory",      url: "/dashboard/practitioners",    icon: UserSearch,   capability: "browse_practitioner_directory" },
   // Employer/Sponsor
   { title: "Post Opportunities",        url: "/dashboard/post",            icon: Briefcase,     capability: "post_opportunities"      },
   { title: "Manage Learners",           url: "/dashboard/learners",        icon: Users,         capability: "manage_learners"         },
