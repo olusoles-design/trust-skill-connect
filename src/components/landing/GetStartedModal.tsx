@@ -329,6 +329,7 @@ interface Props { open: boolean; onClose: () => void; initialRole?: Role; }
 export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { refreshUserData } = useAuth();
 
   const [mode, setMode] = useState<"entry" | "login" | "register" | "forgot">("entry");
   const [forgotSent, setForgotSent] = useState(false);
