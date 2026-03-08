@@ -321,8 +321,10 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   upload_accreditation:            { minPlan: "starter" },
   post_programme_opportunities:    { minPlan: "starter", limit: 3 },
   // Sponsor Directory
-  manage_sponsor_profile:          { minPlan: "starter" },
-  browse_sponsor_directory:        { minPlan: "starter" },
+  manage_sponsor_profile:               { minPlan: "starter" },
+  browse_sponsor_directory:             { minPlan: "starter" },
+  // Practitioner Directory
+  browse_practitioner_directory:        { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
