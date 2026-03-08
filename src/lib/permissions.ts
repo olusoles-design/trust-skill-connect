@@ -106,8 +106,6 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "build_profile",
     "track_progress",
     "view_credentials",
-    "view_tasks",
-    "my_tasks",
     "marketplace_listing",
     "document_vault",
     "availability_toggle",
