@@ -47,6 +47,8 @@ export type Capability =
   | "fund_learners"
   | "manage_funding"
   | "approve_payments"
+  | "post_funding_opportunities"  // Sponsor posts funding briefs
+  | "browse_funding_opportunities" // SDPs discover and submit EOIs
   // Oversight
   | "verify_documents"
   | "view_reports"
@@ -135,6 +137,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "document_vault",
     "marketplace_discovery",
     "workflow_engine",
+    "browse_funding_opportunities",
   ],
   sponsor: [
     "fund_learners",
@@ -151,6 +154,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "workflow_engine",
     "multi_company_sponsorship",
     "marketplace_discovery",
+    "post_funding_opportunities",
   ],
   fundi: [
     "fund_learners",
@@ -230,6 +234,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "workflow_engine",
     "trust_ledger",
     "platform_admin",
+    "post_funding_opportunities",
+    "browse_funding_opportunities",
   ],
 };
 
@@ -275,9 +281,11 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   rfq_board:               { minPlan: "starter" },
   facility_booking:        { minPlan: "professional" },
   // Funding
-  fund_learners:           { minPlan: "starter" },
-  manage_funding:          { minPlan: "professional" },
-  approve_payments:        { minPlan: "professional" },
+  fund_learners:               { minPlan: "starter" },
+  manage_funding:              { minPlan: "professional" },
+  approve_payments:            { minPlan: "professional" },
+  post_funding_opportunities:  { minPlan: "starter", limit: 3 },
+  browse_funding_opportunities:{ minPlan: "starter" },
   // Oversight
   verify_documents:        { minPlan: "professional" },
   view_reports:            { minPlan: "professional" },
