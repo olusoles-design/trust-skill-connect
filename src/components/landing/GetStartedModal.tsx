@@ -647,7 +647,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "forgot" && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="space-y-5 max-w-sm mx-auto">
+                  className="space-y-5 max-w-xl mx-auto">
                   {forgotSent ? (
                     <div className="text-center py-4 space-y-4">
                       <div className="w-16 h-16 rounded-full bg-teal/20 border border-teal/40 flex items-center justify-center mx-auto">
