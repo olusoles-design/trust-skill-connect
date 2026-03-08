@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback, useRef } from "react";
+import { useAuth } from "@/contexts/AuthContext";
 import { motion, AnimatePresence } from "framer-motion";
 import {
   X, ArrowLeft, ArrowRight, Loader2, Upload, CheckCircle2,
@@ -329,6 +330,7 @@ interface Props { open: boolean; onClose: () => void; initialRole?: Role; }
 export default function GetStartedModal({ open, onClose, initialRole = null }: Props) {
   const { toast } = useToast();
   const navigate = useNavigate();
+  const { refreshUserData } = useAuth();
 
   const [mode, setMode] = useState<"entry" | "login" | "register" | "forgot">("entry");
   const [forgotSent, setForgotSent] = useState(false);
@@ -474,8 +476,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
       const uid = data.user?.id;
       const hasSession = !!data.session;
 
-      // Save profile & roles if we have a live session (auto-confirm enabled)
+      // Save profile & roles
       if (uid) {
+        // Use onConflict to handle the row already created by the DB trigger
         await supabase.from("profiles").upsert({
           user_id: uid,
           first_name: form.firstName || null,
@@ -484,13 +487,17 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
           phone: form.phone || null,
           company_name: form.companyName || null,
           job_title: form.jobTitle || null,
-        });
+        }, { onConflict: "user_id" });
+
         if (selectedRole) {
           await supabase.from("user_roles").upsert({ user_id: uid, role: selectedRole }, { onConflict: "user_id,role" });
         }
         for (const role of additionalRoles) {
           await supabase.from("user_roles").upsert({ user_id: uid, role }, { onConflict: "user_id,role" });
         }
+
+        // Refresh AuthContext so roles are picked up immediately (avoids "Guest" on redirect)
+        await refreshUserData();
       }
 
       if (hasSession) {
