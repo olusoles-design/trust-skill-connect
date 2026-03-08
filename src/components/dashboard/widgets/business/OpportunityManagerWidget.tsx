@@ -45,6 +45,7 @@ export function OpportunityManagerWidget() {
   const [form, setForm] = useState(BLANK);
   const { toast } = useToast();
   const qc = useQueryClient();
+  const { data: bodies } = useRegulatoryBodies();
 
   const { data, isLoading, error } = useQuery({
     queryKey: ["my-opportunities", user?.id],
