@@ -116,6 +116,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "practitioner_accreditations",
     "upload_accreditation",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   employer: [
     "post_opportunities",

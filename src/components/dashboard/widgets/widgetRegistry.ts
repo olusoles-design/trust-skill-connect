@@ -141,6 +141,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title: "Upload Accreditation Letter", description: "AI-powered extraction from SETA & professional body letters — auto-fills your qualifications and registrations.",
     icon: "Sparkles", color: "bg-primary/10", accentColor: "text-primary",
   },
+  browse_practitioner_directory: {
+    component: PractitionerDirectoryWidget, layout: "full", persona: "talent",
+    title: "Practitioner Directory", description: "Find registered Facilitators, Assessors, Moderators and SDFs — filter by SETA, province and language.",
+    icon: "Users", color: "bg-primary/10", accentColor: "text-primary",
+  },
 
   // ── Business – Employer/Sponsor ─────────────────────────────────────────────
   post_tasks: {
