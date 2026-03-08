@@ -279,9 +279,11 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   rfq_board:               { minPlan: "starter" },
   facility_booking:        { minPlan: "professional" },
   // Funding
-  fund_learners:           { minPlan: "starter" },
-  manage_funding:          { minPlan: "professional" },
-  approve_payments:        { minPlan: "professional" },
+  fund_learners:               { minPlan: "starter" },
+  manage_funding:              { minPlan: "professional" },
+  approve_payments:            { minPlan: "professional" },
+  post_funding_opportunities:  { minPlan: "starter", limit: 3 },
+  browse_funding_opportunities:{ minPlan: "starter" },
   // Oversight
   verify_documents:        { minPlan: "professional" },
   view_reports:            { minPlan: "professional" },
