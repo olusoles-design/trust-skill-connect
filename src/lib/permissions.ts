@@ -300,6 +300,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   // Admin
   platform_admin:          { minPlan: "starter" },
   portal_switcher:         { minPlan: "starter" },
+  upload_accreditation:    { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
