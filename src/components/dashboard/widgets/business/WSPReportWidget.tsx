@@ -2,11 +2,8 @@ import { useState } from "react";
 import { FileText, Download, CheckCircle2, Clock, AlertCircle, ChevronRight } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-
-const SETAS = [
-  "MERSETA","MICT SETA","ETDP SETA","SERVICES SETA","INSETA","CHIETA",
-  "FASSET","HWSETA","CATHSSETA","AGRISETA","TETA","W&RSETA","CETA","BANKSETA",
-];
+import { useSETAs } from "@/hooks/useRegulatoryBodies";
+import { Skeleton } from "@/components/ui/skeleton";
 
 interface ReportSection {
   label: string;
@@ -31,20 +28,25 @@ const STATUS_CFG = {
 };
 
 export function WSPReportWidget() {
-  const [seta,   setSeta]   = useState("MICT SETA");
-  const [year,   setYear]   = useState("2024-25");
+  const { data: setas, isLoading } = useSETAs();
+  const [seta,       setSeta]       = useState("");
+  const [year,       setYear]       = useState("2024-25");
   const [generating, setGenerating] = useState(false);
 
   const complete  = SECTIONS.filter(s => s.status === "complete").length;
   const readiness = Math.round((complete / SECTIONS.length) * 100);
 
+  // Set default once data arrives
+  if (!seta && setas && setas.length > 0) setSeta(setas[0].acronym);
+
   function handleGenerate() {
     setGenerating(true);
+    const bodyLabel = setas?.find(s => s.acronym === seta)?.acronym ?? seta;
     setTimeout(() => {
       setGenerating(false);
-      toast.success(`WSP/ATR for ${seta} (${year}) generated — ready to download`, {
-        description: "Formatted to SETA template. Review before submission.",
-        action: { label: "Download", onClick: () => toast.success("Downloading WSP_ATR_2024-25.xlsx") },
+      toast.success(`WSP/ATR for ${bodyLabel} (${year}) generated — ready to download`, {
+        description: "Formatted to statutory template. Review before submission.",
+        action: { label: "Download", onClick: () => toast.success("Downloading WSP_ATR.xlsx") },
       });
     }, 1800);
   }
@@ -54,11 +56,22 @@ export function WSPReportWidget() {
       {/* Config row */}
       <div className="grid grid-cols-2 gap-3">
         <div className="space-y-1">
-          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">SETA</p>
-          <Select value={seta} onValueChange={setSeta}>
-            <SelectTrigger className="h-8 text-xs"><SelectValue /></SelectTrigger>
-            <SelectContent>{SETAS.map(s => <SelectItem key={s} value={s} className="text-xs">{s}</SelectItem>)}</SelectContent>
-          </Select>
+          <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Regulatory Body</p>
+          {isLoading ? (
+            <Skeleton className="h-8 w-full" />
+          ) : (
+            <Select value={seta} onValueChange={setSeta}>
+              <SelectTrigger className="h-8 text-xs"><SelectValue placeholder="Select body…" /></SelectTrigger>
+              <SelectContent>
+                {setas?.map(s => (
+                  <SelectItem key={s.id} value={s.acronym} className="text-xs">
+                    {s.acronym}
+                    {s.is_levy_funded && <span className="ml-1 text-[9px] text-muted-foreground">(levy)</span>}
+                  </SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          )}
         </div>
         <div className="space-y-1">
           <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Financial Year</p>
@@ -70,6 +83,26 @@ export function WSPReportWidget() {
           </Select>
         </div>
       </div>
+
+      {/* Body info strip */}
+      {seta && setas && (
+        <div className="flex items-center gap-2 px-3 py-2 rounded-lg bg-muted/30 border border-border text-xs text-muted-foreground">
+          {(() => {
+            const b = setas.find(s => s.acronym === seta);
+            if (!b) return null;
+            const formats = b.reporting_formats as string[];
+            return (
+              <>
+                <span className="font-semibold text-foreground">{b.acronym}</span>
+                <span>·</span>
+                <span>{b.sector ?? b.body_type.toUpperCase()}</span>
+                {b.is_levy_funded && <span className="ml-auto px-1.5 py-0.5 rounded bg-primary/10 text-primary text-[9px] font-bold">LEVY FUNDED</span>}
+                {formats.length > 0 && <span className="hidden sm:block truncate">Reports: {formats.join(", ")}</span>}
+              </>
+            );
+          })()}
+        </div>
+      )}
 
       {/* Readiness */}
       <div className="p-4 rounded-xl bg-muted/30 border border-border">
@@ -116,7 +149,7 @@ export function WSPReportWidget() {
       <div className="flex gap-2">
         <button
           onClick={handleGenerate}
-          disabled={generating}
+          disabled={generating || !seta}
           className="flex-1 flex items-center justify-center gap-2 py-2.5 rounded-xl bg-primary text-primary-foreground text-xs font-semibold hover:bg-primary/90 transition-all disabled:opacity-60"
         >
           {generating ? (
@@ -127,7 +160,7 @@ export function WSPReportWidget() {
           {generating ? "Generating…" : "Generate WSP/ATR"}
         </button>
         <button
-          onClick={() => toast.success("SARS summary exported")}
+          onClick={() => toast.success("Statutory summary exported")}
           className="flex items-center gap-1.5 px-3 py-2.5 rounded-xl border border-border text-xs font-semibold text-foreground hover:bg-muted/50 transition-all"
         >
           <Download className="w-3.5 h-3.5" /> SARS

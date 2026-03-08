@@ -2,18 +2,11 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
-import { Map, Globe, Building2, GraduationCap, CheckCircle2 } from "lucide-react";
+import { Skeleton } from "@/components/ui/skeleton";
+import { Map, Globe, Building2, GraduationCap, CheckCircle2, Layers, FlaskConical, Award } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
-
-const SETA_BODIES = [
-  { id: "merseta",   name: "merSETA",     sector: "Manufacturing, Engineering & Related Services" },
-  { id: "inseta",    name: "INSETA",      sector: "Insurance" },
-  { id: "fasset",    name: "FASSET",      sector: "Finance, Accounting, Management Consulting" },
-  { id: "mict",      name: "MICT SETA",  sector: "Media, Information & Communication Technology" },
-  { id: "etdp",      name: "ETDP SETA",  sector: "Education, Training & Development Practices" },
-  { id: "chieta",    name: "CHIETA",      sector: "Chemical Industries" },
-];
+import { useRegulatoryBodies, type BodyType } from "@/hooks/useRegulatoryBodies";
 
 const NQF_LEVELS = [
   { level: 1, label: "NQF 1", desc: "Grade 9 equivalent" },
@@ -28,22 +21,53 @@ const NQF_LEVELS = [
   { level: 10, label: "NQF 10", desc: "Doctoral Degree" },
 ];
 
-export function CountryFrameworkSettings() {
-  const [activeSETAs, setActiveSETAs] = useState<string[]>(["merseta", "mict", "etdp"]);
-  const [enabledNQF, setEnabledNQF] = useState<number[]>([1, 2, 3, 4, 5, 6, 7, 8, 9, 10]);
+const BODY_TYPE_META: Record<BodyType | "other", { label: string; icon: React.ElementType; color: string }> = {
+  seta:             { label: "SETA",              icon: Building2,    color: "text-primary" },
+  qcto:             { label: "QCTO",              icon: Layers,       color: "text-blue-600" },
+  saqa:             { label: "SAQA",              icon: FlaskConical, color: "text-purple-600" },
+  professional_body:{ label: "Professional Body", icon: Award,        color: "text-orange-600" },
+  other:            { label: "Other",             icon: Globe,        color: "text-muted-foreground" },
+};
 
-  const toggleSETA = (id: string) =>
-    setActiveSETAs((prev) => prev.includes(id) ? prev.filter((s) => s !== id) : [...prev, id]);
+export function CountryFrameworkSettings() {
+  const { data: bodies, isLoading } = useRegulatoryBodies();
+  const [activeIds,  setActiveIds]  = useState<Set<string>>(new Set());
+  const [enabledNQF, setEnabledNQF] = useState<number[]>([1,2,3,4,5,6,7,8,9,10]);
+  const [initialised, setInitialised] = useState(false);
+
+  // Seed active set once bodies load (all active by default)
+  if (!initialised && bodies) {
+    setActiveIds(new Set(bodies.map(b => b.id)));
+    setInitialised(true);
+  }
+
+  const toggle = (id: string) =>
+    setActiveIds(prev => {
+      const next = new Set(prev);
+      next.has(id) ? next.delete(id) : next.add(id);
+      return next;
+    });
 
   const toggleNQF = (level: number) =>
-    setEnabledNQF((prev) => prev.includes(level) ? prev.filter((n) => n !== level) : [...prev, level]);
+    setEnabledNQF(prev => prev.includes(level) ? prev.filter(n => n !== level) : [...prev, level]);
+
+  // Group bodies by type
+  const grouped = (bodies ?? []).reduce<Record<string, typeof bodies>>((acc, b) => {
+    if (!acc[b.body_type]) acc[b.body_type] = [];
+    acc[b.body_type]!.push(b);
+    return acc;
+  }, {});
+
+  const typeOrder: BodyType[] = ["seta", "qcto", "saqa", "professional_body", "other"];
 
   return (
     <div className="space-y-6">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-xl font-semibold text-foreground">Country Framework</h2>
-          <p className="text-sm text-muted-foreground">SETA bodies, NQF levels, and regional regulatory configuration</p>
+          <h2 className="text-xl font-semibold text-foreground">Regulatory Framework</h2>
+          <p className="text-sm text-muted-foreground">
+            Manage statutory and voluntary bodies — SETA, QCTO, SAQA, professional bodies and NQF levels
+          </p>
         </div>
         <Button size="sm" className="gap-2" onClick={() => toast.success("Framework settings saved")}>
           <Map className="w-3.5 h-3.5" /> Save
@@ -63,48 +87,83 @@ export function CountryFrameworkSettings() {
             <div className="text-3xl">🇿🇦</div>
             <div>
               <p className="text-sm font-semibold">South Africa</p>
-              <p className="text-xs text-muted-foreground">NQF, SETA, B-BBEE, POPIA active</p>
+              <p className="text-xs text-muted-foreground">NQF · SETA · QCTO · B-BBEE · POPIA · SARS active</p>
             </div>
             <Badge className="ml-auto bg-primary/10 text-primary border-primary/20">Active</Badge>
           </div>
         </CardContent>
       </Card>
 
-      {/* SETA Bodies */}
-      <Card className="border-border shadow-sm">
-        <CardHeader className="pb-3">
-          <CardTitle className="text-base flex items-center gap-2">
-            <Building2 className="w-4 h-4 text-primary" />
-            SETA Bodies
-          </CardTitle>
-          <CardDescription>Toggle which SETAs are active on the platform</CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-2">
-          {SETA_BODIES.map((seta) => {
-            const active = activeSETAs.includes(seta.id);
-            return (
-              <div key={seta.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/20 transition-colors border border-border">
-                <div className="flex items-center gap-3">
-                  {active ? (
-                    <CheckCircle2 className="w-4 h-4 text-primary" />
-                  ) : (
-                    <div className="w-4 h-4 rounded-full border-2 border-border" />
-                  )}
-                  <div>
-                    <p className="text-sm font-medium">{seta.name}</p>
-                    <p className="text-xs text-muted-foreground">{seta.sector}</p>
-                  </div>
-                </div>
-                <Switch
-                  checked={active}
-                  onCheckedChange={() => toggleSETA(seta.id)}
-                  className="data-[state=checked]:bg-primary"
-                />
-              </div>
-            );
-          })}
-        </CardContent>
-      </Card>
+      {/* Regulatory Bodies — grouped */}
+      {isLoading ? (
+        <Card className="border-border shadow-sm">
+          <CardContent className="pt-6 space-y-3">
+            {[1,2,3,4].map(i => <Skeleton key={i} className="h-12 w-full" />)}
+          </CardContent>
+        </Card>
+      ) : (
+        typeOrder.map(type => {
+          const group = grouped[type];
+          if (!group || group.length === 0) return null;
+          const meta = BODY_TYPE_META[type];
+          const Icon = meta.icon;
+          return (
+            <Card key={type} className="border-border shadow-sm">
+              <CardHeader className="pb-3">
+                <CardTitle className="text-base flex items-center gap-2">
+                  <Icon className={`w-4 h-4 ${meta.color}`} />
+                  {meta.label} Bodies
+                  <Badge variant="outline" className="ml-auto text-[10px]">{group.filter(b => activeIds.has(b.id)).length}/{group.length} active</Badge>
+                </CardTitle>
+                <CardDescription>
+                  {type === "seta" && "Levy-funded sector bodies — govern WSP/ATR reporting and discretionary grants"}
+                  {type === "qcto" && "Quality Council for Trades & Occupations — OFO-based occupational qualifications"}
+                  {type === "saqa" && "South African Qualifications Authority — NQF oversight and NLRD"}
+                  {type === "professional_body" && "Self-regulating professional bodies — CPD requirements and membership recognition"}
+                  {type === "other" && "Other quality councils and statutory bodies"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="space-y-2">
+                {group.map(body => {
+                  const active = activeIds.has(body.id);
+                  const formats = (body.reporting_formats as string[]).slice(0, 3);
+                  return (
+                    <div key={body.id} className="flex items-center justify-between p-3 rounded-lg hover:bg-muted/20 transition-colors border border-border">
+                      <div className="flex items-center gap-3">
+                        {active ? (
+                          <CheckCircle2 className={`w-4 h-4 ${meta.color}`} />
+                        ) : (
+                          <div className="w-4 h-4 rounded-full border-2 border-border" />
+                        )}
+                        <div>
+                          <div className="flex items-center gap-2">
+                            <p className="text-sm font-semibold">{body.acronym}</p>
+                            {body.is_levy_funded && (
+                              <span className="text-[9px] font-bold px-1.5 py-0.5 rounded bg-primary/10 text-primary">LEVY</span>
+                            )}
+                          </div>
+                          <p className="text-xs text-muted-foreground line-clamp-1">{body.sector ?? body.full_name}</p>
+                          {formats.length > 0 && (
+                            <p className="text-[10px] text-muted-foreground/60 mt-0.5">
+                              Reports: {formats.join(" · ")}
+                              {(body.reporting_formats as string[]).length > 3 && ` +${(body.reporting_formats as string[]).length - 3}`}
+                            </p>
+                          )}
+                        </div>
+                      </div>
+                      <Switch
+                        checked={active}
+                        onCheckedChange={() => toggle(body.id)}
+                        className="data-[state=checked]:bg-primary"
+                      />
+                    </div>
+                  );
+                })}
+              </CardContent>
+            </Card>
+          );
+        })
+      )}
 
       {/* NQF Levels */}
       <Card className="border-border shadow-sm">
