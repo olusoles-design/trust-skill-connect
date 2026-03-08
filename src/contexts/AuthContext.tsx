@@ -1,4 +1,4 @@
-import { createContext, useContext, useEffect, useState, ReactNode } from "react";
+import { createContext, useContext, useEffect, useState, ReactNode, useCallback } from "react";
 import { User, Session } from "@supabase/supabase-js";
 import { supabase } from "@/integrations/supabase/client";
 import type { AppRole, SubscriptionPlan, Capability, Persona } from "@/lib/permissions";
@@ -7,18 +7,10 @@ import { ROLE_CAPABILITIES, ROLE_PERSONA, roleHasCapability } from "@/lib/permis
 interface AuthContextValue {
   user: User | null;
   session: Session | null;
-  /** The currently active role (the "hat" the user is wearing) */
   role: AppRole | null;
-  /** All roles this user holds */
   allRoles: AppRole[];
-  /** Switch the active role to a different one the user owns */
   switchRole: (role: AppRole) => void;
-  /**
-   * Admin-only: temporarily preview any role without owning it.
-   * Pass null to exit preview and return to the real active role.
-   */
   previewRole: (role: AppRole | null) => void;
-  /** The role the admin is currently previewing (null when not previewing) */
   previewingAs: AppRole | null;
   plan: SubscriptionPlan | null;
   persona: Persona | null;
@@ -61,7 +53,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [trialEndsAt, setTrialEndsAt] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
 
-  async function loadUserData(userId: string) {
+  const loadUserData = useCallback(async (userId: string) => {
     const [rolesRes, subRes] = await Promise.all([
       supabase.from("user_roles").select("role").eq("user_id", userId),
       supabase.from("subscriptions").select("plan, trial_ends_at").eq("user_id", userId).maybeSingle(),
@@ -77,7 +69,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     setPlan(subRes.data?.plan ?? "starter");
     setTrialEndsAt(subRes.data?.trial_ends_at ?? null);
-  }
+  }, []);
 
   useEffect(() => {
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, sess) => {
@@ -103,24 +95,26 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     });
 
     return () => subscription.unsubscribe();
-  }, []);
+  }, [loadUserData]);
 
   const switchRole = (newRole: AppRole) => {
     if (!allRoles.includes(newRole)) return;
-    setPreviewingAs(null); // exit any preview when explicitly switching
+    setPreviewingAs(null);
     setActiveRole(newRole);
     if (user) localStorage.setItem(`skillsmark_active_role_${user.id}`, newRole);
   };
 
   const previewRole = (role: AppRole | null) => {
-    // Only admins can preview
     if (!allRoles.includes("admin")) return;
     setPreviewingAs(role);
   };
 
-  // The effective role: use previewingAs if set, otherwise the real active role
-  const role = previewingAs ?? activeRole;
+  const refreshUserData = useCallback(async () => {
+    const { data: { session: sess } } = await supabase.auth.getSession();
+    if (sess?.user) await loadUserData(sess.user.id);
+  }, [loadUserData]);
 
+  const role = previewingAs ?? activeRole;
   const isTrialActive = plan === "starter" && !!trialEndsAt && new Date(trialEndsAt) > new Date();
   const capabilities: Capability[] = role ? ROLE_CAPABILITIES[role] ?? [] : [];
   const persona: Persona | null = role ? ROLE_PERSONA[role] ?? null : null;
@@ -128,11 +122,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signOut = async () => {
     await supabase.auth.signOut();
-  };
-
-  const refreshUserData = async () => {
-    const { data: { session: sess } } = await supabase.auth.getSession();
-    if (sess?.user) await loadUserData(sess.user.id);
   };
 
   return (
@@ -154,23 +143,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         hasCapability,
         signOut,
         refreshUserData,
-      }}
-    >
-        user,
-        session,
-        role,
-        allRoles,
-        switchRole,
-        previewRole,
-        previewingAs,
-        plan,
-        persona,
-        capabilities,
-        trialEndsAt,
-        isTrialActive,
-        loading,
-        hasCapability,
-        signOut,
       }}
     >
       {children}
