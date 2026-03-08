@@ -55,6 +55,7 @@ export type Capability =
   | "marketplace_discovery"  // Advanced search: find SDPs, facilitators, venues
   | "workflow_engine"        // RFP→RFQ deal flow, learner registration, SETA packet
   | "trust_ledger"           // Immutable audit ledger + QR verification
+  | "multi_company_sponsorship" // Lead/Host/Funder company management + B-BBEE allocation
   // Admin
   | "platform_admin"
   | "portal_switcher";
@@ -115,6 +116,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "wsp_reports",
     "tender_feed",
     "workflow_engine",
+    "multi_company_sponsorship",
     "marketplace_discovery",
   ],
   provider: [
@@ -145,6 +147,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "manage_funding",
     "approve_payments",
     "workflow_engine",
+    "multi_company_sponsorship",
     "marketplace_discovery",
   ],
   fundi: [
@@ -281,6 +284,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   // Phase 3 – Glue
   marketplace_discovery:   { minPlan: "starter" },
   workflow_engine:         { minPlan: "professional" },
+  multi_company_sponsorship: { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
   portal_switcher:         { minPlan: "starter" },

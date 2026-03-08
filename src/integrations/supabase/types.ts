@@ -52,6 +52,59 @@ export type Database = {
           },
         ]
       }
+      company_participants: {
+        Row: {
+          agreement_document_url: string | null
+          bbbee_points_allocated: number | null
+          company_name: string
+          cost_share_percentage: number | null
+          created_at: string
+          id: string
+          notes: string | null
+          opportunity_id: string
+          role: string
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          agreement_document_url?: string | null
+          bbbee_points_allocated?: number | null
+          company_name: string
+          cost_share_percentage?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          opportunity_id: string
+          role: string
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          agreement_document_url?: string | null
+          bbbee_points_allocated?: number | null
+          company_name?: string
+          cost_share_percentage?: number | null
+          created_at?: string
+          id?: string
+          notes?: string | null
+          opportunity_id?: string
+          role?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "company_participants_opportunity_id_fkey"
+            columns: ["opportunity_id"]
+            isOneToOne: false
+            referencedRelation: "opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       document_vault: {
         Row: {
           created_at: string
@@ -224,6 +277,7 @@ export type Database = {
           nqf_level_required: string | null
           organisation: string | null
           posted_by: string
+          regulatory_body_id: string | null
           seta: string | null
           status: string
           stipend: string | null
@@ -250,6 +304,7 @@ export type Database = {
           nqf_level_required?: string | null
           organisation?: string | null
           posted_by: string
+          regulatory_body_id?: string | null
           seta?: string | null
           status?: string
           stipend?: string | null
@@ -276,6 +331,7 @@ export type Database = {
           nqf_level_required?: string | null
           organisation?: string | null
           posted_by?: string
+          regulatory_body_id?: string | null
           seta?: string | null
           status?: string
           stipend?: string | null
@@ -286,7 +342,15 @@ export type Database = {
           verified?: boolean | null
           views?: number
         }
-        Relationships: []
+        Relationships: [
+          {
+            foreignKeyName: "opportunities_regulatory_body_id_fkey"
+            columns: ["regulatory_body_id"]
+            isOneToOne: false
+            referencedRelation: "regulatory_bodies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       payment_transactions: {
         Row: {
@@ -550,6 +614,62 @@ export type Database = {
           website_url?: string | null
         }
         Relationships: []
+      }
+      reports: {
+        Row: {
+          created_at: string
+          data_snapshot: Json
+          financial_year: string
+          generated_at: string
+          id: string
+          output_url: string | null
+          regulatory_body_id: string | null
+          report_type: string
+          status: string
+          submission_notes: string | null
+          submitted_at: string | null
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          created_at?: string
+          data_snapshot?: Json
+          financial_year: string
+          generated_at?: string
+          id?: string
+          output_url?: string | null
+          regulatory_body_id?: string | null
+          report_type: string
+          status?: string
+          submission_notes?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          created_at?: string
+          data_snapshot?: Json
+          financial_year?: string
+          generated_at?: string
+          id?: string
+          output_url?: string | null
+          regulatory_body_id?: string | null
+          report_type?: string
+          status?: string
+          submission_notes?: string | null
+          submitted_at?: string | null
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reports_regulatory_body_id_fkey"
+            columns: ["regulatory_body_id"]
+            isOneToOne: false
+            referencedRelation: "regulatory_bodies"
+            referencedColumns: ["id"]
+          },
+        ]
       }
       rfq_responses: {
         Row: {
