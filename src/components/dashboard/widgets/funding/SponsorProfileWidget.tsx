@@ -299,7 +299,7 @@ export function SponsorProfileWidget() {
               <div className="flex items-center gap-2">
                 <p className="text-base font-bold text-foreground">{profile!.company_name}</p>
                 {profile!.verified && (
-                  <BadgeCheck className="w-4 h-4 text-primary" title="Verified Sponsor" />
+                  <BadgeCheck className="w-4 h-4 text-primary" aria-label="Verified Sponsor" />
                 )}
                 <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full ${
                   profile!.is_public ? "bg-green-500/15 text-green-600" : "bg-muted text-muted-foreground"
