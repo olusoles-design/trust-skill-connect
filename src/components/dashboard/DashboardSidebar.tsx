@@ -19,7 +19,7 @@ import {
   DollarSign, Store, Crosshair, ShieldCheck, LogOut, User, Home,
   Wallet, Settings, Lock, ToggleRight, FileSignature, TrendingUp,
   Calculator, Rss, UserSearch, BarChart2, ShoppingCart, Bell,
-  ClipboardList, CalendarCheck, Activity, GitBranch, Link2, Eye, Award,
+  ClipboardList, CalendarCheck, Activity, GitBranch, Link2, Eye, Award, Zap,
 } from "lucide-react";
 import type { Capability } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
@@ -41,6 +41,9 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Smart Contracting",         url: "/dashboard/contracting",     icon: FileSignature, capability: "smart_contracting"             },
   { title: "Practitioner Accreditations", url: "/dashboard/accreditations",   icon: Award,        capability: "practitioner_accreditations"   },
   { title: "Practitioner Directory",      url: "/dashboard/practitioners",    icon: UserSearch,   capability: "browse_practitioner_directory" },
+  // Gigs & Micro-tasks – Learner only
+  { title: "Gigs & Micro-tasks",          url: "/dashboard/gigs",             icon: Zap,          capability: "view_tasks"                    },
+  { title: "My Earnings & Tasks",         url: "/dashboard/my-tasks",         icon: Wallet,       capability: "my_tasks"                      },
   // Employer/Sponsor
   { title: "Post Opportunities",        url: "/dashboard/post",            icon: Briefcase,     capability: "post_opportunities"      },
   { title: "Manage Learners",           url: "/dashboard/learners",        icon: Users,         capability: "manage_learners"         },
@@ -79,7 +82,7 @@ const PERSONA_LABELS: Record<string, string> = {
 };
 
 const PERSONA_CAPABILITIES: Record<string, Capability[]> = {
-  talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations","browse_practitioner_directory"],
+  talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations","browse_practitioner_directory","view_tasks","my_tasks"],
   business: ["post_opportunities","manage_learners","learner_pipeline","bbee_simulator","tax_calculator","wsp_reports","tender_feed","learner_recruitment","outcome_tracking","manage_procurement","marketplace_listing","marketplace_discovery","tender_matching","procurement_alerts","rfq_board","facility_booking","workflow_engine"],
   funding:  ["fund_learners","manage_funding","approve_payments"],
   oversight:["verify_documents","view_reports","trust_ledger","platform_admin","portal_switcher"],
