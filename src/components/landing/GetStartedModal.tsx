@@ -539,7 +539,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative bg-navy border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto"
+            className="relative bg-navy border border-white/10 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
