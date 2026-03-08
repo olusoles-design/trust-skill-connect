@@ -62,7 +62,8 @@ export type Capability =
   // Admin
   | "platform_admin"
   | "portal_switcher"
-  | "upload_accreditation";  // AI-powered accreditation letter extraction
+  | "upload_accreditation"  // AI-powered accreditation letter extraction
+  | "post_programme_opportunities"; // Sponsor lists learnership/bursary/internship in main feed
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
@@ -157,6 +158,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "multi_company_sponsorship",
     "marketplace_discovery",
     "post_funding_opportunities",
+    "post_programme_opportunities",
   ],
   fundi: [
     "fund_learners",
@@ -238,6 +240,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "platform_admin",
     "post_funding_opportunities",
     "browse_funding_opportunities",
+    "post_programme_opportunities",
   ],
 };
 
@@ -301,7 +304,8 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   // Admin
   platform_admin:          { minPlan: "starter" },
   portal_switcher:         { minPlan: "starter" },
-  upload_accreditation:    { minPlan: "starter" },
+  upload_accreditation:            { minPlan: "starter" },
+  post_programme_opportunities:    { minPlan: "starter", limit: 3 },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
