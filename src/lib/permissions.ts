@@ -234,6 +234,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "workflow_engine",
     "trust_ledger",
     "platform_admin",
+    "post_funding_opportunities",
+    "browse_funding_opportunities",
   ],
 };
 

@@ -219,7 +219,7 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     icon: "CalendarCheck", color: "bg-primary/10", accentColor: "text-primary",
   },
 
-  // ── Funding ────────────────────────────────────────────────────────────────
+// ─── Funding ────────────────────────────────────────────────────────────────
   fund_learners: {
     component: FundingAllocationWidget, layout: "full", persona: "funding",
     title: "Fund Learners", description: "Sponsor skills development and track B-BBEE impact.",
@@ -229,6 +229,16 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     component: DisbursementQueueWidget, layout: "half", persona: "funding",
     title: "Funding Allocation", description: "Budget management, disbursement and payment approvals.",
     icon: "PieChart", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  post_funding_opportunities: {
+    component: SponsorOpportunityWidget, layout: "full", persona: "funding",
+    title: "Post Funding Briefs", description: "Advertise learnership, internship and bursary programmes. Receive and evaluate provider EOIs.",
+    icon: "Megaphone", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  browse_funding_opportunities: {
+    component: FundingOpportunitiesWidget, layout: "full", persona: "business",
+    title: "Sponsor Funding Briefs", description: "Discover sponsor-funded programmes and express interest in delivering them.",
+    icon: "Banknote", color: "bg-primary/10", accentColor: "text-primary",
   },
 
   // ── Oversight ──────────────────────────────────────────────────────────────
