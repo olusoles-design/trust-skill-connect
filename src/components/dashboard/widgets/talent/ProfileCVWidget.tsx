@@ -78,7 +78,7 @@ export function ProfileCVWidget() {
     },
   });
 
-  // Sync form when profile loads
+  // Sync form when profile loads — also restore saved practitioner types from demographics
   useEffect(() => {
     if (profile) {
       setForm({
@@ -93,6 +93,11 @@ export function ProfileCVWidget() {
         linkedin_url: profile.linkedin_url ?? "",
         website_url: profile.website_url ?? "",
       });
+      // Restore practitioner_types stored in demographics JSONB
+      const demo = profile.demographics as Record<string, unknown> | null;
+      if (demo?.practitioner_types && Array.isArray(demo.practitioner_types)) {
+        setPractitionerTypes(demo.practitioner_types as PractitionerTypeKey[]);
+      }
     }
   }, [profile]);
 
