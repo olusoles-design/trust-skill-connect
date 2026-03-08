@@ -314,9 +314,14 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   marketplace_discovery:   { minPlan: "starter" },
   workflow_engine:         { minPlan: "professional" },
   multi_company_sponsorship: { minPlan: "professional" },
+  // Admin
+  platform_admin:          { minPlan: "starter" },
+  portal_switcher:         { minPlan: "starter" },
+  upload_accreditation:            { minPlan: "starter" },
+  post_programme_opportunities:    { minPlan: "starter", limit: 3 },
   // Sponsor Directory
-  manage_sponsor_profile:   { minPlan: "starter" },
-  browse_sponsor_directory: { minPlan: "starter" },
+  manage_sponsor_profile:          { minPlan: "starter" },
+  browse_sponsor_directory:        { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
