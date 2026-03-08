@@ -47,6 +47,8 @@ export type Capability =
   | "fund_learners"
   | "manage_funding"
   | "approve_payments"
+  | "post_funding_opportunities"  // Sponsor posts funding briefs
+  | "browse_funding_opportunities" // SDPs discover and submit EOIs
   // Oversight
   | "verify_documents"
   | "view_reports"

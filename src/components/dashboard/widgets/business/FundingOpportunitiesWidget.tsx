@@ -36,10 +36,10 @@ const PROG_LABELS: Record<string, string> = {
 };
 
 const PROG_COLORS: Record<string, string> = {
-  learnership:   "bg-primary/10 text-primary",
+      learnership:   "bg-primary/10 text-primary",
   internship:    "bg-secondary/20 text-secondary-foreground",
-  bursary:       "bg-amber-500/15 text-amber-700",
-  apprenticeship:"bg-teal-500/10 text-teal-700",
+  bursary:       "bg-accent/20 text-accent-foreground",
+  apprenticeship:"bg-muted text-muted-foreground",
   skills_programme: "bg-muted text-muted-foreground",
 };
 
