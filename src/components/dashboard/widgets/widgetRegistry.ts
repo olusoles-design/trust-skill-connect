@@ -18,6 +18,7 @@ import { AvailabilityToggleWidget }    from "./talent/AvailabilityToggleWidget";
 import { SmartContractingWidget }      from "./talent/SmartContractingWidget";
 import { PractitionerAccreditationsWidget } from "./talent/PractitionerAccreditationsWidget";
 import { AccreditationUploaderWidget }      from "./talent/AccreditationUploaderWidget";
+import { PractitionerDirectoryWidget }      from "./talent/PractitionerDirectoryWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";

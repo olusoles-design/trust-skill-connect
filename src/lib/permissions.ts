@@ -98,6 +98,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "my_tasks",
     "document_vault",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   practitioner: [
     "find_opportunities",
