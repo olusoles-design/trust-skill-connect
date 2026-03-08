@@ -1,63 +1,93 @@
 import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
 import { Progress } from "@/components/ui/progress";
-import { CheckCircle2, Clock, AlertTriangle, UserCheck, MapPin, Filter } from "lucide-react";
+import { CheckCircle2, Clock, AlertTriangle, UserCheck, MapPin, Filter, Loader2, AlertCircle, Users } from "lucide-react";
 
-interface PipelineLearner {
+interface ApplicationRow {
   id: string;
-  name: string;
-  programme: string;
-  nqfLevel: number;
-  province: string;
-  sdp: string;
-  phase: "registered" | "active" | "assessment" | "completed" | "at_risk";
-  attendance: number;
-  completionDate: string;
-  stipendPaid: boolean;
+  status: string;
+  created_at: string;
+  opportunities: {
+    id: string;
+    title: string;
+    type: string;
+    location: string | null;
+    nqf_level_required: string | null;
+    seta: string | null;
+    organisation: string | null;
+  } | null;
 }
 
-const MOCK: PipelineLearner[] = [
-  { id:"1",  name:"Aisha Khumalo",   programme:"IT Support NQF3",      nqfLevel:3, province:"Gauteng",    sdp:"Bytes Academy",   phase:"active",      attendance:92, completionDate:"Nov 2025", stipendPaid:true  },
-  { id:"2",  name:"Thabo Dlamini",   programme:"Business Admin NQF3",  nqfLevel:3, province:"Gauteng",    sdp:"Bytes Academy",   phase:"at_risk",     attendance:61, completionDate:"Nov 2025", stipendPaid:true  },
-  { id:"3",  name:"Zanele Mokoena",  programme:"Data Analytics NQF4",  nqfLevel:4, province:"KZN",        sdp:"TIH Training",    phase:"completed",   attendance:100,completionDate:"Sep 2025", stipendPaid:true  },
-  { id:"4",  name:"Sipho Ndlovu",    programme:"IT Support NQF3",      nqfLevel:3, province:"Gauteng",    sdp:"Bytes Academy",   phase:"active",      attendance:88, completionDate:"Nov 2025", stipendPaid:true  },
-  { id:"5",  name:"Nomvula Sithole", programme:"Customer Service NQF3",nqfLevel:3, province:"W. Cape",   sdp:"Growth Hub",      phase:"registered",  attendance:0,  completionDate:"Apr 2026", stipendPaid:false },
-  { id:"6",  name:"Kagiso Motsepe",  programme:"Data Analytics NQF4",  nqfLevel:4, province:"Gauteng",    sdp:"TIH Training",    phase:"assessment",  attendance:95, completionDate:"Dec 2025", stipendPaid:true  },
-  { id:"7",  name:"Lerato Phiri",    programme:"Management NQF4",      nqfLevel:4, province:"Free State", sdp:"Empower SA",      phase:"active",      attendance:79, completionDate:"Jan 2026", stipendPaid:true  },
-  { id:"8",  name:"Bongani Dube",    programme:"Business Admin NQF3",  nqfLevel:3, province:"Limpopo",    sdp:"Bytes Academy",   phase:"registered",  attendance:0,  completionDate:"Mar 2026", stipendPaid:false },
-];
+type Phase = "registered" | "active" | "assessment" | "completed" | "at_risk";
 
-const PHASES = {
-  registered:  { label:"Registered",  icon:UserCheck,    color:"bg-muted text-muted-foreground",         dot:"bg-muted-foreground"     },
-  active:      { label:"Active",      icon:Clock,        color:"bg-primary/15 text-primary",             dot:"bg-primary"              },
-  assessment:  { label:"Assessment",  icon:CheckCircle2, color:"bg-yellow-500/15 text-yellow-600",       dot:"bg-yellow-500"           },
-  completed:   { label:"Completed",   icon:CheckCircle2, color:"bg-emerald-500/15 text-emerald-600",     dot:"bg-emerald-500"          },
-  at_risk:     { label:"At Risk",     icon:AlertTriangle,color:"bg-destructive/10 text-destructive",     dot:"bg-destructive"          },
+function toPhase(status: string): Phase {
+  if (status === "accepted")    return "active";
+  if (status === "shortlisted") return "assessment";
+  if (status === "rejected")    return "at_risk";
+  return "registered";
+}
+
+const PHASES: Record<Phase, { label: string; icon: React.ElementType; color: string; dot: string }> = {
+  registered: { label: "Registered",  icon: UserCheck,     color: "bg-muted text-muted-foreground",         dot: "bg-muted-foreground" },
+  active:     { label: "Active",      icon: Clock,         color: "bg-primary/15 text-primary",             dot: "bg-primary" },
+  assessment: { label: "Assessment",  icon: CheckCircle2,  color: "bg-yellow-500/15 text-yellow-600",       dot: "bg-yellow-500" },
+  completed:  { label: "Completed",   icon: CheckCircle2,  color: "bg-emerald-500/15 text-emerald-600",     dot: "bg-emerald-500" },
+  at_risk:    { label: "At Risk",     icon: AlertTriangle, color: "bg-destructive/10 text-destructive",     dot: "bg-destructive" },
 };
 
 export function LearnerPipelineWidget() {
-  const [province, setProvince] = useState("All");
-  const provinces = ["All", ...Array.from(new Set(MOCK.map(l => l.province)))];
+  const { user } = useAuth();
+  const [locationFilter, setLocationFilter] = useState("All");
 
-  const filtered = MOCK.filter(l => province === "All" || l.province === province);
+  const { data: applications = [], isLoading, error } = useQuery({
+    queryKey: ["learner-pipeline", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("applications")
+        .select("id, status, created_at, opportunities!inner(id, title, type, location, nqf_level_required, seta, organisation)")
+        .eq("opportunities.posted_by", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return (data ?? []) as ApplicationRow[];
+    },
+  });
+
+  const locations = ["All", ...Array.from(new Set(
+    applications.map(a => a.opportunities?.location ?? "Unknown").filter(Boolean)
+  ))];
+
+  const filtered = applications.filter(a =>
+    locationFilter === "All" || a.opportunities?.location === locationFilter
+  );
 
   const stats = {
-    total:     MOCK.length,
-    active:    MOCK.filter(l => l.phase === "active").length,
-    at_risk:   MOCK.filter(l => l.phase === "at_risk").length,
-    completed: MOCK.filter(l => l.phase === "completed").length,
-    avgAtt:    Math.round(MOCK.filter(l => l.attendance > 0).reduce((s, l) => s + l.attendance, 0) / MOCK.filter(l => l.attendance > 0).length),
+    total:     applications.length,
+    active:    applications.filter(a => toPhase(a.status) === "active").length,
+    at_risk:   applications.filter(a => toPhase(a.status) === "at_risk").length,
+    completed: applications.filter(a => toPhase(a.status) === "completed").length,
   };
+
+  if (isLoading) return (
+    <div className="space-y-3">{[1,2,3].map(i => <div key={i} className="h-14 rounded-xl bg-muted animate-pulse" />)}</div>
+  );
+  if (error) return (
+    <div className="flex items-center gap-2 p-4 rounded-xl bg-destructive/10 text-destructive text-sm">
+      <AlertCircle className="w-4 h-4" /> Failed to load pipeline
+    </div>
+  );
 
   return (
     <div className="space-y-4">
       {/* Pipeline KPIs */}
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-4 gap-2">
         {[
-          { label:"Total",     val:stats.total,     cls:"bg-muted/40 border-border text-foreground" },
-          { label:"Active",    val:stats.active,    cls:"bg-primary/10 border-primary/20 text-primary" },
-          { label:"At Risk",   val:stats.at_risk,   cls:"bg-destructive/10 border-destructive/20 text-destructive" },
-          { label:"Completed", val:stats.completed, cls:"bg-emerald-500/10 border-emerald-500/20 text-emerald-600" },
-          { label:"Avg Att.",  val:`${stats.avgAtt}%`, cls:"bg-muted/40 border-border text-foreground" },
+          { label: "Total",     val: stats.total,     cls: "bg-muted/40 border-border text-foreground" },
+          { label: "Active",    val: stats.active,    cls: "bg-primary/10 border-primary/20 text-primary" },
+          { label: "At Risk",   val: stats.at_risk,   cls: "bg-destructive/10 border-destructive/20 text-destructive" },
+          { label: "Completed", val: stats.completed, cls: "bg-emerald-500/10 border-emerald-500/20 text-emerald-600" },
         ].map(k => (
           <div key={k.label} className={`rounded-xl border p-2.5 text-center ${k.cls}`}>
             <p className="text-lg font-black">{k.val}</p>
@@ -66,57 +96,71 @@ export function LearnerPipelineWidget() {
         ))}
       </div>
 
-      {/* Province filter */}
-      <div className="flex items-center gap-2 flex-wrap">
-        <Filter className="w-3.5 h-3.5 text-muted-foreground" />
-        {provinces.map(p => (
-          <button
-            key={p}
-            onClick={() => setProvince(p)}
-            className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${province === p ? "bg-primary text-primary-foreground border-primary" : "border-border text-muted-foreground hover:border-primary/50"}`}
-          >
-            {p}
-          </button>
-        ))}
-      </div>
+      {/* Location filter */}
+      {locations.length > 1 && (
+        <div className="flex items-center gap-2 flex-wrap">
+          <Filter className="w-3.5 h-3.5 text-muted-foreground" />
+          {locations.map(loc => (
+            <button
+              key={loc}
+              onClick={() => setLocationFilter(loc)}
+              className={`px-2.5 py-1 rounded-full text-[10px] font-semibold border transition-all ${
+                locationFilter === loc
+                  ? "bg-primary text-primary-foreground border-primary"
+                  : "border-border text-muted-foreground hover:border-primary/50"
+              }`}
+            >
+              {loc}
+            </button>
+          ))}
+        </div>
+      )}
 
-      {/* Learner list */}
-      <div className="space-y-2">
-        {filtered.map(l => {
-          const ph = PHASES[l.phase];
-          const Icon = ph.icon;
-          return (
-            <div key={l.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:bg-muted/30 transition-colors cursor-pointer">
-              <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
-                {l.name.split(" ").map(n => n[0]).join("")}
-              </div>
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-xs font-semibold text-foreground truncate">{l.name}</p>
-                  <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-bold ${ph.color}`}>
-                    <Icon className="w-2.5 h-2.5" />{ph.label}
-                  </span>
+      {applications.length === 0 ? (
+        <div className="text-center py-10 space-y-2">
+          <Users className="w-8 h-8 text-muted-foreground mx-auto" />
+          <p className="text-sm text-muted-foreground">No learners in pipeline yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {filtered.map(app => {
+            const phase = toPhase(app.status);
+            const ph = PHASES[phase];
+            const Icon = ph.icon;
+            const progress = phase === "completed" ? 100 : phase === "active" ? 65 : phase === "assessment" ? 85 : phase === "at_risk" ? 30 : 5;
+            return (
+              <div key={app.id} className="flex items-center gap-3 p-3 rounded-xl border border-border bg-card hover:bg-muted/30 transition-colors">
+                <div className="w-8 h-8 rounded-full bg-primary/15 flex items-center justify-center text-xs font-bold text-primary flex-shrink-0">
+                  {app.id.slice(0, 2).toUpperCase()}
                 </div>
-                <div className="flex items-center gap-2 mt-0.5 text-[10px] text-muted-foreground">
-                  <span>{l.programme}</span>
-                  <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{l.province}</span>
-                  <span>NQF {l.nqfLevel}</span>
-                </div>
-                {l.attendance > 0 && (
-                  <div className="flex items-center gap-2 mt-1">
-                    <Progress value={l.attendance} className="h-1 flex-1" />
-                    <span className="text-[10px] text-muted-foreground w-8">{l.attendance}%</span>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-xs font-semibold text-foreground truncate">{app.opportunities?.title ?? "Programme"}</p>
+                    <span className={`inline-flex items-center gap-1 text-[10px] px-1.5 py-0.5 rounded-full font-bold ${ph.color}`}>
+                      <Icon className="w-2.5 h-2.5" />{ph.label}
+                    </span>
                   </div>
-                )}
+                  <div className="flex items-center gap-2 mt-0.5 text-[10px] text-muted-foreground">
+                    {app.opportunities?.organisation && <span>{app.opportunities.organisation}</span>}
+                    {app.opportunities?.location && (
+                      <span className="flex items-center gap-0.5"><MapPin className="w-2.5 h-2.5" />{app.opportunities.location}</span>
+                    )}
+                    {app.opportunities?.nqf_level_required && <span>NQF {app.opportunities.nqf_level_required}</span>}
+                  </div>
+                  <div className="flex items-center gap-2 mt-1">
+                    <Progress value={progress} className="h-1 flex-1" />
+                    <span className="text-[10px] text-muted-foreground w-8">{progress}%</span>
+                  </div>
+                </div>
+                <div className="text-right text-[10px] text-muted-foreground flex-shrink-0">
+                  {app.opportunities?.seta && <p>{app.opportunities.seta}</p>}
+                  <p>{new Date(app.created_at).toLocaleDateString("en-ZA", { month: "short", year: "numeric" })}</p>
+                </div>
               </div>
-              <div className="text-right text-[10px] text-muted-foreground flex-shrink-0">
-                <p>{l.sdp}</p>
-                <p>{l.completionDate}</p>
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
