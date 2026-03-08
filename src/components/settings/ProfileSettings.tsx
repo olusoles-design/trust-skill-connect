@@ -277,6 +277,11 @@ export function ProfileSettings() {
           </Card>
         </TabsContent>
 
+        {/* ── Accreditations tab ──────────────────────────────────────── */}
+        <TabsContent value="accreditations" className="mt-6">
+          <AccreditationsProfileWidget />
+        </TabsContent>
+
         <TabsContent value="learning" className="mt-6">
           <Card className="border-border shadow-sm">
             <CardHeader>
