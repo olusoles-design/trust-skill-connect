@@ -67,6 +67,7 @@ export function OpportunityManagerWidget() {
         ...form,
         posted_by: user!.id,
         closing_date: form.closing_date || null,
+        regulatory_body_id: form.regulatory_body_id || null,
       });
       if (error) throw error;
     },
