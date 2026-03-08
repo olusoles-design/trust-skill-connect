@@ -984,6 +984,69 @@ export type Database = {
         }
         Relationships: []
       }
+      sponsor_profiles: {
+        Row: {
+          annual_budget: string | null
+          company_name: string
+          contact_email: string | null
+          contact_phone: string | null
+          created_at: string
+          description: string | null
+          id: string
+          is_public: boolean
+          linkedin_url: string | null
+          logo_url: string | null
+          programme_types: string[] | null
+          provinces: string[] | null
+          sectors: string[] | null
+          tagline: string | null
+          updated_at: string
+          user_id: string
+          verified: boolean
+          website_url: string | null
+        }
+        Insert: {
+          annual_budget?: string | null
+          company_name: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          linkedin_url?: string | null
+          logo_url?: string | null
+          programme_types?: string[] | null
+          provinces?: string[] | null
+          sectors?: string[] | null
+          tagline?: string | null
+          updated_at?: string
+          user_id: string
+          verified?: boolean
+          website_url?: string | null
+        }
+        Update: {
+          annual_budget?: string | null
+          company_name?: string
+          contact_email?: string | null
+          contact_phone?: string | null
+          created_at?: string
+          description?: string | null
+          id?: string
+          is_public?: boolean
+          linkedin_url?: string | null
+          logo_url?: string | null
+          programme_types?: string[] | null
+          provinces?: string[] | null
+          sectors?: string[] | null
+          tagline?: string | null
+          updated_at?: string
+          user_id?: string
+          verified?: boolean
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       subscriptions: {
         Row: {
           created_at: string

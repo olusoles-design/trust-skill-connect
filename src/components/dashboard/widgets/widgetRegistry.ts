@@ -46,6 +46,8 @@ import { FundingAllocationWidget }     from "./funding/FundingAllocationWidget";
 import { DisbursementQueueWidget }     from "./funding/DisbursementQueueWidget";
 import { SponsorOpportunityWidget }    from "./funding/SponsorOpportunityWidget";
 import { SponsorProgrammeWidget }      from "./funding/SponsorProgrammeWidget";
+import { SponsorProfileWidget }        from "./funding/SponsorProfileWidget";
+import { SponsorDirectoryWidget }      from "./funding/SponsorDirectoryWidget";
 import { FundingOpportunitiesWidget }  from "./business/FundingOpportunitiesWidget";
 
 // ─── Oversight
@@ -248,6 +250,16 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     component: SponsorProgrammeWidget, layout: "full", persona: "funding",
     title: "List Sponsored Programmes", description: "Publish learnerships, bursaries and internships to the main feed — learners apply directly, SDPs submit delivery EOIs.",
     icon: "GraduationCap", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  manage_sponsor_profile: {
+    component: SponsorProfileWidget, layout: "full", persona: "funding",
+    title: "My Sponsor Profile", description: "Manage your public directory listing — sectors, provinces, programme types and contact details.",
+    icon: "Building2", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  browse_sponsor_directory: {
+    component: SponsorDirectoryWidget, layout: "full", persona: "funding",
+    title: "Sponsor Directory", description: "Discover organisations that fund learnerships, bursaries and internships — filter by sector and programme type.",
+    icon: "BookOpen", color: "bg-primary/10", accentColor: "text-primary",
   },
   browse_funding_opportunities: {
     component: FundingOpportunitiesWidget, layout: "full", persona: "business",
