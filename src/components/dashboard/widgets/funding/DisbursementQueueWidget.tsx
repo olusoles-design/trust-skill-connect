@@ -1,86 +1,105 @@
-import { CheckCircle2, XCircle, Clock, AlertCircle } from "lucide-react";
+import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
+import { CheckCircle2, XCircle, Clock, AlertCircle, DollarSign, Loader2 } from "lucide-react";
 
-interface Payment {
+interface TxRow {
   id: string;
-  learner: string;
-  amount: string;
-  programme: string;
-  provider: string;
-  period: string;
-  status: "pending" | "approved" | "rejected" | "query";
-  submittedAt: string;
+  amount: number;
+  type: string;
+  status: string;
+  currency: string;
+  created_at: string;
+  gateway: string;
+  metadata: Record<string, unknown> | null;
 }
 
-const MOCK: Payment[] = [
-  { id:"1", learner:"Aisha Khumalo",   amount:"R5 200", programme:"IT Learnership",  provider:"Bytes Academy",   period:"Nov 2025", status:"pending",  submittedAt:"Today" },
-  { id:"2", learner:"Sipho Ndlovu",    amount:"R4 200", programme:"IT Learnership",  provider:"Bytes Academy",   period:"Nov 2025", status:"pending",  submittedAt:"Today" },
-  { id:"3", learner:"Thabo Dlamini",   amount:"R3 800", programme:"Business Admin",  provider:"Centurion Academy",period:"Nov 2025", status:"query",    submittedAt:"Yesterday" },
-  { id:"4", learner:"Zanele Mokoena",  amount:"R5 500", programme:"Data Analytics",  provider:"DataTech SA",     period:"Oct 2025", status:"approved", submittedAt:"3 days ago" },
-  { id:"5", learner:"Nomvula Sithole", amount:"R3 500", programme:"Customer Service",provider:"Service Academy", period:"Oct 2025", status:"rejected", submittedAt:"5 days ago" },
-];
-
-const statusConfig = {
-  pending:  { label:"Pending",  icon:Clock,         color:"bg-muted text-muted-foreground",         action:"Review" },
-  approved: { label:"Approved", icon:CheckCircle2,  color:"bg-green-500/15 text-green-600",         action:"View" },
-  rejected: { label:"Rejected", icon:XCircle,       color:"bg-destructive/10 text-destructive",     action:"View" },
-  query:    { label:"Query",    icon:AlertCircle,   color:"bg-accent/20 text-accent-foreground",    action:"Resolve" },
+const statusConfig: Record<string, { label: string; icon: React.ElementType; color: string }> = {
+  pending:   { label: "Pending",  icon: Clock,        color: "bg-muted text-muted-foreground" },
+  completed: { label: "Approved", icon: CheckCircle2, color: "bg-green-500/15 text-green-600" },
+  failed:    { label: "Failed",   icon: XCircle,      color: "bg-destructive/10 text-destructive" },
+  query:     { label: "Query",    icon: AlertCircle,  color: "bg-accent/20 text-accent-foreground" },
 };
 
 export function DisbursementQueueWidget() {
-  const pending = MOCK.filter(p => p.status === "pending").length;
-  const totalPending = MOCK.filter(p => p.status === "pending").reduce((s,p) => {
-    return s + parseFloat(p.amount.replace(/[^0-9]/g,""));
-  }, 0);
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const qc = useQueryClient();
+
+  const { data: transactions = [], isLoading } = useQuery({
+    queryKey: ["disbursement-queue", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("payment_transactions")
+        .select("id, amount, type, status, currency, created_at, gateway, metadata")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false })
+        .limit(20);
+      if (error) throw error;
+      return (data ?? []) as TxRow[];
+    },
+  });
+
+  const pending = transactions.filter(t => t.status === "pending");
+  const totalPending = pending.reduce((s, t) => s + t.amount, 0);
+  const totalProcessed = transactions.filter(t => t.status === "completed").reduce((s, t) => s + t.amount, 0);
+
+  if (isLoading) return (
+    <div className="space-y-3">{[1,2].map(i => <div key={i} className="h-20 rounded-xl bg-muted animate-pulse" />)}</div>
+  );
 
   return (
     <div className="space-y-4">
       {/* Summary */}
       <div className="flex gap-3">
         <div className="flex-1 rounded-xl bg-primary/10 border border-primary/20 p-4">
-          <p className="text-xs text-primary/70">Awaiting Approval</p>
-          <p className="text-2xl font-bold text-foreground">{pending}</p>
-          <p className="text-xs text-muted-foreground">R{(totalPending/1000).toFixed(1)}k total</p>
+          <p className="text-xs text-primary/70">Awaiting Processing</p>
+          <p className="text-2xl font-bold text-foreground">{pending.length}</p>
+          <p className="text-xs text-muted-foreground">R{(totalPending / 1000).toFixed(1)}k total</p>
         </div>
         <div className="flex-1 rounded-xl bg-muted/40 border border-border p-4">
-          <p className="text-xs text-muted-foreground">Processed This Month</p>
-          <p className="text-2xl font-bold text-foreground">R16.9k</p>
-          <p className="text-xs text-primary">4 payments</p>
+          <p className="text-xs text-muted-foreground">Processed</p>
+          <p className="text-2xl font-bold text-foreground">R{(totalProcessed / 1000).toFixed(1)}k</p>
+          <p className="text-xs text-primary">{transactions.filter(t => t.status === "completed").length} payments</p>
         </div>
       </div>
 
-      {/* Queue */}
-      <div className="space-y-2">
-        {MOCK.map(payment => {
-          const cfg = statusConfig[payment.status];
-          const Icon = cfg.icon;
-          return (
-            <div key={payment.id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/30 transition-all">
-              <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-2">
-                  <p className="text-sm font-semibold text-foreground">{payment.learner}</p>
-                  <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 ${cfg.color}`}>
-                    <Icon className="w-2.5 h-2.5" /> {cfg.label}
+      {transactions.length === 0 ? (
+        <div className="text-center py-8 space-y-2">
+          <DollarSign className="w-8 h-8 text-muted-foreground mx-auto" />
+          <p className="text-sm text-muted-foreground">No transactions yet.</p>
+        </div>
+      ) : (
+        <div className="space-y-2">
+          {transactions.map(tx => {
+            const cfg = statusConfig[tx.status] ?? statusConfig.pending;
+            const Icon = cfg.icon;
+            return (
+              <div key={tx.id} className="flex items-center gap-4 p-4 rounded-xl border border-border bg-card hover:bg-muted/30 transition-all">
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2">
+                    <p className="text-sm font-semibold text-foreground capitalize">{tx.type}</p>
+                    <span className={`text-[10px] font-bold px-1.5 py-0.5 rounded-full flex items-center gap-0.5 ${cfg.color}`}>
+                      <Icon className="w-2.5 h-2.5" /> {cfg.label}
+                    </span>
+                  </div>
+                  <p className="text-xs text-muted-foreground capitalize">{tx.gateway}</p>
+                  <p className="text-xs text-muted-foreground/70">
+                    {new Date(tx.created_at).toLocaleDateString("en-ZA", { day: "numeric", month: "short", year: "numeric" })}
+                  </p>
+                </div>
+                <div className="flex flex-col items-end gap-1 flex-shrink-0">
+                  <span className="text-sm font-bold text-foreground">
+                    {tx.currency} {tx.amount.toLocaleString()}
                   </span>
                 </div>
-                <p className="text-xs text-muted-foreground">{payment.programme} · {payment.provider}</p>
-                <p className="text-xs text-muted-foreground/70">{payment.period} · {payment.submittedAt}</p>
               </div>
-              <div className="flex flex-col items-end gap-2 flex-shrink-0">
-                <span className="text-sm font-bold text-foreground">{payment.amount}</span>
-                {payment.status === "pending" && (
-                  <div className="flex gap-1.5">
-                    <button className="px-2 py-1 rounded text-xs bg-destructive/10 text-destructive hover:bg-destructive/20 font-medium transition-all">Decline</button>
-                    <button className="px-2 py-1 rounded text-xs bg-primary/15 text-primary hover:bg-primary/25 font-medium transition-all">Approve</button>
-                  </div>
-                )}
-                {payment.status === "query" && (
-                  <button className="px-2 py-1 rounded text-xs bg-accent/20 text-accent-foreground hover:bg-accent/30 font-medium transition-all">Resolve</button>
-                )}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      )}
     </div>
   );
 }
