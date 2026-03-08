@@ -4,7 +4,7 @@ import { Shield, Lock, FileCheck, Building } from "lucide-react";
 const compliance = [
   { icon: Shield, label: "POPIA Compliant", sub: "Full data protection" },
   { icon: Lock, label: "256-bit Encryption", sub: "Data at rest & transit" },
-  { icon: FileCheck, label: "SETA Reporting", sub: "Multi-SETA formats" },
+  { icon: FileCheck, label: "Statutory Reporting", sub: "SETA · QCTO · SAQA formats" },
   { icon: Building, label: "B-BBEE Verified", sub: "Scorecard ready" },
 ];
 

@@ -1,4 +1,5 @@
 import { Award, BadgeCheck, Download, ExternalLink, GraduationCap, FileText, Briefcase, Cpu } from "lucide-react";
+import { useRegulatoryBodies } from "@/hooks/useRegulatoryBodies";
 
 // ─── Practitioner role badge types ───────────────────────────────────────────
 
