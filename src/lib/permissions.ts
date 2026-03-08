@@ -372,4 +372,5 @@ export const FEATURE_CAPABILITY: Record<string, Capability> = {
   "government:tender_matching":         "tender_matching",
   "government:audit":                   "audit_system",
   "admin:platform":                     "platform_admin",
+  "practitioner:upload_accreditation":  "upload_accreditation",
 };
