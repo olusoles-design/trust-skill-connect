@@ -463,7 +463,7 @@ export function PractitionerDirectoryWidget() {
             </div>
 
             {/* Availability */}
-            {(() => { const av = AVAIL_CONFIG[selected.availability] ?? AVAIL_CONFIG.flexible; return (
+            {(() => { const av = AVAIL_CONFIG[selected.availability as keyof typeof AVAIL_CONFIG] ?? AVAIL_CONFIG.flexible; return (
               <div className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border w-fit ${av.badge}`}>
                 <PulsingDot color={av.dot} />
                 <span className="text-xs font-semibold">{av.label}</span>
