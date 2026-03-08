@@ -156,7 +156,9 @@ export function CredentialWalletWidget() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold text-foreground leading-tight">{reg.practitionerRole}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{reg.seta ?? reg.issuer}</p>
+                    <p className="text-[10px] text-muted-foreground truncate" title={resolveBodyName(reg.seta ?? reg.issuer)}>
+                      {reg.seta ?? reg.issuer}
+                    </p>
                     {reg.regNumber && (
                       <p className="text-[9px] font-mono text-muted-foreground/60 truncate">{reg.regNumber}</p>
                     )}
