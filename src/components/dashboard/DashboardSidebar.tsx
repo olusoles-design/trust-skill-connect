@@ -39,7 +39,8 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Document Vault",            url: "/dashboard/vault",           icon: Lock,          capability: "document_vault"          },
   { title: "Availability & Contracts",  url: "/dashboard/availability",    icon: ToggleRight,   capability: "availability_toggle"           },
   { title: "Smart Contracting",         url: "/dashboard/contracting",     icon: FileSignature, capability: "smart_contracting"             },
-  { title: "Practitioner Accreditations", url: "/dashboard/accreditations", icon: Award,        capability: "practitioner_accreditations"   },
+  { title: "Practitioner Accreditations", url: "/dashboard/accreditations",   icon: Award,        capability: "practitioner_accreditations"   },
+  { title: "Practitioner Directory",      url: "/dashboard/practitioners",    icon: UserSearch,   capability: "browse_practitioner_directory" },
   // Employer/Sponsor
   { title: "Post Opportunities",        url: "/dashboard/post",            icon: Briefcase,     capability: "post_opportunities"      },
   { title: "Manage Learners",           url: "/dashboard/learners",        icon: Users,         capability: "manage_learners"         },
@@ -78,7 +79,7 @@ const PERSONA_LABELS: Record<string, string> = {
 };
 
 const PERSONA_CAPABILITIES: Record<string, Capability[]> = {
-  talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations"],
+  talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations","browse_practitioner_directory"],
   business: ["post_opportunities","manage_learners","learner_pipeline","bbee_simulator","tax_calculator","wsp_reports","tender_feed","learner_recruitment","outcome_tracking","manage_procurement","marketplace_listing","marketplace_discovery","tender_matching","procurement_alerts","rfq_board","facility_booking","workflow_engine"],
   funding:  ["fund_learners","manage_funding","approve_payments"],
   oversight:["verify_documents","view_reports","trust_ledger","platform_admin","portal_switcher"],
