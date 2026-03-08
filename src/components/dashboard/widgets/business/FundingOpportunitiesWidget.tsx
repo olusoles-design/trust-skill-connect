@@ -237,7 +237,7 @@ export function FundingOpportunitiesWidget() {
                     )}
 
                     {opp.application_deadline && (
-                      <p className={`text-xs mt-1.5 font-medium ${isUrgent ? "text-amber-600" : "text-muted-foreground"}`}>
+                      <p className={`text-xs mt-1.5 font-medium ${isUrgent ? "text-destructive" : "text-muted-foreground"}`}>
                         Deadline: {new Date(opp.application_deadline).toLocaleDateString("en-ZA")}
                       </p>
                     )}
