@@ -8,6 +8,7 @@ import { ArrowLeft } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 
 // Talent
+import { BrowseOpportunitiesWidget }  from "@/components/dashboard/widgets/BrowseOpportunitiesWidget";
 import { MicroTaskBoardWidget }        from "@/components/dashboard/widgets/talent/MicroTaskBoardWidget";
 import { MyTasksWidget }               from "@/components/dashboard/widgets/talent/MyTasksWidget";
 import { MyApplicationsWidget }       from "@/components/dashboard/widgets/talent/MyApplicationsWidget";
