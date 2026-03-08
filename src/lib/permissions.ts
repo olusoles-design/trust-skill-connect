@@ -65,7 +65,8 @@ export type Capability =
   | "upload_accreditation"       // AI-powered accreditation letter extraction
   | "post_programme_opportunities" // Sponsor lists learnership/bursary/internship in main feed
   | "manage_sponsor_profile"       // Sponsor manages their own directory listing
-  | "browse_sponsor_directory";    // Learners/providers browse the sponsor directory
+  | "browse_sponsor_directory"    // Learners/providers browse the sponsor directory
+  | "browse_practitioner_directory"; // Any authenticated user finds registered practitioners
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
@@ -97,6 +98,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "my_tasks",
     "document_vault",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   practitioner: [
     "find_opportunities",
@@ -114,6 +116,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "practitioner_accreditations",
     "upload_accreditation",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   employer: [
     "post_opportunities",
@@ -130,6 +133,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "multi_company_sponsorship",
     "marketplace_discovery",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   provider: [
     "post_opportunities",
@@ -147,6 +151,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "workflow_engine",
     "browse_funding_opportunities",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   sponsor: [
     "fund_learners",
@@ -166,6 +171,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "post_funding_opportunities",
     "post_programme_opportunities",
     "manage_sponsor_profile",
+    "browse_practitioner_directory",
   ],
   fundi: [
     "fund_learners",
@@ -175,6 +181,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "approve_payments",
     "marketplace_discovery",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   support_provider: [
     "marketplace_listing",
@@ -187,6 +194,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "facility_booking",
     "document_vault",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   seta: [
     "verify_documents",
@@ -197,6 +205,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "trust_ledger",
     "platform_admin",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   government: [
     "view_reports",
@@ -208,6 +217,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "platform_admin",
     "document_vault",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   admin: [
     "portal_switcher",
@@ -254,6 +264,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "post_programme_opportunities",
     "manage_sponsor_profile",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
 };
 
@@ -320,8 +331,10 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   upload_accreditation:            { minPlan: "starter" },
   post_programme_opportunities:    { minPlan: "starter", limit: 3 },
   // Sponsor Directory
-  manage_sponsor_profile:          { minPlan: "starter" },
-  browse_sponsor_directory:        { minPlan: "starter" },
+  manage_sponsor_profile:               { minPlan: "starter" },
+  browse_sponsor_directory:             { minPlan: "starter" },
+  // Practitioner Directory
+  browse_practitioner_directory:        { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
