@@ -952,10 +952,13 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   </div>
 
                   <button
-                    onClick={() => { handleClose(); navigate("/dashboard"); }}
+                    onClick={async () => {
+                      handleClose();
+                      navigate("/dashboard");
+                    }}
                     className="w-full py-3 rounded-xl bg-primary text-primary-foreground font-semibold text-sm hover:bg-primary/90 transition-all"
                   >
-                    {selectedPlan === "Enterprise" ? "Request a Demo →" : selectedPlan === "Starter" ? "Activate Free Trial →" : "Confirm Subscription →"}
+                    {selectedPlan === "Enterprise" ? "Request a Demo →" : selectedPlan === "Starter" ? "Go to Dashboard →" : "Go to Dashboard →"}
                   </button>
 
                   <button onClick={() => setStep(5)} className="text-xs text-muted-foreground hover:text-foreground transition-colors">
