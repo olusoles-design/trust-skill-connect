@@ -758,7 +758,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "register" && step === 3 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="space-y-4 max-w-md mx-auto">
+                  className="space-y-4">
                   <Stepper current={2} total={4} />
 
                   {/* Role badge */}
@@ -772,7 +772,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                         )}
                       </div>
                       {/* Additional roles */}
-                      <div className="ml-auto flex flex-wrap gap-1.5 max-w-[200px] justify-end">
+                      <div className="ml-auto flex flex-wrap gap-1.5 max-w-[260px] justify-end">
                         {allRoles.filter(r => r.id !== selectedRole).map(r => {
                           const isAdded = additionalRoles.includes(r.id);
                           return (
@@ -791,6 +791,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <p className="text-[10px] text-white/25 -mt-2 flex items-center gap-1"><Plus className="w-3 h-3" /> Tap role badges above to add multiple roles</p>
                   )}
 
+                  {/* Two-column form grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <FieldRow label="First Name">
                       <input name="firstName" value={form.firstName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Jane" />
@@ -798,17 +799,23 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <FieldRow label="Last Name">
                       <input name="lastName" value={form.lastName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Doe" />
                     </FieldRow>
+                    <FieldRow label="Email Address">
+                      <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="jane@example.com" />
+                    </FieldRow>
+                    <FieldRow label="Phone Number">
+                      <input name="phone" type="tel" value={form.phone} onChange={handleFormChange} className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
+                    </FieldRow>
+                    {ExtraFields && (
+                      <div className="col-span-2 grid grid-cols-2 gap-4">
+                        <ExtraFields form={form} onChange={handleFormChange} />
+                      </div>
+                    )}
+                    <div className="col-span-2">
+                      <FieldRow label="Password">
+                        <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Create a secure password" />
+                      </FieldRow>
+                    </div>
                   </div>
-                  <FieldRow label="Email Address">
-                    <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="jane@example.com" />
-                  </FieldRow>
-                  <FieldRow label="Phone Number">
-                    <input name="phone" type="tel" value={form.phone} onChange={handleFormChange} className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
-                  </FieldRow>
-                  {ExtraFields && <ExtraFields form={form} onChange={handleFormChange} />}
-                  <FieldRow label="Password">
-                    <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Create a secure password" />
-                  </FieldRow>
 
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-teal/10 border border-teal/20">
                     <span className="text-teal text-sm mt-0.5">✦</span>
