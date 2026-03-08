@@ -375,7 +375,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const resetModal = useCallback(() => {
     setMode("entry"); setStep(1); setSelectedHub(null); setSelectedRole(null);
     setPractitionerRole(null); setAdditionalRoles([]); setSelectedPlan(null);
-    setForm(EMPTY_FORM); setUploads([]); setForgotSent(false);
+    setForm(EMPTY_FORM); setFieldErrors({}); setUploads([]); setForgotSent(false);
   }, []);
 
   const handleClose = useCallback(() => {
@@ -383,8 +383,34 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
     setTimeout(resetModal, 300);
   }, [onClose, resetModal]);
 
-  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
-    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }));
+  const handleFormChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { name, value } = e.target;
+    setForm(prev => ({ ...prev, [name]: value }));
+    // Clear the error for this field as the user types
+    setFieldErrors(prev => ({ ...prev, [name]: undefined }));
+  };
+
+  const validateProfileForm = (): boolean => {
+    const errors: Partial<Record<keyof FormState, string>> = {};
+    if (!form.email.trim()) {
+      errors.email = "Email is required.";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email.trim())) {
+      errors.email = "Enter a valid email address.";
+    }
+    if (!form.password) {
+      errors.password = "Password is required.";
+    } else if (form.password.length < 6) {
+      errors.password = "Minimum 6 characters.";
+    }
+    if (form.firstName && form.firstName.length > 60) {
+      errors.firstName = "First name is too long.";
+    }
+    if (form.lastName && form.lastName.length > 60) {
+      errors.lastName = "Last name is too long.";
+    }
+    setFieldErrors(errors);
+    return Object.keys(errors).length === 0;
+  };
 
   const toggleAdditionalRole = (role: AppRole) => {
     if (role === selectedRole) return;
