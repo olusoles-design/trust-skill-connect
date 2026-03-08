@@ -264,6 +264,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "post_programme_opportunities",
     "manage_sponsor_profile",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
 };
 
