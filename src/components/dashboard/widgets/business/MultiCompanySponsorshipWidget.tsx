@@ -58,7 +58,7 @@ export function MultiCompanySponsorshipWidget() {
   const INPUT = "w-full px-3 py-2 text-sm rounded-lg border border-border bg-background focus:outline-none focus:ring-2 focus:ring-ring";
 
   // ── Fetch user's opportunities ──
-  const { data: opps = [] } = useQuery<OppOption[]>({
+  const { data: rawOpps } = useQuery({
     queryKey: ["sponsor-opps", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -71,11 +71,14 @@ export function MultiCompanySponsorshipWidget() {
       if (error) throw error;
       return (data ?? []) as OppOption[];
     },
-    onSuccess: (d: OppOption[]) => { if (!selectedOpp && d.length > 0) setSelectedOpp(d[0].id); },
-  } as Parameters<typeof useQuery>[0]);
+  });
+  const opps: OppOption[] = (rawOpps as OppOption[] | undefined) ?? [];
+
+  // Auto-select first
+  if (!selectedOpp && opps.length > 0) setSelectedOpp(opps[0].id);
 
   // ── Fetch participants for selected opportunity ──
-  const { data: participants = [], isLoading } = useQuery<Participant[]>({
+  const { data: rawParticipants, isLoading } = useQuery({
     queryKey: ["company-participants", selectedOpp],
     enabled: !!selectedOpp,
     queryFn: async () => {
@@ -88,6 +91,7 @@ export function MultiCompanySponsorshipWidget() {
       return (data ?? []) as Participant[];
     },
   });
+  const participants: Participant[] = (rawParticipants as Participant[] | undefined) ?? [];
 
   // ── Add participant ──
   const addParticipant = useMutation({
