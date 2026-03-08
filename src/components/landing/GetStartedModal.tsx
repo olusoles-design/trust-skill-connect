@@ -341,6 +341,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   const [selectedPlan, setSelectedPlan] = useState<PlanName>(null);
   const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState<FormState>(EMPTY_FORM);
+  const [fieldErrors, setFieldErrors] = useState<Partial<Record<keyof FormState, string>>>({});
   const [uploads, setUploads] = useState<UploadedFile[]>([]);
 
   useEffect(() => {
