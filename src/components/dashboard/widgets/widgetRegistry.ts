@@ -17,6 +17,7 @@ import { DocumentVaultWidget }         from "./talent/DocumentVaultWidget";
 import { AvailabilityToggleWidget }    from "./talent/AvailabilityToggleWidget";
 import { SmartContractingWidget }      from "./talent/SmartContractingWidget";
 import { PractitionerAccreditationsWidget } from "./talent/PractitionerAccreditationsWidget";
+import { AccreditationUploaderWidget }      from "./talent/AccreditationUploaderWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";
@@ -130,6 +131,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     component: PractitionerAccreditationsWidget, layout: "full", persona: "talent",
     title: "Practitioner Accreditations", description: "Upload and manage statutory documents for each practitioner role — Assessor, Facilitator, Moderator, SDF.",
     icon: "BadgeCheck", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  upload_accreditation: {
+    component: AccreditationUploaderWidget, layout: "half", persona: "talent",
+    title: "Upload Accreditation Letter", description: "AI-powered extraction from SETA & professional body letters — auto-fills your qualifications and registrations.",
+    icon: "Sparkles", color: "bg-primary/10", accentColor: "text-primary",
   },
 
   // ── Business – Employer/Sponsor ─────────────────────────────────────────────

@@ -61,7 +61,8 @@ export type Capability =
   | "multi_company_sponsorship" // Lead/Host/Funder company management + B-BBEE allocation
   // Admin
   | "platform_admin"
-  | "portal_switcher";
+  | "portal_switcher"
+  | "upload_accreditation";  // AI-powered accreditation letter extraction
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
@@ -107,6 +108,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "smart_contracting",
     "marketplace_discovery",
     "practitioner_accreditations",
+    "upload_accreditation",
   ],
   employer: [
     "post_opportunities",
@@ -299,6 +301,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   // Admin
   platform_admin:          { minPlan: "starter" },
   portal_switcher:         { minPlan: "starter" },
+  upload_accreditation:    { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
@@ -369,4 +372,5 @@ export const FEATURE_CAPABILITY: Record<string, Capability> = {
   "government:tender_matching":         "tender_matching",
   "government:audit":                   "audit_system",
   "admin:platform":                     "platform_admin",
+  "practitioner:upload_accreditation":  "upload_accreditation",
 };

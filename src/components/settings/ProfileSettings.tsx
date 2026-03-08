@@ -13,8 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import {
   User, Mail, Phone, MapPin, Briefcase, Link, Edit3, Save, X,
-  GraduationCap, Shield, Activity, Camera
+  GraduationCap, Shield, Activity, Camera, Award,
 } from "lucide-react";
+import { AccreditationsProfileWidget } from "@/components/dashboard/widgets/talent/AccreditationsProfileWidget";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
@@ -126,10 +127,11 @@ export function ProfileSettings() {
       <Tabs defaultValue="personal">
         <TabsList className="border-b border-border rounded-none bg-transparent h-auto p-0 space-x-6 w-full justify-start">
           {[
-            { value: "personal",  label: "Personal",  icon: User },
-            { value: "learning",  label: "Learning",  icon: GraduationCap },
-            { value: "security",  label: "Security",  icon: Shield },
-            { value: "audit",     label: "Audit",     icon: Activity },
+            { value: "personal",        label: "Personal",        icon: User },
+            { value: "accreditations",  label: "Accreditations",  icon: Award },
+            { value: "learning",        label: "Learning",        icon: GraduationCap },
+            { value: "security",        label: "Security",        icon: Shield },
+            { value: "audit",           label: "Audit",           icon: Activity },
           ].map((tab) => (
             <TabsTrigger
               key={tab.value}
@@ -273,6 +275,11 @@ export function ProfileSettings() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        {/* ── Accreditations tab ──────────────────────────────────────── */}
+        <TabsContent value="accreditations" className="mt-6">
+          <AccreditationsProfileWidget />
         </TabsContent>
 
         <TabsContent value="learning" className="mt-6">

@@ -14,6 +14,47 @@ export type Database = {
   }
   public: {
     Tables: {
+      accreditation_qualifications: {
+        Row: {
+          accreditation_id: string
+          created_at: string
+          credits: number | null
+          id: string
+          nqf_level: string | null
+          saqa_id: string | null
+          title: string
+          user_id: string
+        }
+        Insert: {
+          accreditation_id: string
+          created_at?: string
+          credits?: number | null
+          id?: string
+          nqf_level?: string | null
+          saqa_id?: string | null
+          title: string
+          user_id: string
+        }
+        Update: {
+          accreditation_id?: string
+          created_at?: string
+          credits?: number | null
+          id?: string
+          nqf_level?: string | null
+          saqa_id?: string | null
+          title?: string
+          user_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "accreditation_qualifications_accreditation_id_fkey"
+            columns: ["accreditation_id"]
+            isOneToOne: false
+            referencedRelation: "practitioner_accreditations"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       applications: {
         Row: {
           applicant_id: string
@@ -510,6 +551,54 @@ export type Database = {
           type?: string
           updated_at?: string
           user_id?: string
+        }
+        Relationships: []
+      }
+      practitioner_accreditations: {
+        Row: {
+          created_at: string
+          document_url: string | null
+          id: string
+          id_number: string | null
+          raw_extracted: Json | null
+          registration_number: string | null
+          role_type: string
+          seta_body: string
+          status: string
+          updated_at: string
+          user_id: string
+          valid_from: string | null
+          valid_to: string | null
+        }
+        Insert: {
+          created_at?: string
+          document_url?: string | null
+          id?: string
+          id_number?: string | null
+          raw_extracted?: Json | null
+          registration_number?: string | null
+          role_type: string
+          seta_body: string
+          status?: string
+          updated_at?: string
+          user_id: string
+          valid_from?: string | null
+          valid_to?: string | null
+        }
+        Update: {
+          created_at?: string
+          document_url?: string | null
+          id?: string
+          id_number?: string | null
+          raw_extracted?: Json | null
+          registration_number?: string | null
+          role_type?: string
+          seta_body?: string
+          status?: string
+          updated_at?: string
+          user_id?: string
+          valid_from?: string | null
+          valid_to?: string | null
         }
         Relationships: []
       }
