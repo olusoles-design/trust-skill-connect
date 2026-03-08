@@ -152,22 +152,32 @@ export function OpportunityManagerWidget() {
         <div className="rounded-xl border border-primary/20 bg-primary/5 p-4 space-y-3">
           <p className="text-sm font-semibold text-foreground">New Opportunity</p>
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <input {...field("title")} placeholder="Title *" className={INPUT} />
-            <select {...field("type")} className={INPUT}>
-              {["job","learnership","gig","programme","apprenticeship","bursary"].map(t => (
-                <option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>
-              ))}
-            </select>
-            <input {...field("organisation")} placeholder="Organisation" className={INPUT} />
-            <input {...field("location")} placeholder="Location" className={INPUT} />
-            <input {...field("stipend")} placeholder="Stipend / Salary" className={INPUT} />
-            <input {...field("duration")} placeholder="Duration (e.g. 12 months)" className={INPUT} />
-            <input {...field("closing_date")} type="date" className={INPUT} />
-            <select {...field("status")} className={INPUT}>
-              <option value="active">Active</option>
-              <option value="draft">Draft</option>
-            </select>
-          </div>
+              <input {...field("title")} placeholder="Title *" className={INPUT} />
+              <select {...field("type")} className={INPUT}>
+                {["job","learnership","gig","programme","apprenticeship","bursary"].map(t => (
+                  <option key={t} value={t}>{t.charAt(0).toUpperCase()+t.slice(1)}</option>
+                ))}
+              </select>
+              <input {...field("organisation")} placeholder="Organisation" className={INPUT} />
+              <input {...field("location")} placeholder="Location" className={INPUT} />
+              <input {...field("stipend")} placeholder="Stipend / Salary" className={INPUT} />
+              <input {...field("duration")} placeholder="Duration (e.g. 12 months)" className={INPUT} />
+              <input {...field("closing_date")} type="date" className={INPUT} />
+              <select {...field("status")} className={INPUT}>
+                <option value="active">Active</option>
+                <option value="draft">Draft</option>
+              </select>
+              {/* Regulatory body FK */}
+              <div className="sm:col-span-2 space-y-1">
+                <p className="text-[10px] text-muted-foreground font-medium uppercase tracking-wide">Regulatory Body (SETA / QCTO / SAQA)</p>
+                <select {...field("regulatory_body_id")} className={INPUT}>
+                  <option value="">— None / General —</option>
+                  {(bodies ?? []).map(b => (
+                    <option key={b.id} value={b.id}>{b.acronym} — {b.full_name}</option>
+                  ))}
+                </select>
+              </div>
+            </div>
           <textarea {...field("description")} placeholder="Description (optional)" rows={3} className={`${INPUT} resize-none`} />
           <button
             onClick={() => create.mutate()}
