@@ -35,6 +35,7 @@ interface ProfileRow {
   linkedin_url: string | null;
   website_url: string | null;
   avatar_url: string | null;
+  demographics: Record<string, unknown> | null;
 }
 
 const BLANK_PROFILE: Partial<ProfileRow> = {
