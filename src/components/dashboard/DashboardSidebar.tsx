@@ -19,7 +19,7 @@ import {
   DollarSign, Store, Crosshair, ShieldCheck, LogOut, User, Home,
   Wallet, Settings, Lock, ToggleRight, FileSignature, TrendingUp,
   Calculator, Rss, UserSearch, BarChart2, ShoppingCart, Bell,
-  ClipboardList, CalendarCheck, Activity, GitBranch, Link2, Eye,
+  ClipboardList, CalendarCheck, Activity, GitBranch, Link2, Eye, Award,
 } from "lucide-react";
 import type { Capability } from "@/lib/permissions";
 import { Button } from "@/components/ui/button";
