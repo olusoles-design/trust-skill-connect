@@ -836,7 +836,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "register" && step === 4 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="max-w-md mx-auto space-y-5">
+                  className="space-y-5">
                   <Stepper current={3} total={4} />
                   {requiredDocs.length > 0 ? (
                     <>
