@@ -127,10 +127,11 @@ export function ProfileSettings() {
       <Tabs defaultValue="personal">
         <TabsList className="border-b border-border rounded-none bg-transparent h-auto p-0 space-x-6 w-full justify-start">
           {[
-            { value: "personal",  label: "Personal",  icon: User },
-            { value: "learning",  label: "Learning",  icon: GraduationCap },
-            { value: "security",  label: "Security",  icon: Shield },
-            { value: "audit",     label: "Audit",     icon: Activity },
+            { value: "personal",        label: "Personal",        icon: User },
+            { value: "accreditations",  label: "Accreditations",  icon: Award },
+            { value: "learning",        label: "Learning",        icon: GraduationCap },
+            { value: "security",        label: "Security",        icon: Shield },
+            { value: "audit",           label: "Audit",           icon: Activity },
           ].map((tab) => (
             <TabsTrigger
               key={tab.value}
