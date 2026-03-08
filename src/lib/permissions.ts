@@ -181,6 +181,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "approve_payments",
     "marketplace_discovery",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   support_provider: [
     "marketplace_listing",
