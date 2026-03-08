@@ -112,8 +112,15 @@ const typeColor: Record<Credential["type"], string> = {
 };
 
 export function CredentialWalletWidget() {
+  const { data: regulatoryBodies } = useRegulatoryBodies();
   const verified = MOCK.filter(c => c.verified).length;
   const registrations = MOCK.filter(c => c.type === "Registration");
+
+  // Resolve a credential's SETA/body name to its full name from the DB
+  const resolveBodyName = (acronym?: string) => {
+    if (!acronym || !regulatoryBodies) return acronym;
+    return regulatoryBodies.find(b => b.acronym === acronym)?.full_name ?? acronym;
+  };
 
   return (
     <div className="space-y-4">
