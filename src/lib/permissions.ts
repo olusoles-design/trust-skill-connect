@@ -194,6 +194,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "facility_booking",
     "document_vault",
     "browse_sponsor_directory",
+    "browse_practitioner_directory",
   ],
   seta: [
     "verify_documents",
