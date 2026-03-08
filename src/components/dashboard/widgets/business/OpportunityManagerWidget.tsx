@@ -34,7 +34,8 @@ const typeColor: Record<string, string> = {
 
 const BLANK = {
   title: "", type: "job", description: "", organisation: "",
-  location: "", stipend: "", duration: "", closing_date: "", status: "active",
+  location: "", stipend: "", duration: "", closing_date: "",
+  status: "active", regulatory_body_id: "",
 };
 
 export function OpportunityManagerWidget() {
