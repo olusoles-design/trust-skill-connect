@@ -51,8 +51,9 @@ export function SETAReportingWidget() {
   const { data: bodies, isLoading } = useRegulatoryBodies();
   const [selectedId, setSelectedId] = useState<string>("");
 
-  const selectedBody = bodies?.find(b => b.id === selectedId) ?? bodies?.[0];
-  if (!selectedId && bodies?.length) setSelectedId(bodies[0].id);
+  const firstBodyId = bodies?.[0]?.id ?? "";
+  const effectiveId = selectedId || firstBodyId;
+  const selectedBody = bodies?.find(b => b.id === effectiveId);
 
   // Derive reports based on the body's reporting_formats
   const formats = (selectedBody?.reporting_formats ?? []) as string[];

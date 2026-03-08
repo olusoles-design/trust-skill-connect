@@ -33,13 +33,11 @@ export function CountryFrameworkSettings() {
   const { data: bodies, isLoading } = useRegulatoryBodies();
   const [activeIds,  setActiveIds]  = useState<Set<string>>(new Set());
   const [enabledNQF, setEnabledNQF] = useState<number[]>([1,2,3,4,5,6,7,8,9,10]);
-  const [initialised, setInitialised] = useState(false);
 
-  // Seed active set once bodies load (all active by default)
-  if (!initialised && bodies) {
-    setActiveIds(new Set(bodies.map(b => b.id)));
-    setInitialised(true);
-  }
+  // Derive active set — all loaded bodies are active by default
+  const effectiveActive = activeIds.size > 0
+    ? activeIds
+    : new Set((bodies ?? []).map(b => b.id));
 
   const toggle = (id: string) =>
     setActiveIds(prev => {
