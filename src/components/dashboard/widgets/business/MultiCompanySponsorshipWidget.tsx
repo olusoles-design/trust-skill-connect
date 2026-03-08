@@ -96,8 +96,8 @@ export function MultiCompanySponsorshipWidget() {
   // ── Add participant ──
   const addParticipant = useMutation({
     mutationFn: async () => {
-      const { error } = await supabase
-        .from("company_participants" as never)
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const { error } = await (supabase.from("company_participants") as any)
         .insert({
           opportunity_id: selectedOpp,
           user_id: user!.id,
