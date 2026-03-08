@@ -97,7 +97,7 @@ export function SponsorProfileWidget() {
         .eq("user_id", user!.id)
         .maybeSingle();
       if (error) throw error;
-      return data as SponsorProfile | null;
+      return data as unknown as SponsorProfile | null;
     },
   });
 
