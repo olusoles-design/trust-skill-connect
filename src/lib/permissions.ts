@@ -22,6 +22,7 @@ export type Capability =
   // Practitioner
   | "availability_toggle"      // Availability switch + reputation
   | "smart_contracting"        // SLA templates + digital timesheets
+  | "practitioner_accreditations" // Statutory accreditation docs per role
   // Business – Employer/Sponsor
   | "post_opportunities"
   | "post_tasks"
