@@ -96,6 +96,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "view_tasks",
     "my_tasks",
     "document_vault",
+    "browse_sponsor_directory",
   ],
   practitioner: [
     "find_opportunities",
@@ -112,6 +113,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "marketplace_discovery",
     "practitioner_accreditations",
     "upload_accreditation",
+    "browse_sponsor_directory",
   ],
   employer: [
     "post_opportunities",
@@ -127,6 +129,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "workflow_engine",
     "multi_company_sponsorship",
     "marketplace_discovery",
+    "browse_sponsor_directory",
   ],
   provider: [
     "post_opportunities",
@@ -143,6 +146,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "marketplace_discovery",
     "workflow_engine",
     "browse_funding_opportunities",
+    "browse_sponsor_directory",
   ],
   sponsor: [
     "fund_learners",
@@ -170,6 +174,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "manage_funding",
     "approve_payments",
     "marketplace_discovery",
+    "browse_sponsor_directory",
   ],
   support_provider: [
     "marketplace_listing",
@@ -181,6 +186,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "rfq_board",
     "facility_booking",
     "document_vault",
+    "browse_sponsor_directory",
   ],
   seta: [
     "verify_documents",
@@ -190,6 +196,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "audit_system",
     "trust_ledger",
     "platform_admin",
+    "browse_sponsor_directory",
   ],
   government: [
     "view_reports",
@@ -200,6 +207,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "trust_ledger",
     "platform_admin",
     "document_vault",
+    "browse_sponsor_directory",
   ],
   admin: [
     "portal_switcher",
@@ -244,6 +252,8 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "post_funding_opportunities",
     "browse_funding_opportunities",
     "post_programme_opportunities",
+    "manage_sponsor_profile",
+    "browse_sponsor_directory",
   ],
 };
 
