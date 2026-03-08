@@ -159,6 +159,125 @@ export type Database = {
         }
         Relationships: []
       }
+      eoi_submissions: {
+        Row: {
+          accreditations: Json
+          created_at: string
+          funding_opp_id: string
+          id: string
+          message: string | null
+          proposed_start: string | null
+          provider_id: string
+          reviewed_at: string | null
+          reviewer_note: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          accreditations?: Json
+          created_at?: string
+          funding_opp_id: string
+          id?: string
+          message?: string | null
+          proposed_start?: string | null
+          provider_id: string
+          reviewed_at?: string | null
+          reviewer_note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          accreditations?: Json
+          created_at?: string
+          funding_opp_id?: string
+          id?: string
+          message?: string | null
+          proposed_start?: string | null
+          provider_id?: string
+          reviewed_at?: string | null
+          reviewer_note?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "eoi_submissions_funding_opp_id_fkey"
+            columns: ["funding_opp_id"]
+            isOneToOne: false
+            referencedRelation: "funding_opportunities"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      funding_opportunities: {
+        Row: {
+          application_deadline: string | null
+          awarded_to: string | null
+          budget_per_learner: number | null
+          created_at: string
+          currency: string
+          description: string | null
+          duration: string | null
+          id: string
+          nqf_level: string | null
+          programme_type: string
+          province: string | null
+          requirements: Json
+          seats_available: number
+          sector: string | null
+          sponsor_id: string
+          start_date: string | null
+          status: string
+          title: string
+          total_budget: number | null
+          updated_at: string
+        }
+        Insert: {
+          application_deadline?: string | null
+          awarded_to?: string | null
+          budget_per_learner?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          nqf_level?: string | null
+          programme_type?: string
+          province?: string | null
+          requirements?: Json
+          seats_available?: number
+          sector?: string | null
+          sponsor_id: string
+          start_date?: string | null
+          status?: string
+          title: string
+          total_budget?: number | null
+          updated_at?: string
+        }
+        Update: {
+          application_deadline?: string | null
+          awarded_to?: string | null
+          budget_per_learner?: number | null
+          created_at?: string
+          currency?: string
+          description?: string | null
+          duration?: string | null
+          id?: string
+          nqf_level?: string | null
+          programme_type?: string
+          province?: string | null
+          requirements?: Json
+          seats_available?: number
+          sector?: string | null
+          sponsor_id?: string
+          start_date?: string | null
+          status?: string
+          title?: string
+          total_budget?: number | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
       match_results: {
         Row: {
           created_at: string
