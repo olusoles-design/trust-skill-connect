@@ -116,6 +116,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "wsp_reports",
     "tender_feed",
     "workflow_engine",
+    "multi_company_sponsorship",
     "marketplace_discovery",
   ],
   provider: [
