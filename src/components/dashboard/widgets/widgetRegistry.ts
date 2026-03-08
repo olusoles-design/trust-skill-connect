@@ -37,6 +37,7 @@ import { RFQBoardWidget }              from "./business/RFQBoardWidget";
 import { FacilityBookingWidget }       from "./business/FacilityBookingWidget";
 import { TaskPosterWidget }            from "./business/TaskPosterWidget";
 import { WorkflowEngineWidget }        from "./business/WorkflowEngineWidget";
+import { MultiCompanySponsorshipWidget } from "./business/MultiCompanySponsorshipWidget";
 
 // ─── Funding
 import { FundingAllocationWidget }     from "./funding/FundingAllocationWidget";
