@@ -431,6 +431,77 @@ export function MicroTaskBoardWidget() {
         </div>
       )}
 
+      {/* ── Trust Score + Competency Profile ── */}
+      <div className={`rounded-2xl border border-border bg-gradient-to-br ${trustBg} p-4 space-y-3`}>
+        <div className="flex items-center justify-between gap-3">
+          {/* Trust score ring */}
+          <div className="flex items-center gap-3">
+            <div className="relative w-14 h-14 flex-shrink-0">
+              <svg viewBox="0 0 52 52" className="w-14 h-14 -rotate-90">
+                <circle cx="26" cy="26" r="22" fill="none" stroke="currentColor" strokeWidth="4" className="text-muted/40" />
+                <circle cx="26" cy="26" r="22" fill="none" stroke="currentColor" strokeWidth="4"
+                  strokeDasharray={`${(trustScore / 100) * 138.2} 138.2`}
+                  strokeLinecap="round"
+                  className={trustColor}
+                />
+              </svg>
+              <div className="absolute inset-0 flex items-center justify-center">
+                <span className={`text-xs font-black ${trustColor}`}>{trustScore}</span>
+              </div>
+            </div>
+            <div>
+              <div className="flex items-center gap-1.5">
+                <Shield className="w-3.5 h-3.5 text-primary" />
+                <p className="text-sm font-bold text-foreground">Trust Score</p>
+                <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold border ${
+                  trustScore >= 90 ? "bg-emerald-500/10 text-emerald-600 border-emerald-500/20" :
+                  trustScore >= 75 ? "bg-primary/10 text-primary border-primary/20" :
+                  trustScore >= 55 ? "bg-amber-500/10 text-amber-600 border-amber-500/20" :
+                  "bg-muted text-muted-foreground border-border"
+                }`}>{trustLabel}</span>
+              </div>
+              <p className="text-[10px] text-muted-foreground mt-0.5">
+                Complete tasks & earn high quality scores to increase your score
+              </p>
+            </div>
+          </div>
+          <div className="text-right">
+            <p className="text-lg font-black text-green-600">R{totalEarnings.toFixed(0)}</p>
+            <p className="text-[10px] text-muted-foreground">total earned</p>
+          </div>
+        </div>
+
+        {/* Competency badges from approved task categories */}
+        {approvedCount > 0 && (
+          <div>
+            <p className="text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-1.5 flex items-center gap-1">
+              <Star className="w-3 h-3 text-amber-500" /> Competencies Built
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {Array.from(new Set(
+                mySubmissions
+                  .filter(s => s.status === "approved")
+                  .map(s => tasks.find(t => t.id === s.task_id)?.category)
+                  .filter(Boolean) as string[]
+              )).map(cat => (
+                <div key={cat} className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-primary/10 text-primary font-bold border border-primary/20">
+                  <CheckCircle2 className="w-2.5 h-2.5" />{cat}
+                </div>
+              ))}
+              <span className="text-[10px] text-muted-foreground self-center">
+                {approvedCount} task{approvedCount !== 1 ? "s" : ""} done · {pendingCount} in progress
+              </span>
+            </div>
+          </div>
+        )}
+
+        {approvedCount === 0 && (
+          <p className="text-[11px] text-muted-foreground">
+            <span className="font-semibold text-foreground">Complete your first task</span> to start building competency badges and increase your Trust Score — helping you get hired faster.
+          </p>
+        )}
+      </div>
+
       {/* Category filter */}
       <div className="flex gap-2 flex-wrap">
         {categories.map(cat => (
