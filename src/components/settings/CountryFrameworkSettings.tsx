@@ -41,9 +41,10 @@ export function CountryFrameworkSettings() {
 
   const toggle = (id: string) =>
     setActiveIds(prev => {
-      const next = new Set(prev);
-      next.has(id) ? next.delete(id) : next.add(id);
-      return next;
+      // initialise from all bodies on first toggle
+      const base = prev.size > 0 ? new Set(prev) : new Set((bodies ?? []).map(b => b.id));
+      base.has(id) ? base.delete(id) : base.add(id);
+      return base;
     });
 
   const toggleNQF = (level: number) =>
