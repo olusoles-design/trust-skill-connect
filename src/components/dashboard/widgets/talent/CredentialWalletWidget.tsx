@@ -1,4 +1,5 @@
 import { Award, BadgeCheck, Download, ExternalLink, GraduationCap, FileText, Briefcase, Cpu } from "lucide-react";
+import { useRegulatoryBodies } from "@/hooks/useRegulatoryBodies";
 
 // ─── Practitioner role badge types ───────────────────────────────────────────
 
@@ -111,8 +112,15 @@ const typeColor: Record<Credential["type"], string> = {
 };
 
 export function CredentialWalletWidget() {
+  const { data: regulatoryBodies } = useRegulatoryBodies();
   const verified = MOCK.filter(c => c.verified).length;
   const registrations = MOCK.filter(c => c.type === "Registration");
+
+  // Resolve a credential's SETA/body name to its full name from the DB
+  const resolveBodyName = (acronym?: string) => {
+    if (!acronym || !regulatoryBodies) return acronym;
+    return regulatoryBodies.find(b => b.acronym === acronym)?.full_name ?? acronym;
+  };
 
   return (
     <div className="space-y-4">
@@ -148,7 +156,9 @@ export function CredentialWalletWidget() {
                   </div>
                   <div className="flex-1 min-w-0">
                     <p className="text-[10px] font-bold text-foreground leading-tight">{reg.practitionerRole}</p>
-                    <p className="text-[10px] text-muted-foreground truncate">{reg.seta ?? reg.issuer}</p>
+                    <p className="text-[10px] text-muted-foreground truncate" title={resolveBodyName(reg.seta ?? reg.issuer)}>
+                      {reg.seta ?? reg.issuer}
+                    </p>
                     {reg.regNumber && (
                       <p className="text-[9px] font-mono text-muted-foreground/60 truncate">{reg.regNumber}</p>
                     )}

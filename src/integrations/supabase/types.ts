@@ -500,6 +500,57 @@ export type Database = {
           },
         ]
       }
+      regulatory_bodies: {
+        Row: {
+          acronym: string
+          body_type: string
+          created_at: string
+          doc_rules: Json
+          full_name: string
+          id: string
+          is_active: boolean
+          is_levy_funded: boolean
+          notes: string | null
+          reporting_formats: Json
+          sector: string | null
+          sort_order: number
+          updated_at: string
+          website_url: string | null
+        }
+        Insert: {
+          acronym: string
+          body_type: string
+          created_at?: string
+          doc_rules?: Json
+          full_name: string
+          id?: string
+          is_active?: boolean
+          is_levy_funded?: boolean
+          notes?: string | null
+          reporting_formats?: Json
+          sector?: string | null
+          sort_order?: number
+          updated_at?: string
+          website_url?: string | null
+        }
+        Update: {
+          acronym?: string
+          body_type?: string
+          created_at?: string
+          doc_rules?: Json
+          full_name?: string
+          id?: string
+          is_active?: boolean
+          is_levy_funded?: boolean
+          notes?: string | null
+          reporting_formats?: Json
+          sector?: string | null
+          sort_order?: number
+          updated_at?: string
+          website_url?: string | null
+        }
+        Relationships: []
+      }
       rfq_responses: {
         Row: {
           created_at: string
