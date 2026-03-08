@@ -240,6 +240,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "platform_admin",
     "post_funding_opportunities",
     "browse_funding_opportunities",
+    "post_programme_opportunities",
   ],
 };
 
