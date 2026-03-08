@@ -158,6 +158,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "multi_company_sponsorship",
     "marketplace_discovery",
     "post_funding_opportunities",
+    "post_programme_opportunities",
   ],
   fundi: [
     "fund_learners",
