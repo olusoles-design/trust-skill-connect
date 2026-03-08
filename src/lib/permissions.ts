@@ -104,6 +104,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "availability_toggle",
     "smart_contracting",
     "marketplace_discovery",
+    "practitioner_accreditations",
   ],
   employer: [
     "post_opportunities",
