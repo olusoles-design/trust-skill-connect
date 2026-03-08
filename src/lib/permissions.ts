@@ -250,8 +250,9 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   my_tasks:                { minPlan: "starter" },
   document_vault:          { minPlan: "starter" },
   // Practitioner
-  availability_toggle:     { minPlan: "starter" },
-  smart_contracting:       { minPlan: "professional" },
+  availability_toggle:          { minPlan: "starter" },
+  smart_contracting:            { minPlan: "professional" },
+  practitioner_accreditations:  { minPlan: "starter" },
   // Business – Employer/Sponsor
   post_opportunities:      { minPlan: "starter", limit: 1 },
   post_tasks:              { minPlan: "starter", limit: 3 },
