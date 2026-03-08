@@ -165,7 +165,7 @@ export function SponsorDirectoryWidget() {
         .eq("is_public", true)
         .order("verified", { ascending: false });
       if (error) throw error;
-      return (data ?? []) as SponsorProfile[];
+      return (data ?? []) as unknown as SponsorProfile[];
     },
   });
 
