@@ -124,6 +124,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title: "Smart Contracting", description: "Digital timesheets, geo clock-in/out, SLA templates and invoicing.",
     icon: "FileSignature", color: "bg-primary/10", accentColor: "text-primary",
   },
+  practitioner_accreditations: {
+    component: PractitionerAccreditationsWidget, layout: "full", persona: "talent",
+    title: "Practitioner Accreditations", description: "Upload and manage statutory documents for each practitioner role — Assessor, Facilitator, Moderator, SDF.",
+    icon: "BadgeCheck", color: "bg-primary/10", accentColor: "text-primary",
+  },
 
   // ── Business – Employer/Sponsor ─────────────────────────────────────────────
   post_tasks: {
