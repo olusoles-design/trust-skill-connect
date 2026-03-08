@@ -456,8 +456,8 @@ export function PractitionerAccreditationsWidget() {
   const { user } = useAuth();
   const qc = useQueryClient();
 
-  // Fetch all practitioner-tagged docs from the vault
-  const { data: allDocs = [], isLoading } = useQuery<AccreditationDoc[]>({
+  // Fetch manually-uploaded docs from document_vault
+  const { data: vaultDocs = [], isLoading: vaultLoading } = useQuery<AccreditationDoc[]>({
     queryKey: ["practitioner_docs", user?.id],
     enabled: !!user,
     queryFn: async () => {
@@ -470,24 +470,69 @@ export function PractitionerAccreditationsWidget() {
     },
   });
 
+  // Fetch AI-extracted accreditations from practitioner_accreditations → treat as "verified"
+  const { data: extractedAccreds = [], isLoading: accredLoading } = useQuery({
+    queryKey: ["practitioner_accreditations_widget", user?.id],
+    enabled: !!user,
+    queryFn: async () => {
+      const { data, error } = await supabase
+        .from("practitioner_accreditations")
+        .select("*")
+        .eq("user_id", user!.id)
+        .order("created_at", { ascending: false });
+      if (error) throw error;
+      return data ?? [];
+    },
+  });
+
+  // Map extracted accreditations into AccreditationDoc shape so they appear as verified
+  const extractedAsDocs: AccreditationDoc[] = extractedAccreds.map(acc => ({
+    id: acc.id,
+    doc_type: `practitioner_${acc.role_type.toLowerCase()}_registration`,
+    label: `${acc.seta_body} ${acc.role_type} Registration${acc.registration_number ? ` – ${acc.registration_number}` : ""}`,
+    file_url: acc.document_url ?? "",
+    file_name: acc.document_url ? acc.document_url.split("/").pop() ?? "accreditation.pdf" : "AI Extracted",
+    file_size: null,
+    status: (acc.status === "active" ? "verified" : acc.status) as DocStatus,
+    expires_at: acc.valid_to ?? null,
+    reviewer_note: null,
+    created_at: acc.created_at,
+  }));
+
+  // Merge: extracted (verified) + vault docs, deduplicate by id
+  const allDocs: AccreditationDoc[] = [
+    ...extractedAsDocs,
+    ...vaultDocs,
+  ];
+
+  const isLoading = vaultLoading || accredLoading;
+
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const { error } = await (supabase.from("document_vault" as any) as any).delete().eq("id", id);
-      if (error) throw error;
+      // Try document_vault first, then practitioner_accreditations
+      const isExtracted = extractedAsDocs.some(d => d.id === id);
+      if (isExtracted) {
+        const { error } = await supabase.from("practitioner_accreditations").delete().eq("id", id);
+        if (error) throw error;
+      } else {
+        const { error } = await (supabase.from("document_vault" as any) as any).delete().eq("id", id);
+        if (error) throw error;
+      }
     },
     onSuccess: () => {
       qc.invalidateQueries({ queryKey: ["practitioner_docs"] });
+      qc.invalidateQueries({ queryKey: ["practitioner_accreditations_widget"] });
       toast.success("Document removed");
     },
     onError: () => toast.error("Failed to remove document"),
   });
 
-  // Split docs by role
+  // Split docs by role — extracted docs match by role_type, vault docs match by doc_type prefix
   const docsForRole = (role: PractitionerRole): AccreditationDoc[] =>
-    allDocs.filter(d => d.doc_type.startsWith(`practitioner_${role.toLowerCase()}_`));
-
-  // Also include CV documents (any doc_type === "cv")
-  const cvDocs = allDocs.filter(d => d.doc_type === "cv" || d.doc_type.includes("_cv"));
+    allDocs.filter(d =>
+      d.doc_type.startsWith(`practitioner_${role.toLowerCase()}_`) ||
+      d.doc_type === `practitioner_${role.toLowerCase()}`
+    );
 
   const totalVerified = allDocs.filter(d => d.status === "verified").length;
   const totalDocs     = allDocs.length;
