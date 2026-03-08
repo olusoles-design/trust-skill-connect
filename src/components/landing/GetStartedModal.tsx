@@ -600,16 +600,18 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
 
               {/* ── LOGIN ──────────────────────────────────────────────────── */}
               {mode === "login" && (
-                <motion.div {...slide} className="space-y-5">
+                <motion.div key="login" {...slide} className="space-y-5">
                   <div className="mb-7">
                     <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Sora, sans-serif" }}>Welcome back</h2>
                     <p className="text-muted-foreground text-sm mt-1">Sign into your SkillsMark account.</p>
                   </div>
                   <FieldRow label="Email">
-                    <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus />
+                    <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus
+                      onKeyDown={(e) => e.key === "Enter" && handleSignIn()} />
                   </FieldRow>
                   <FieldRow label="Password">
-                    <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password" />
+                    <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password"
+                      onKeyDown={(e) => e.key === "Enter" && handleSignIn()} />
                   </FieldRow>
                   <div className="text-right -mt-2">
                     <button onClick={() => { setForgotSent(false); setMode("forgot"); }} className="text-xs text-primary hover:underline">Forgot password?</button>
