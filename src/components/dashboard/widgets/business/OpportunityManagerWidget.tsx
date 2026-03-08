@@ -2,8 +2,9 @@ import { useState } from "react";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
-import { Plus, Eye, Edit2, Trash2, Users, Loader2, AlertCircle, X, Save } from "lucide-react";
+import { Plus, Eye, Trash2, Users, Loader2, AlertCircle, X, Save } from "lucide-react";
 import { useToast } from "@/hooks/use-toast";
+import { useRegulatoryBodies } from "@/hooks/useRegulatoryBodies";
 
 interface OppRow {
   id: string;

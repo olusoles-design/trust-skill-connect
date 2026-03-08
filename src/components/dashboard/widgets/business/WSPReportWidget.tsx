@@ -1,9 +1,10 @@
 import { useState } from "react";
-import { FileText, Download, CheckCircle2, Clock, AlertCircle, ChevronRight } from "lucide-react";
+import { FileText, Download, CheckCircle2, Clock, AlertCircle, ChevronRight, ExternalLink } from "lucide-react";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
-import { useSETAs } from "@/hooks/useRegulatoryBodies";
+import { useRegulatoryBodies } from "@/hooks/useRegulatoryBodies";
 import { Skeleton } from "@/components/ui/skeleton";
+import { supabase } from "@/integrations/supabase/client";
 
 interface ReportSection {
   label: string;
