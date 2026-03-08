@@ -217,11 +217,19 @@ const ROLE_EXTRA_FIELDS: Partial<Record<AppRole, React.FC<{ form: FormState; onC
 const INPUT_CLS =
   "w-full px-3.5 py-2.5 rounded-lg bg-muted/50 border border-border text-foreground placeholder-muted-foreground focus:outline-none focus:border-primary/50 focus:bg-background text-sm transition-colors";
 
-function FieldRow({ label, children }: { label: string; children: React.ReactNode }) {
+const INPUT_ERROR_CLS =
+  "w-full px-3.5 py-2.5 rounded-lg bg-destructive/5 border border-destructive text-foreground placeholder-muted-foreground focus:outline-none focus:border-destructive focus:bg-background text-sm transition-colors";
+
+function FieldRow({ label, children, error }: { label: string; children: React.ReactNode; error?: string }) {
   return (
     <div>
       <label className="text-xs font-medium text-muted-foreground block mb-1.5">{label}</label>
       {children}
+      {error && (
+        <p className="text-xs text-destructive mt-1 flex items-center gap-1">
+          <span>⚠</span> {error}
+        </p>
+      )}
     </div>
   );
 }
