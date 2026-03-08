@@ -286,7 +286,7 @@ export function SponsorProgrammeWidget() {
                   {prog.status}
                 </span>
                 {prog.bbee_points && (
-                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-green-500/10 text-green-600">
+                  <span className="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-accent/20 text-accent-foreground">
                     B-BBEE
                   </span>
                 )}

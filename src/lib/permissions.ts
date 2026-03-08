@@ -62,7 +62,8 @@ export type Capability =
   // Admin
   | "platform_admin"
   | "portal_switcher"
-  | "upload_accreditation";  // AI-powered accreditation letter extraction
+  | "upload_accreditation"  // AI-powered accreditation letter extraction
+  | "post_programme_opportunities"; // Sponsor lists learnership/bursary/internship in main feed
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
