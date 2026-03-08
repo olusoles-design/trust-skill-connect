@@ -814,17 +814,21 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   )}
 
                   <div className="grid grid-cols-2 gap-4">
-                    <FieldRow label="First Name">
-                      <input name="firstName" value={form.firstName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Jane" />
+                    <FieldRow label="First Name" error={fieldErrors.firstName}>
+                      <input name="firstName" value={form.firstName} onChange={handleFormChange}
+                        className={fieldErrors.firstName ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="Jane" />
                     </FieldRow>
-                    <FieldRow label="Last Name">
-                      <input name="lastName" value={form.lastName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Doe" />
+                    <FieldRow label="Last Name" error={fieldErrors.lastName}>
+                      <input name="lastName" value={form.lastName} onChange={handleFormChange}
+                        className={fieldErrors.lastName ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="Doe" />
                     </FieldRow>
-                    <FieldRow label="Email">
-                      <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="jane@example.com" />
+                    <FieldRow label="Email *" error={fieldErrors.email}>
+                      <input name="email" type="email" value={form.email} onChange={handleFormChange}
+                        className={fieldErrors.email ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="jane@example.com" />
                     </FieldRow>
                     <FieldRow label="Phone">
-                      <input name="phone" type="tel" value={form.phone} onChange={handleFormChange} className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
+                      <input name="phone" type="tel" value={form.phone} onChange={handleFormChange}
+                        className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
                     </FieldRow>
                     {ExtraFields && (
                       <div className="col-span-2 grid grid-cols-2 gap-4">
@@ -832,8 +836,9 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                       </div>
                     )}
                     <div className="col-span-2">
-                      <FieldRow label="Password">
-                        <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Min. 6 characters" />
+                      <FieldRow label="Password *" error={fieldErrors.password}>
+                        <input name="password" type="password" value={form.password} onChange={handleFormChange}
+                          className={fieldErrors.password ? INPUT_ERROR_CLS : INPUT_CLS} placeholder="Min. 6 characters" />
                       </FieldRow>
                     </div>
                   </div>
