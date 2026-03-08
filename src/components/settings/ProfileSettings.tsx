@@ -13,8 +13,9 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Separator } from "@/components/ui/separator";
 import {
   User, Mail, Phone, MapPin, Briefcase, Link, Edit3, Save, X,
-  GraduationCap, Shield, Activity, Camera
+  GraduationCap, Shield, Activity, Camera, Award,
 } from "lucide-react";
+import { AccreditationsProfileWidget } from "@/components/dashboard/widgets/talent/AccreditationsProfileWidget";
 import { toast } from "sonner";
 import { format } from "date-fns";
 
