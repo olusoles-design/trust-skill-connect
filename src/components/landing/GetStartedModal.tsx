@@ -539,7 +539,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ duration: 0.25, ease: "easeOut" }}
-            className="relative bg-navy border border-white/10 rounded-2xl shadow-2xl w-full max-w-2xl max-h-[92vh] overflow-y-auto"
+            className="relative bg-navy border border-white/10 rounded-2xl shadow-2xl w-full max-w-3xl max-h-[92vh] overflow-y-auto"
             onClick={(e) => e.stopPropagation()}
           >
             {/* Close */}
@@ -617,13 +617,15 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "login" && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="space-y-4 max-w-sm mx-auto">
-                  <FieldRow label="Email Address">
-                    <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus />
-                  </FieldRow>
-                  <FieldRow label="Password">
-                    <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password" />
-                  </FieldRow>
+                  className="space-y-4 max-w-xl mx-auto">
+                  <div className="grid grid-cols-2 gap-4">
+                    <FieldRow label="Email Address">
+                      <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="you@example.com" autoFocus />
+                    </FieldRow>
+                    <FieldRow label="Password">
+                      <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Your password" />
+                    </FieldRow>
+                  </div>
                   <div className="text-right">
                     <button onClick={() => { setForgotSent(false); setMode("forgot"); }} className="text-xs text-teal hover:underline transition-colors">Forgot password?</button>
                   </div>
@@ -645,7 +647,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "forgot" && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="space-y-5 max-w-sm mx-auto">
+                  className="space-y-5 max-w-xl mx-auto">
                   {forgotSent ? (
                     <div className="text-center py-4 space-y-4">
                       <div className="w-16 h-16 rounded-full bg-teal/20 border border-teal/40 flex items-center justify-center mx-auto">
@@ -756,7 +758,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "register" && step === 3 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="space-y-4 max-w-md mx-auto">
+                  className="space-y-4">
                   <Stepper current={2} total={4} />
 
                   {/* Role badge */}
@@ -770,7 +772,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                         )}
                       </div>
                       {/* Additional roles */}
-                      <div className="ml-auto flex flex-wrap gap-1.5 max-w-[200px] justify-end">
+                      <div className="ml-auto flex flex-wrap gap-1.5 max-w-[260px] justify-end">
                         {allRoles.filter(r => r.id !== selectedRole).map(r => {
                           const isAdded = additionalRoles.includes(r.id);
                           return (
@@ -789,6 +791,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <p className="text-[10px] text-white/25 -mt-2 flex items-center gap-1"><Plus className="w-3 h-3" /> Tap role badges above to add multiple roles</p>
                   )}
 
+                  {/* Two-column form grid */}
                   <div className="grid grid-cols-2 gap-4">
                     <FieldRow label="First Name">
                       <input name="firstName" value={form.firstName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Jane" />
@@ -796,17 +799,23 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     <FieldRow label="Last Name">
                       <input name="lastName" value={form.lastName} onChange={handleFormChange} className={INPUT_CLS} placeholder="Doe" />
                     </FieldRow>
+                    <FieldRow label="Email Address">
+                      <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="jane@example.com" />
+                    </FieldRow>
+                    <FieldRow label="Phone Number">
+                      <input name="phone" type="tel" value={form.phone} onChange={handleFormChange} className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
+                    </FieldRow>
+                    {ExtraFields && (
+                      <div className="col-span-2 grid grid-cols-2 gap-4">
+                        <ExtraFields form={form} onChange={handleFormChange} />
+                      </div>
+                    )}
+                    <div className="col-span-2">
+                      <FieldRow label="Password">
+                        <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Create a secure password" />
+                      </FieldRow>
+                    </div>
                   </div>
-                  <FieldRow label="Email Address">
-                    <input name="email" type="email" value={form.email} onChange={handleFormChange} className={INPUT_CLS} placeholder="jane@example.com" />
-                  </FieldRow>
-                  <FieldRow label="Phone Number">
-                    <input name="phone" type="tel" value={form.phone} onChange={handleFormChange} className={INPUT_CLS} placeholder="+27 xx xxx xxxx" />
-                  </FieldRow>
-                  {ExtraFields && <ExtraFields form={form} onChange={handleFormChange} />}
-                  <FieldRow label="Password">
-                    <input name="password" type="password" value={form.password} onChange={handleFormChange} className={INPUT_CLS} placeholder="Create a secure password" />
-                  </FieldRow>
 
                   <div className="flex items-start gap-3 p-3 rounded-lg bg-teal/10 border border-teal/20">
                     <span className="text-teal text-sm mt-0.5">✦</span>
@@ -827,7 +836,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
               {/* ═══════════════════════════════════════════════════════════ */}
               {mode === "register" && step === 4 && (
                 <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.2 }}
-                  className="max-w-md mx-auto space-y-5">
+                  className="space-y-5">
                   <Stepper current={3} total={4} />
                   {requiredDocs.length > 0 ? (
                     <>
