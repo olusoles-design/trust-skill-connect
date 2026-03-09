@@ -29,7 +29,7 @@ Your task is to extract EVERY qualification from the table in the letter plus th
 CRITICAL RULES:
 1. Extract ALL rows from the qualifications table — do NOT skip any.
 2. The registration/accreditation number is usually formatted like "RAS/07/2018/0051" — find it exactly.
-3. For role_type, detect from the letter heading: "REGISTERED ASSESSOR" → "assessor", "REGISTERED FACILITATOR" → "facilitator", "REGISTERED MODERATOR" → "moderator", "SKILLS DEVELOPMENT FACILITATOR" → "sdf", "VERIFIER" → "verifier", "ETQA EVALUATOR" → "etqa_evaluator".
+3. For role_type, detect from the letter heading: "REGISTERED ASSESSOR" → "assessor", "REGISTERED FACILITATOR" → "facilitator", "SUBJECT MATTER EXPERT" → "facilitator", "SME/FACILITATOR" → "facilitator", "REGISTERED MODERATOR" → "moderator", "SKILLS DEVELOPMENT FACILITATOR" → "sdf", "VERIFIER" → "verifier", "ETQA EVALUATOR" → "etqa_evaluator".
 4. For valid_from and valid_to: look for a date range like "2021-10-12 to 2024-10-11" — extract both dates as YYYY-MM-DD. If only one date is present use it for valid_from. If no dates found, return null.
 5. nqf_level must be in the format "Level X" e.g. "Level 5".
 6. credits must be a number (integer), not a string.

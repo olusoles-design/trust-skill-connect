@@ -46,7 +46,7 @@ interface Accred {
 // ─── Constants ───────────────────────────────────────────────────────────────
 const ROLE_TYPES = [
   { key: "all",         label: "All" },
-  { key: "facilitator", label: "Facilitator" },
+  { key: "facilitator", label: "SME/Facilitator" },
   { key: "assessor",    label: "Assessor" },
   { key: "moderator",   label: "Moderator" },
   { key: "sdf",         label: "SDF" },

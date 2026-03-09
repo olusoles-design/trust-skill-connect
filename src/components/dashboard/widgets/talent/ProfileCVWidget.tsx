@@ -12,10 +12,10 @@ import { useToast } from "@/hooks/use-toast";
 // ─── Practitioner sub-types ───────────────────────────────────────────────────
 
 const PRACTITIONER_TYPES = [
-  { key: "facilitator", label: "Facilitator",                  icon: GraduationCap, desc: "Delivers training programmes" },
-  { key: "assessor",    label: "Assessor",                     icon: FileText,      desc: "Assesses learner competence"  },
-  { key: "moderator",   label: "Moderator",                    icon: Briefcase,     desc: "Moderates assessment quality" },
-  { key: "sdf",         label: "Skills Development Facilitator (SDF)", icon: Cpu,   desc: "WSP/ATR & SETA liaison"       },
+  { key: "facilitator", label: "SME/Facilitator",                      icon: GraduationCap, desc: "Subject matter expert delivering training" },
+  { key: "assessor",    label: "Assessor",                             icon: FileText,      desc: "Assesses learner competence"  },
+  { key: "moderator",   label: "Moderator",                            icon: Briefcase,     desc: "Moderates assessment quality" },
+  { key: "sdf",         label: "Skills Development Facilitator (SDF)", icon: Cpu,           desc: "WSP/ATR & SETA liaison"       },
 ] as const;
 
 type PractitionerTypeKey = (typeof PRACTITIONER_TYPES)[number]["key"];

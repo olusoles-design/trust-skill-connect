@@ -112,7 +112,7 @@ const ROLE_DOCUMENTS: Partial<Record<AppRole, DocRequirement[]>> = {
   ],
   practitioner: [
     { id: "id_document",       label: "SA ID / Passport",          description: "Clear copy, not expired",         required: true },
-    { id: "etdp_registration", label: "ETDP Registration Cert",    description: "Assessor / Facilitator / Moderator", required: true },
+    { id: "etdp_registration", label: "ETDP Registration Cert",    description: "Assessor / SME/Facilitator / Moderator", required: true },
     { id: "qualification",     label: "Relevant Qualification",    description: "NQF level 5+",                    required: false },
   ],
   provider: [

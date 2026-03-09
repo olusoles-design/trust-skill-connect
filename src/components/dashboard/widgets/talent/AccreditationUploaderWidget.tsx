@@ -34,7 +34,7 @@ type Step = "idle" | "uploading" | "extracting" | "review" | "saving" | "done" |
 
 const ROLE_LABELS: Record<string, string> = {
   assessor: "Registered Assessor",
-  facilitator: "Registered Facilitator",
+  facilitator: "SME (Subject Matter Expert) / Facilitator",
   moderator: "Registered Moderator",
   sdf: "Skills Development Facilitator",
   verifier: "Verifier",

@@ -109,7 +109,7 @@ const SETA_BODIES = [
 
 const ROLE_TYPES = [
   { value: "assessor",       label: "Registered Assessor" },
-  { value: "facilitator",    label: "Registered Facilitator" },
+  { value: "facilitator",    label: "SME (Subject Matter Expert) / Facilitator" },
   { value: "moderator",      label: "Registered Moderator" },
   { value: "sdf",            label: "Skills Development Facilitator" },
   { value: "verifier",       label: "Verifier" },

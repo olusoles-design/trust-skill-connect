@@ -309,7 +309,7 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
   // ── Phase 3 – Glue ─────────────────────────────────────────────────────────
   marketplace_discovery: {
     component: MarketplaceDiscoveryWidget, layout: "full", persona: "business",
-    title: "Marketplace Discovery", description: "Powerful search: find accredited SDPs, facilitators, venues and suppliers.",
+    title: "Marketplace Discovery", description: "Powerful search: find accredited SDPs, SME/Facilitators, venues and suppliers.",
     icon: "Store", color: "bg-primary/10", accentColor: "text-primary",
   },
   workflow_engine: {
