@@ -133,17 +133,12 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
   },
   practitioner_accreditations: {
     component: PractitionerAccreditationsWidget, layout: "full", persona: "talent",
-    title: "Practitioner Accreditations", description: "Upload and manage statutory documents for each practitioner role — Assessor, Facilitator, Moderator, SDF.",
+    title: "Practitioner Accreditations", description: "Upload and manage statutory documents for each practitioner role — Assessor, SME/Facilitator, Moderator, SDF.",
     icon: "BadgeCheck", color: "bg-primary/10", accentColor: "text-primary",
-  },
-  upload_accreditation: {
-    component: AccreditationUploaderWidget, layout: "half", persona: "talent",
-    title: "Upload Accreditation Letter", description: "AI-powered extraction from SETA & professional body letters — auto-fills your qualifications and registrations.",
-    icon: "Sparkles", color: "bg-primary/10", accentColor: "text-primary",
   },
   browse_practitioner_directory: {
     component: PractitionerDirectoryWidget, layout: "full", persona: "talent",
-    title: "Practitioner Directory", description: "Find registered Facilitators, Assessors, Moderators and SDFs — filter by SETA, province and language.",
+    title: "Practitioner Directory", description: "Find registered SME/Facilitators, Assessors, Moderators and SDFs — filter by SETA, province and language.",
     icon: "Users", color: "bg-primary/10", accentColor: "text-primary",
   },
 
@@ -313,7 +308,7 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
   // ── Phase 3 – Glue ─────────────────────────────────────────────────────────
   marketplace_discovery: {
     component: MarketplaceDiscoveryWidget, layout: "full", persona: "business",
-    title: "Marketplace Discovery", description: "Powerful search: find accredited SDPs, facilitators, venues and suppliers.",
+    title: "Marketplace Discovery", description: "Powerful search: find accredited SDPs, SME/Facilitators, venues and suppliers.",
     icon: "Store", color: "bg-primary/10", accentColor: "text-primary",
   },
   workflow_engine: {

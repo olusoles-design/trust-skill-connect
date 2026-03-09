@@ -33,14 +33,14 @@ const ROLES: {
 }[] = [
   {
     key: "Facilitator",
-    label: "Facilitator",
+    label: "SME (Subject Matter Expert) / Facilitator",
     icon: GraduationCap,
     color: "text-primary",
     bg: "bg-primary/10",
     border: "border-primary/30",
-    description: "Delivers training and learning programmes",
+    description: "Delivers training and learning programmes as a subject matter expert",
     docTypes: [
-      { value: "facilitator_registration", label: "SETA Facilitator Registration" },
+      { value: "facilitator_registration", label: "SETA SME/Facilitator Registration" },
       { value: "etdp_certificate",         label: "ETDP Certificate" },
       { value: "qualification",            label: "Relevant Qualification" },
       { value: "cv",                       label: "Curriculum Vitae (CV)" },

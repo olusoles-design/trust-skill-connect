@@ -40,11 +40,11 @@ const HUBS: {
     emoji: "🎓",
     label: "Talent",
     tagline: "Learn · Earn · Grow",
-    description: "Learners, practitioners and facilitators in the skills ecosystem.",
+    description: "Learners, practitioners and SME/Facilitators in the skills ecosystem.",
     color: "hsl(var(--teal))",
     roles: [
       { id: "learner",      emoji: "🎓", title: "Learner",       description: "Seeking learnerships, bursaries & jobs" },
-      { id: "practitioner", emoji: "👨‍🏫", title: "Practitioner",  description: "Facilitators, assessors, moderators & SDFs" },
+      { id: "practitioner", emoji: "👨‍🏫", title: "Practitioner",  description: "SME/Facilitators, assessors, moderators & SDFs" },
     ],
   },
   {
@@ -88,7 +88,7 @@ const HUBS: {
 ];
 
 const PRACTITIONER_ROLES = [
-  { id: "facilitator", label: "Facilitator",                    sub: "Delivers accredited training" },
+  { id: "facilitator", label: "SME/Facilitator",                sub: "Subject matter expert delivering accredited training" },
   { id: "assessor",    label: "Assessor",                       sub: "Evaluates learner competency" },
   { id: "moderator",   label: "Moderator",                      sub: "Quality assures assessments" },
   { id: "sdf",         label: "Skills Development Facilitator", sub: "Strategic L&D advisor" },
@@ -112,7 +112,7 @@ const ROLE_DOCUMENTS: Partial<Record<AppRole, DocRequirement[]>> = {
   ],
   practitioner: [
     { id: "id_document",       label: "SA ID / Passport",          description: "Clear copy, not expired",         required: true },
-    { id: "etdp_registration", label: "ETDP Registration Cert",    description: "Assessor / Facilitator / Moderator", required: true },
+    { id: "etdp_registration", label: "ETDP Registration Cert",    description: "Assessor / SME/Facilitator / Moderator", required: true },
     { id: "qualification",     label: "Relevant Qualification",    description: "NQF level 5+",                    required: false },
   ],
   provider: [

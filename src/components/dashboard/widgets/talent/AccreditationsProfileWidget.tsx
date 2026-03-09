@@ -92,12 +92,12 @@ const ROLE_CONFIG: Record<string, {
   badgeCls: string;
   borderCls: string;
 }> = {
-  assessor:       { label: "Registered Assessor",      icon: FileText,      headerBg: "bg-blue-500/10",    iconBg: "bg-blue-500/15",    iconColor: "text-blue-600",    badgeCls: "bg-blue-500/15 text-blue-700",    borderCls: "border-blue-500/20" },
-  facilitator:    { label: "Registered Facilitator",   icon: GraduationCap, headerBg: "bg-primary/10",     iconBg: "bg-primary/15",     iconColor: "text-primary",     badgeCls: "bg-primary/15 text-primary",      borderCls: "border-primary/20" },
-  moderator:      { label: "Registered Moderator",     icon: Briefcase,     headerBg: "bg-purple-500/10",  iconBg: "bg-purple-500/15",  iconColor: "text-purple-600",  badgeCls: "bg-purple-500/15 text-purple-700",borderCls: "border-purple-500/20" },
-  sdf:            { label: "Skills Dev. Facilitator",  icon: Cpu,           headerBg: "bg-orange-500/10",  iconBg: "bg-orange-500/15",  iconColor: "text-orange-600",  badgeCls: "bg-orange-500/15 text-orange-700",borderCls: "border-orange-500/20" },
-  verifier:       { label: "Verifier",                 icon: BadgeCheck,    headerBg: "bg-emerald-500/10", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-600", badgeCls: "bg-emerald-500/15 text-emerald-700",borderCls: "border-emerald-500/20" },
-  etqa_evaluator: { label: "ETQA Evaluator",           icon: Award,         headerBg: "bg-muted",          iconBg: "bg-muted",          iconColor: "text-muted-foreground",badgeCls: "bg-muted text-muted-foreground",  borderCls: "border-border" },
+  assessor:       { label: "Registered Assessor",               icon: FileText,      headerBg: "bg-blue-500/10",    iconBg: "bg-blue-500/15",    iconColor: "text-blue-600",    badgeCls: "bg-blue-500/15 text-blue-700",    borderCls: "border-blue-500/20" },
+  facilitator:    { label: "SME / Facilitator",                 icon: GraduationCap, headerBg: "bg-primary/10",     iconBg: "bg-primary/15",     iconColor: "text-primary",     badgeCls: "bg-primary/15 text-primary",      borderCls: "border-primary/20" },
+  moderator:      { label: "Registered Moderator",              icon: Briefcase,     headerBg: "bg-purple-500/10",  iconBg: "bg-purple-500/15",  iconColor: "text-purple-600",  badgeCls: "bg-purple-500/15 text-purple-700",borderCls: "border-purple-500/20" },
+  sdf:            { label: "Skills Development Facilitator",    icon: Cpu,           headerBg: "bg-orange-500/10",  iconBg: "bg-orange-500/15",  iconColor: "text-orange-600",  badgeCls: "bg-orange-500/15 text-orange-700",borderCls: "border-orange-500/20" },
+  verifier:       { label: "Verifier",                          icon: BadgeCheck,    headerBg: "bg-emerald-500/10", iconBg: "bg-emerald-500/15", iconColor: "text-emerald-600", badgeCls: "bg-emerald-500/15 text-emerald-700",borderCls: "border-emerald-500/20" },
+  etqa_evaluator: { label: "ETQA Evaluator",                    icon: Award,         headerBg: "bg-muted",          iconBg: "bg-muted",          iconColor: "text-muted-foreground",badgeCls: "bg-muted text-muted-foreground",  borderCls: "border-border" },
 };
 
 const SETA_BODIES = [
@@ -109,7 +109,7 @@ const SETA_BODIES = [
 
 const ROLE_TYPES = [
   { value: "assessor",       label: "Registered Assessor" },
-  { value: "facilitator",    label: "Registered Facilitator" },
+  { value: "facilitator",    label: "SME (Subject Matter Expert) / Facilitator" },
   { value: "moderator",      label: "Registered Moderator" },
   { value: "sdf",            label: "Skills Development Facilitator" },
   { value: "verifier",       label: "Verifier" },
