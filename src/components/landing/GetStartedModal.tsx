@@ -88,7 +88,7 @@ const HUBS: {
 ];
 
 const PRACTITIONER_ROLES = [
-  { id: "facilitator", label: "Facilitator",                    sub: "Delivers accredited training" },
+  { id: "facilitator", label: "SME/Facilitator",                sub: "Subject matter expert delivering accredited training" },
   { id: "assessor",    label: "Assessor",                       sub: "Evaluates learner competency" },
   { id: "moderator",   label: "Moderator",                      sub: "Quality assures assessments" },
   { id: "sdf",         label: "Skills Development Facilitator", sub: "Strategic L&D advisor" },
