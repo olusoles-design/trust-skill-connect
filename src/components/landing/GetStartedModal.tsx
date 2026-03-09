@@ -40,7 +40,7 @@ const HUBS: {
     emoji: "🎓",
     label: "Talent",
     tagline: "Learn · Earn · Grow",
-    description: "Learners, practitioners and facilitators in the skills ecosystem.",
+    description: "Learners, practitioners and SME/Facilitators in the skills ecosystem.",
     color: "hsl(var(--teal))",
     roles: [
       { id: "learner",      emoji: "🎓", title: "Learner",       description: "Seeking learnerships, bursaries & jobs" },
