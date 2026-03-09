@@ -44,7 +44,7 @@ const HUBS: {
     color: "hsl(var(--teal))",
     roles: [
       { id: "learner",      emoji: "🎓", title: "Learner",       description: "Seeking learnerships, bursaries & jobs" },
-      { id: "practitioner", emoji: "👨‍🏫", title: "Practitioner",  description: "Facilitators, assessors, moderators & SDFs" },
+      { id: "practitioner", emoji: "👨‍🏫", title: "Practitioner",  description: "SME/Facilitators, assessors, moderators & SDFs" },
     ],
   },
   {
