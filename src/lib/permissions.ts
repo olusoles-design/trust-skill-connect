@@ -217,6 +217,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "document_vault",
     "browse_sponsor_directory",
     "browse_practitioner_directory",
+    "view_audit_logs",
   ],
   admin: [
     "portal_switcher",
