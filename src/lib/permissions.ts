@@ -205,6 +205,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "platform_admin",
     "browse_sponsor_directory",
     "browse_practitioner_directory",
+    "view_audit_logs",
   ],
   government: [
     "view_reports",
@@ -265,6 +266,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "manage_sponsor_profile",
     "browse_sponsor_directory",
     "browse_practitioner_directory",
+    "view_audit_logs",
   ],
 };
 
