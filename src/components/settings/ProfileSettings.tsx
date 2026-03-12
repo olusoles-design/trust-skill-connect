@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useAuth } from "@/contexts/AuthContext";
+import { useAuditLog } from "@/hooks/useAuditLog";
 import { useQuery, useMutation, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
@@ -21,6 +22,7 @@ import { format } from "date-fns";
 
 export function ProfileSettings() {
   const { user, role } = useAuth();
+  const { log } = useAuditLog();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
@@ -50,6 +52,14 @@ export function ProfileSettings() {
       qc.invalidateQueries({ queryKey: ["profile", user?.id] });
       setEditing(false);
       toast.success("Profile updated successfully");
+      // ── Audit log: profile update
+      log({
+        action: "UPDATE",
+        entity_type: "profile",
+        entity_id: user!.id,
+        entity_label: [form.first_name, form.last_name].filter(Boolean).join(" ") || user?.email,
+        after_data: form,
+      });
     },
     onError: () => toast.error("Failed to update profile"),
   });
@@ -81,6 +91,8 @@ export function ProfileSettings() {
       await supabase.from("profiles").upsert({ user_id: user.id, avatar_url: data.publicUrl }, { onConflict: "user_id" });
       qc.invalidateQueries({ queryKey: ["profile", user.id] });
       toast.success("Avatar updated");
+      // ── Audit log: avatar upload
+      log({ action: "UPLOAD", entity_type: "profile", entity_id: user.id, entity_label: "Avatar", after_data: { avatar_url: data.publicUrl } });
     } catch {
       toast.error("Avatar upload failed");
     } finally {
@@ -344,28 +356,79 @@ export function ProfileSettings() {
         <TabsContent value="audit" className="mt-6">
           <Card className="border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base">Activity Audit Log</CardTitle>
-              <CardDescription>A record of recent actions on your account</CardDescription>
+              <CardTitle className="text-base">My Activity Trail</CardTitle>
+              <CardDescription>Your recent actions on the platform — live from the immutable audit log.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {[
-                  { action: "Profile viewed",      time: "Just now",   type: "info" },
-                  { action: "Signed in",           time: "Today",      type: "success" },
-                  { action: "Settings accessed",   time: "Today",      type: "info" },
-                  { action: "Password unchanged",  time: "—",          type: "warning" },
-                ].map((entry, i) => (
-                  <div key={i} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${entry.type === "success" ? "bg-primary" : entry.type === "warning" ? "bg-gold" : "bg-muted-foreground"}`} />
-                    <p className="text-sm flex-1 text-foreground">{entry.action}</p>
-                    <span className="text-xs text-muted-foreground">{entry.time}</span>
-                  </div>
-                ))}
-              </div>
+              <MyAuditTrail userId={user?.id} />
             </CardContent>
           </Card>
         </TabsContent>
       </Tabs>
+    </div>
+  );
+}
+
+function MyAuditTrail({ userId }: { userId?: string }) {
+  const [entries, setEntries] = useState<Array<{
+    id: string;
+    action: string;
+    entity_type: string;
+    entity_label: string | null;
+    created_at: string;
+  }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from("audit_logs")
+      .select("id, action, entity_type, entity_label, created_at")
+      .eq("actor_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        setEntries(data ?? []);
+        setLoading(false);
+      });
+  }, [userId]);
+
+  const ACTION_COLORS: Record<string, string> = {
+    CREATE: "bg-green-500", UPDATE: "bg-blue-500", DELETE: "bg-red-500",
+    UPLOAD: "bg-blue-500", VIEW: "bg-muted-foreground", READ: "bg-muted-foreground",
+    APPROVE: "bg-green-500", REJECT: "bg-red-500", SUBMIT: "bg-primary",
+  };
+  const ENTITY_MAP: Record<string, string> = {
+    profile: "Profile", application: "Application", document_vault: "Document",
+    opportunity: "Opportunity", micro_task: "Task", accreditation: "Accreditation",
+  };
+
+  if (loading) return <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-9 bg-muted/40 rounded animate-pulse" />)}</div>;
+
+  if (!entries.length) return (
+    <p className="text-sm text-muted-foreground italic text-center py-6">No activity recorded yet. Actions you take on the platform will appear here.</p>
+  );
+
+  return (
+    <div className="space-y-2">
+      {entries.map(e => {
+        const dot = ACTION_COLORS[e.action] ?? "bg-muted-foreground";
+        const entityName = ENTITY_MAP[e.entity_type] ?? e.entity_type;
+        const diff = Date.now() - new Date(e.created_at).getTime();
+        const mins = Math.floor(diff / 60000);
+        const time = mins < 1 ? "just now" : mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.floor(mins/60)}h ago` : new Date(e.created_at).toLocaleDateString("en-ZA");
+        return (
+          <div key={e.id} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
+            <p className="text-sm flex-1 text-foreground">
+              <span className="font-medium capitalize">{e.action.toLowerCase()}</span>
+              {" "}
+              <span className="text-muted-foreground">{entityName}{e.entity_label ? `: ${e.entity_label}` : ""}</span>
+            </p>
+            <span className="text-xs text-muted-foreground flex-shrink-0">{time}</span>
+          </div>
+        );
+      })}
     </div>
   );
 }

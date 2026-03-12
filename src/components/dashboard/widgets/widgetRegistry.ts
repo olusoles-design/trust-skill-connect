@@ -53,6 +53,7 @@ import { FundingOpportunitiesWidget }  from "./business/FundingOpportunitiesWidg
 
 // ─── Oversight
 import { VerificationQueueWidget }     from "./oversight/VerificationQueueWidget";
+import { AuditLogWidget }              from "./oversight/AuditLogWidget";
 import { ReportsAnalyticsWidget }      from "./oversight/ReportsAnalyticsWidget";
 import { SETAReportingWidget }         from "./oversight/SETAReportingWidget";
 import { ComplianceMonitorWidget }     from "./oversight/ComplianceMonitorWidget";
@@ -293,6 +294,11 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     component: TrustLedgerWidget, layout: "full", persona: "oversight",
     title: "Trust Ledger", description: "Immutable audit trail — QR-verified proof for B-BBEE auditors.",
     icon: "Link2", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  view_audit_logs: {
+    component: AuditLogWidget, layout: "full", persona: "oversight",
+    title: "Audit Log", description: "Immutable, real-time log of every platform action — filterable by actor, entity, action type and date.",
+    icon: "ScrollText", color: "bg-primary/10", accentColor: "text-primary",
   },
   platform_admin: {
     component: PlatformAdminWidget, layout: "full", persona: "oversight",

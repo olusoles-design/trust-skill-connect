@@ -93,6 +93,48 @@ export type Database = {
           },
         ]
       }
+      audit_logs: {
+        Row: {
+          action: string
+          actor_id: string
+          actor_role: string
+          after_data: Json | null
+          before_data: Json | null
+          created_at: string
+          entity_id: string
+          entity_label: string | null
+          entity_type: string
+          id: string
+          metadata: Json
+        }
+        Insert: {
+          action: string
+          actor_id: string
+          actor_role: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id: string
+          entity_label?: string | null
+          entity_type: string
+          id?: string
+          metadata?: Json
+        }
+        Update: {
+          action?: string
+          actor_id?: string
+          actor_role?: string
+          after_data?: Json | null
+          before_data?: Json | null
+          created_at?: string
+          entity_id?: string
+          entity_label?: string | null
+          entity_type?: string
+          id?: string
+          metadata?: Json
+        }
+        Relationships: []
+      }
       company_participants: {
         Row: {
           agreement_document_url: string | null
