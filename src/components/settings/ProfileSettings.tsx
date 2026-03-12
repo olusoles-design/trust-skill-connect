@@ -52,6 +52,14 @@ export function ProfileSettings() {
       qc.invalidateQueries({ queryKey: ["profile", user?.id] });
       setEditing(false);
       toast.success("Profile updated successfully");
+      // ── Audit log: profile update
+      log({
+        action: "UPDATE",
+        entity_type: "profile",
+        entity_id: user!.id,
+        entity_label: [form.first_name, form.last_name].filter(Boolean).join(" ") || user?.email,
+        after_data: form,
+      });
     },
     onError: () => toast.error("Failed to update profile"),
   });
