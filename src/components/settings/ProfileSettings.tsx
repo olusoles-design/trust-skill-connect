@@ -356,31 +356,14 @@ export function ProfileSettings() {
         <TabsContent value="audit" className="mt-6">
           <Card className="border-border shadow-sm">
             <CardHeader>
-              <CardTitle className="text-base">Activity Audit Log</CardTitle>
-              <CardDescription>A record of recent actions on your account</CardDescription>
+              <CardTitle className="text-base">My Activity Trail</CardTitle>
+              <CardDescription>Your recent actions on the platform — live from the immutable audit log.</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-3">
-                {[
-                  { action: "Profile viewed",      time: "Just now",   type: "info" },
-                  { action: "Signed in",           time: "Today",      type: "success" },
-                  { action: "Settings accessed",   time: "Today",      type: "info" },
-                  { action: "Password unchanged",  time: "—",          type: "warning" },
-                ].map((entry, i) => (
-                  <div key={i} className="flex items-center gap-3 py-2 border-b border-border last:border-0">
-                    <div className={`w-2 h-2 rounded-full flex-shrink-0 ${entry.type === "success" ? "bg-primary" : entry.type === "warning" ? "bg-gold" : "bg-muted-foreground"}`} />
-                    <p className="text-sm flex-1 text-foreground">{entry.action}</p>
-                    <span className="text-xs text-muted-foreground">{entry.time}</span>
-                  </div>
-                ))}
-              </div>
+              <MyAuditTrail userId={user?.id} />
             </CardContent>
           </Card>
         </TabsContent>
-      </Tabs>
-    </div>
-  );
-}
 
 function ProfileField({
   icon: Icon,
