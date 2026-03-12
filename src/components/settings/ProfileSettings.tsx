@@ -91,6 +91,8 @@ export function ProfileSettings() {
       await supabase.from("profiles").upsert({ user_id: user.id, avatar_url: data.publicUrl }, { onConflict: "user_id" });
       qc.invalidateQueries({ queryKey: ["profile", user.id] });
       toast.success("Avatar updated");
+      // ── Audit log: avatar upload
+      log({ action: "UPLOAD", entity_type: "profile", entity_id: user.id, entity_label: "Avatar", after_data: { avatar_url: data.publicUrl } });
     } catch {
       toast.error("Avatar upload failed");
     } finally {
