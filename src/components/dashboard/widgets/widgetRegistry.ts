@@ -53,6 +53,7 @@ import { FundingOpportunitiesWidget }  from "./business/FundingOpportunitiesWidg
 
 // ─── Oversight
 import { VerificationQueueWidget }     from "./oversight/VerificationQueueWidget";
+import { AuditLogWidget }              from "./oversight/AuditLogWidget";
 import { ReportsAnalyticsWidget }      from "./oversight/ReportsAnalyticsWidget";
 import { SETAReportingWidget }         from "./oversight/SETAReportingWidget";
 import { ComplianceMonitorWidget }     from "./oversight/ComplianceMonitorWidget";

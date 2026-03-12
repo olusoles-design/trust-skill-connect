@@ -66,7 +66,8 @@ export type Capability =
   | "post_programme_opportunities" // Sponsor lists learnership/bursary/internship in main feed
   | "manage_sponsor_profile"       // Sponsor manages their own directory listing
   | "browse_sponsor_directory"    // Learners/providers browse the sponsor directory
-  | "browse_practitioner_directory"; // Any authenticated user finds registered practitioners
+  | "browse_practitioner_directory" // Any authenticated user finds registered practitioners
+  | "view_audit_logs";              // Platform Admin / Oversight — full audit trail
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
