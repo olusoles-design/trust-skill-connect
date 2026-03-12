@@ -22,6 +22,7 @@ import { format } from "date-fns";
 
 export function ProfileSettings() {
   const { user, role } = useAuth();
+  const { log } = useAuditLog();
   const qc = useQueryClient();
   const [editing, setEditing] = useState(false);
   const [form, setForm] = useState<Record<string, string>>({});
