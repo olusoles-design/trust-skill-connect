@@ -364,6 +364,74 @@ export function ProfileSettings() {
             </CardContent>
           </Card>
         </TabsContent>
+      </Tabs>
+    </div>
+  );
+}
+
+function MyAuditTrail({ userId }: { userId?: string }) {
+  const [entries, setEntries] = useState<Array<{
+    id: string;
+    action: string;
+    entity_type: string;
+    entity_label: string | null;
+    created_at: string;
+  }>>([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (!userId) return;
+    supabase
+      .from("audit_logs")
+      .select("id, action, entity_type, entity_label, created_at")
+      .eq("actor_id", userId)
+      .order("created_at", { ascending: false })
+      .limit(20)
+      .then(({ data }) => {
+        setEntries(data ?? []);
+        setLoading(false);
+      });
+  }, [userId]);
+
+  const ACTION_COLORS: Record<string, string> = {
+    CREATE: "bg-green-500", UPDATE: "bg-blue-500", DELETE: "bg-red-500",
+    UPLOAD: "bg-blue-500", VIEW: "bg-muted-foreground", READ: "bg-muted-foreground",
+    APPROVE: "bg-green-500", REJECT: "bg-red-500", SUBMIT: "bg-primary",
+  };
+  const ENTITY_MAP: Record<string, string> = {
+    profile: "Profile", application: "Application", document_vault: "Document",
+    opportunity: "Opportunity", micro_task: "Task", accreditation: "Accreditation",
+  };
+
+  if (loading) return <div className="space-y-2">{Array.from({ length: 5 }).map((_, i) => <div key={i} className="h-9 bg-muted/40 rounded animate-pulse" />)}</div>;
+
+  if (!entries.length) return (
+    <p className="text-sm text-muted-foreground italic text-center py-6">No activity recorded yet. Actions you take on the platform will appear here.</p>
+  );
+
+  return (
+    <div className="space-y-2">
+      {entries.map(e => {
+        const dot = ACTION_COLORS[e.action] ?? "bg-muted-foreground";
+        const entityName = ENTITY_MAP[e.entity_type] ?? e.entity_type;
+        const diff = Date.now() - new Date(e.created_at).getTime();
+        const mins = Math.floor(diff / 60000);
+        const time = mins < 1 ? "just now" : mins < 60 ? `${mins}m ago` : mins < 1440 ? `${Math.floor(mins/60)}h ago` : new Date(e.created_at).toLocaleDateString("en-ZA");
+        return (
+          <div key={e.id} className="flex items-center gap-3 py-2.5 border-b border-border last:border-0">
+            <div className={`w-2 h-2 rounded-full flex-shrink-0 ${dot}`} />
+            <p className="text-sm flex-1 text-foreground">
+              <span className="font-medium capitalize">{e.action.toLowerCase()}</span>
+              {" "}
+              <span className="text-muted-foreground">{entityName}{e.entity_label ? `: ${e.entity_label}` : ""}</span>
+            </p>
+            <span className="text-xs text-muted-foreground flex-shrink-0">{time}</span>
+          </div>
+        );
+      })}
+    </div>
+  );
+}
 
 function ProfileField({
   icon: Icon,
