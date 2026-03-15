@@ -4,84 +4,84 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
-/* SkillsMark Design System — Friendly Warm palette — All colors MUST be HSL */
+/* SkillsMark Design System — Vibrant Corporate palette — All colors MUST be HSL */
 
 @layer base {
   :root {
-    /* Core brand — Friendly Warm */
-    --coral:          16 100% 60%;   /* #FF6B35 */
-    --coral-dark:     16 100% 50%;   /* #E65517 */
-    --yellow:         43 100% 70%;   /* #FFD166 */
-    --yellow-dark:    43  95% 58%;
-    --warm-bg:        20 100% 98%;   /* #FFF7F3 */
+    /* Core brand — Vibrant Corporate */
+    --blue:           211 100% 52%;   /* #0A84FF */
+    --blue-dark:      211 100% 45%;   /* #006AE6 */
+    --teal-brand:     172 100% 38%;   /* #00C2A8 */
+    --teal-brand-dark:172 100% 33%;   /* #00A88E */
+    --corp-bg:        220 100% 98%;   /* #F6F9FF */
 
     /* Legacy aliases — kept so existing components don't break */
-    --navy:           16 100% 50%;
-    --navy-mid:       16  90% 42%;
-    --navy-light:     16  80% 36%;
-    --teal:           43 100% 70%;
-    --teal-light:     43 100% 78%;
-    --gold:           43 100% 70%;
-    --gold-light:     43 100% 80%;
+    --navy:           211 100% 20%;
+    --navy-mid:       211  90% 28%;
+    --navy-light:     211  80% 35%;
+    --teal:           172 100% 38%;
+    --teal-light:     172 100% 48%;
+    --gold:            38  92% 50%;
+    --gold-light:      38  92% 62%;
 
     /* ── Semantic tokens ── */
-    --background:     20 100% 98%;   /* warm off-white */
-    --foreground:     24  12% 18%;   /* near-black warm */
+    --background:     220 100% 98%;   /* very light blue */
+    --foreground:     220  12% 15%;   /* near-black cool */
 
     --card:            0   0% 100%;
-    --card-foreground: 24  12% 18%;
+    --card-foreground: 220  12% 15%;
 
     --popover:            0   0% 100%;
-    --popover-foreground: 24  12% 18%;
+    --popover-foreground: 220  12% 15%;
 
-    --primary:            16 100% 60%;   /* coral */
-    --primary-foreground:  0   0% 100%;
+    --primary:            211 100% 52%;   /* deep sky blue */
+    --primary-foreground:   0   0% 100%;
 
-    --secondary:          16 100% 50%;   /* coral-dark */
-    --secondary-foreground: 0  0% 100%;
+    --secondary:          172 100% 38%;   /* teal */
+    --secondary-foreground: 0   0% 100%;
 
-    --muted:           24  10% 93%;
-    --muted-foreground: 0   0% 42%;   /* #6B6B6B */
+    --muted:           220  14% 93%;
+    --muted-foreground: 220   9% 46%;   /* #6B7280 */
 
-    --accent:          43 100% 70%;   /* sunny yellow */
-    --accent-foreground: 24 12% 18%;
+    --accent:           172 100% 38%;   /* teal */
+    --accent-foreground:  0   0% 100%;
 
-    --destructive:      0  72% 51%;   /* #DC2626 */
+    --destructive:       0  84% 60%;   /* #EF4444 */
     --destructive-foreground: 0 0% 100%;
 
-    --border:          24  10% 88%;
-    --input:           24  10% 88%;
-    --ring:            16 100% 60%;
+    --border:           220  14% 88%;
+    --input:            220  14% 88%;
+    --ring:             211 100% 52%;
 
     --radius: 0.75rem;
 
     /* ── Status colours ── */
-    --success:        152  64% 41%;   /* #16A34A */
-    --warning:         25  97% 53%;   /* #F97316 */
-    --danger:           0  72% 51%;   /* #DC2626 */
+    --success:         160  84% 39%;   /* #10B981 */
+    --warning:          38  92% 50%;   /* #F59E0B */
+    --danger:            0  84% 60%;   /* #EF4444 */
 
     /* ── Gradients ── */
-    --gradient-hero: linear-gradient(135deg, hsl(16,100%,44%) 0%, hsl(16,90%,36%) 50%, hsl(30,80%,32%) 100%);
-    --gradient-teal: linear-gradient(135deg, hsl(43,100%,70%), hsl(43,95%,58%));
-    --gradient-gold: linear-gradient(135deg, hsl(43,100%,70%), hsl(43,95%,58%));
-    --gradient-card: linear-gradient(135deg, hsl(0,0%,100%), hsl(20,100%,98%));
+    --gradient-hero: linear-gradient(135deg, hsl(211,100%,30%) 0%, hsl(211,100%,42%) 50%, hsl(172,100%,30%) 100%);
+    --gradient-teal: linear-gradient(135deg, hsl(172,100%,38%), hsl(172,100%,30%));
+    --gradient-gold: linear-gradient(135deg, hsl(38,92%,50%), hsl(38,92%,40%));
+    --gradient-card: linear-gradient(135deg, hsl(0,0%,100%), hsl(220,100%,98%));
 
     /* ── Shadows ── */
-    --shadow-sm:   0  2px  8px hsl(16 100% 50% / 0.07);
-    --shadow-md:   0  8px 24px hsl(16 100% 50% / 0.12);
-    --shadow-lg:   0 16px 48px hsl(16 100% 50% / 0.16);
-    --shadow-teal: 0  8px 32px hsl(43 100% 70% / 0.35);
-    --shadow-gold: 0  8px 32px hsl(43 100% 70% / 0.35);
+    --shadow-sm:   0  2px  8px hsl(211 100% 52% / 0.08);
+    --shadow-md:   0  8px 24px hsl(211 100% 52% / 0.14);
+    --shadow-lg:   0 16px 48px hsl(211 100% 52% / 0.18);
+    --shadow-teal: 0  8px 32px hsl(172 100% 38% / 0.30);
+    --shadow-gold: 0  8px 32px hsl(38   92% 50% / 0.30);
 
     /* ── Sidebar ── */
-    --sidebar-background:        0  0% 100%;
-    --sidebar-foreground:       24 12% 25%;
-    --sidebar-primary:          16 100% 60%;
-    --sidebar-primary-foreground: 0  0% 100%;
-    --sidebar-accent:           20 100% 96%;
-    --sidebar-accent-foreground: 16 100% 50%;
-    --sidebar-border:           24  10% 90%;
-    --sidebar-ring:             16 100% 60%;
+    --sidebar-background:          0   0% 100%;
+    --sidebar-foreground:        220  12% 22%;
+    --sidebar-primary:           211 100% 52%;
+    --sidebar-primary-foreground:  0   0% 100%;
+    --sidebar-accent:            220 100% 96%;
+    --sidebar-accent-foreground: 211 100% 45%;
+    --sidebar-border:            220  14% 90%;
+    --sidebar-ring:              211 100% 52%;
   }
 }
 
@@ -112,18 +112,18 @@
   .text-navy  { color: hsl(var(--navy)); }
   .text-teal  { color: hsl(var(--teal)); }
   .text-gold  { color: hsl(var(--gold)); }
-  .text-coral { color: hsl(var(--coral)); }
+  .text-blue  { color: hsl(var(--blue)); }
 
   .bg-navy       { background-color: hsl(var(--navy)); }
   .bg-navy-mid   { background-color: hsl(var(--navy-mid)); }
   .bg-navy-light { background-color: hsl(var(--navy-light)); }
   .bg-teal       { background-color: hsl(var(--teal)); }
   .bg-gold       { background-color: hsl(var(--gold)); }
-  .bg-coral      { background-color: hsl(var(--coral)); }
+  .bg-blue       { background-color: hsl(var(--blue)); }
 
   .border-teal  { border-color: hsl(var(--teal)); }
   .border-gold  { border-color: hsl(var(--gold)); }
-  .border-coral { border-color: hsl(var(--coral)); }
+  .border-blue  { border-color: hsl(var(--blue)); }
 
   .shadow-teal { box-shadow: var(--shadow-teal); }
   .shadow-gold { box-shadow: var(--shadow-gold); }

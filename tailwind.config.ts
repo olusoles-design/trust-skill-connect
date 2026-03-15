@@ -19,14 +19,10 @@ export default {
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
-        /* Friendly Warm brand tokens */
-        coral: {
-          DEFAULT: "hsl(var(--coral))",
-          dark: "hsl(var(--coral-dark))",
-        },
-        yellow: {
-          DEFAULT: "hsl(var(--yellow))",
-          dark: "hsl(var(--yellow-dark))",
+        /* Vibrant Corporate brand tokens */
+        blue: {
+          DEFAULT: "hsl(var(--blue))",
+          dark: "hsl(var(--blue-dark))",
         },
         /* Legacy aliases */
         navy: {
