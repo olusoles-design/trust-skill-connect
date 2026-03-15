@@ -4,84 +4,84 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
-/* SkillsMark Design System — Vibrant Corporate palette — All colors MUST be HSL */
+/* SkillsMark Design System — High-Contrast Accessible palette — All colors MUST be HSL */
 
 @layer base {
   :root {
-    /* Core brand — Vibrant Corporate */
-    --blue:           211 100% 52%;   /* #0A84FF */
-    --blue-dark:      211 100% 45%;   /* #006AE6 */
-    --teal-brand:     172 100% 38%;   /* #00C2A8 */
-    --teal-brand-dark:172 100% 33%;   /* #00A88E */
-    --corp-bg:        220 100% 98%;   /* #F6F9FF */
+    /* Core brand — High-Contrast Accessible */
+    --blue:           222 100% 50%;   /* #0055FF */
+    --blue-dark:      222 100% 42%;
+    --teal-brand:      40 100% 50%;   /* #FFAA00 amber accent */
+    --teal-brand-dark: 40 100% 43%;
+    --corp-bg:        220  18% 96%;   /* #F2F4F8 */
 
     /* Legacy aliases — kept so existing components don't break */
-    --navy:           211 100% 20%;
-    --navy-mid:       211  90% 28%;
-    --navy-light:     211  80% 35%;
-    --teal:           172 100% 38%;
-    --teal-light:     172 100% 48%;
-    --gold:            38  92% 50%;
-    --gold-light:      38  92% 62%;
+    --navy:           222 100% 20%;
+    --navy-mid:       222  90% 28%;
+    --navy-light:     222  80% 35%;
+    --teal:            40 100% 50%;
+    --teal-light:      40 100% 62%;
+    --gold:            40 100% 50%;
+    --gold-light:      40 100% 62%;
 
     /* ── Semantic tokens ── */
-    --background:     220 100% 98%;   /* very light blue */
-    --foreground:     220  12% 15%;   /* near-black cool */
+    --background:     220  18% 96%;   /* #F2F4F8 */
+    --foreground:       0   0% 20%;   /* #333333 near-black */
 
-    --card:            0   0% 100%;
-    --card-foreground: 220  12% 15%;
+    --card:             0   0% 100%;
+    --card-foreground:  0   0% 20%;
 
     --popover:            0   0% 100%;
-    --popover-foreground: 220  12% 15%;
+    --popover-foreground: 0   0% 20%;
 
-    --primary:            211 100% 52%;   /* deep sky blue */
-    --primary-foreground:   0   0% 100%;
+    --primary:          222 100% 50%;   /* #0055FF */
+    --primary-foreground: 0   0% 100%;
 
-    --secondary:          172 100% 38%;   /* teal */
-    --secondary-foreground: 0   0% 100%;
+    --secondary:         40 100% 50%;   /* #FFAA00 amber */
+    --secondary-foreground: 0 0% 10%;
 
-    --muted:           220  14% 93%;
-    --muted-foreground: 220   9% 46%;   /* #6B7280 */
+    --muted:            220  14% 91%;
+    --muted-foreground:   0   0% 20%;   /* #333333 */
 
-    --accent:           172 100% 38%;   /* teal */
-    --accent-foreground:  0   0% 100%;
+    --accent:            40 100% 50%;   /* #FFAA00 */
+    --accent-foreground:  0   0% 10%;
 
-    --destructive:       0  84% 60%;   /* #EF4444 */
+    --destructive:        0  73% 41%;   /* #B91C1C */
     --destructive-foreground: 0 0% 100%;
 
-    --border:           220  14% 88%;
-    --input:            220  14% 88%;
-    --ring:             211 100% 52%;
+    --border:           220  14% 86%;
+    --input:            220  14% 86%;
+    --ring:             222 100% 50%;
 
     --radius: 0.75rem;
 
     /* ── Status colours ── */
-    --success:         160  84% 39%;   /* #10B981 */
-    --warning:          38  92% 50%;   /* #F59E0B */
-    --danger:            0  84% 60%;   /* #EF4444 */
+    --success:          150 100% 24%;   /* #007A3D */
+    --warning:           27  93% 37%;   /* #B45309 */
+    --danger:             0  73% 41%;   /* #B91C1C */
 
     /* ── Gradients ── */
-    --gradient-hero: linear-gradient(135deg, hsl(211,100%,30%) 0%, hsl(211,100%,42%) 50%, hsl(172,100%,30%) 100%);
-    --gradient-teal: linear-gradient(135deg, hsl(172,100%,38%), hsl(172,100%,30%));
-    --gradient-gold: linear-gradient(135deg, hsl(38,92%,50%), hsl(38,92%,40%));
-    --gradient-card: linear-gradient(135deg, hsl(0,0%,100%), hsl(220,100%,98%));
+    --gradient-hero: linear-gradient(135deg, hsl(222,100%,30%) 0%, hsl(222,100%,45%) 60%, hsl(40,100%,45%) 100%);
+    --gradient-teal: linear-gradient(135deg, hsl(40,100%,50%), hsl(40,100%,40%));
+    --gradient-gold: linear-gradient(135deg, hsl(40,100%,50%), hsl(40,100%,40%));
+    --gradient-card: linear-gradient(135deg, hsl(0,0%,100%), hsl(220,18%,96%));
 
     /* ── Shadows ── */
-    --shadow-sm:   0  2px  8px hsl(211 100% 52% / 0.08);
-    --shadow-md:   0  8px 24px hsl(211 100% 52% / 0.14);
-    --shadow-lg:   0 16px 48px hsl(211 100% 52% / 0.18);
-    --shadow-teal: 0  8px 32px hsl(172 100% 38% / 0.30);
-    --shadow-gold: 0  8px 32px hsl(38   92% 50% / 0.30);
+    --shadow-sm:   0  2px  8px hsl(222 100% 50% / 0.08);
+    --shadow-md:   0  8px 24px hsl(222 100% 50% / 0.14);
+    --shadow-lg:   0 16px 48px hsl(222 100% 50% / 0.18);
+    --shadow-teal: 0  8px 32px hsl(40  100% 50% / 0.30);
+    --shadow-gold: 0  8px 32px hsl(40  100% 50% / 0.30);
 
     /* ── Sidebar ── */
     --sidebar-background:          0   0% 100%;
-    --sidebar-foreground:        220  12% 22%;
-    --sidebar-primary:           211 100% 52%;
+    --sidebar-foreground:          0   0% 20%;
+    --sidebar-primary:           222 100% 50%;
     --sidebar-primary-foreground:  0   0% 100%;
-    --sidebar-accent:            220 100% 96%;
-    --sidebar-accent-foreground: 211 100% 45%;
-    --sidebar-border:            220  14% 90%;
-    --sidebar-ring:              211 100% 52%;
+    --sidebar-accent:            220  18% 94%;
+    --sidebar-accent-foreground: 222 100% 42%;
+    --sidebar-border:            220  14% 88%;
+    --sidebar-ring:              222 100% 50%;
   }
 }
 
