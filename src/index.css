@@ -4,18 +4,25 @@
 
 @import url('https://fonts.googleapis.com/css2?family=Sora:wght@300;400;500;600;700;800&family=Inter:wght@300;400;500;600&display=swap');
 
-/* SkillsMark Design System — All colors MUST be HSL */
+/* SkillsMark Design System — Friendly Warm palette — All colors MUST be HSL */
 
 @layer base {
   :root {
-    /* Core brand */
-    --navy: 218 60% 10%;
-    --navy-mid: 218 50% 15%;
-    --navy-light: 218 40% 20%;
-    --teal: 178 72% 42%;
-    --teal-light: 178 72% 55%;
-    --gold: 42 95% 55%;
-    --gold-light: 42 95% 68%;
+    /* Core brand — Friendly Warm */
+    --coral:       16 100% 60%;
+    --coral-dark:  16 100% 50%;
+    --yellow:      43 100% 70%;
+    --yellow-dark: 43 100% 58%;
+    --surface-bg:  20 100% 98%;   /* #FFF7F3 */
+
+    /* Legacy aliases kept for component compatibility */
+    --navy:       16 100% 50%;
+    --navy-mid:   16 90%  40%;
+    --navy-light: 16 80%  35%;
+    --teal:       43 100% 70%;
+    --teal-light: 43 100% 78%;
+    --gold:       43 100% 70%;
+    --gold-light: 43 100% 80%;
 
     /* Semantic tokens */
     --background: 220 30% 97%;
