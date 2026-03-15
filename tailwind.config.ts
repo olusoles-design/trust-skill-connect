@@ -13,12 +13,22 @@ export default {
       },
     },
     extend: {
-      colors: {
+        colors: {
         border: "hsl(var(--border))",
         input: "hsl(var(--input))",
         ring: "hsl(var(--ring))",
         background: "hsl(var(--background))",
         foreground: "hsl(var(--foreground))",
+        /* Friendly Warm brand tokens */
+        coral: {
+          DEFAULT: "hsl(var(--coral))",
+          dark: "hsl(var(--coral-dark))",
+        },
+        yellow: {
+          DEFAULT: "hsl(var(--yellow))",
+          dark: "hsl(var(--yellow-dark))",
+        },
+        /* Legacy aliases */
         navy: {
           DEFAULT: "hsl(var(--navy))",
           mid: "hsl(var(--navy-mid))",
@@ -32,6 +42,7 @@ export default {
           DEFAULT: "hsl(var(--gold))",
           light: "hsl(var(--gold-light))",
         },
+        /* Semantic */
         primary: {
           DEFAULT: "hsl(var(--primary))",
           foreground: "hsl(var(--primary-foreground))",
