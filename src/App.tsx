@@ -12,6 +12,7 @@ import Payments from "./pages/Payments";
 import Settings from "./pages/Settings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import Schema from "./pages/Schema";
 
 const queryClient = new QueryClient();
 
