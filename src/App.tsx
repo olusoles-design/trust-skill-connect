@@ -12,6 +12,7 @@ import Payments from "./pages/Payments";
 import Settings from "./pages/Settings";
 import ResetPassword from "./pages/ResetPassword";
 import NotFound from "./pages/NotFound";
+import Schema from "./pages/Schema";
 
 const queryClient = new QueryClient();
 
@@ -30,6 +31,7 @@ const App = () => (
             <Route path="/dashboard/settings" element={<Settings />} />
             <Route path="/reset-password" element={<ResetPassword />} />
             {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+            <Route path="/schema" element={<Schema />} />
             <Route path="*" element={<NotFound />} />
           </Routes>
         </BrowserRouter>
