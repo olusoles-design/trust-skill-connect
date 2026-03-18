@@ -772,5 +772,144 @@ CREATE POLICY "Poster manages participants on own opportunity" ON public.company
 CREATE POLICY "Admins manage all participants"             ON public.company_participants FOR ALL USING (has_role(auth.uid(), 'admin'));
 
 -- ============================================================
+-- SEED DATA — ADMIN USER
+-- ============================================================
+--
+-- ⚠️  IMPORTANT — HOW TO CREATE AN ADMIN USER:
+--
+--  Supabase manages authentication in the internal `auth.users` table,
+--  which CANNOT be inserted into via plain SQL in the dashboard SQL editor.
+--  You must create the auth user first, then run the seed below.
+--
+--  STEP 1 — Create the auth user (choose ONE method):
+--
+--    A) Via Supabase Dashboard (recommended):
+--       → Authentication → Users → "Add user"
+--       → Enter email + password (e.g. admin@yourdomain.com / AdminPass123!)
+--       → Copy the generated UUID shown in the Users table
+--
+--    B) Via Supabase CLI or API:
+--       curl -X POST 'https://<project-ref>.supabase.co/auth/v1/signup' \
+--         -H "apikey: <anon-key>" \
+--         -H "Content-Type: application/json" \
+--         -d '{"email":"admin@yourdomain.com","password":"AdminPass123!"}'
+--       → Copy the returned `id` UUID
+--
+--  STEP 2 — Replace the UUID below with your real user UUID, then run
+--           this entire block in the SQL editor:
+--
+-- ============================================================
+
+DO $$
+DECLARE
+  v_admin_id uuid := '00000000-0000-0000-0000-000000000001'; -- ← REPLACE with real auth user UUID
+BEGIN
+
+  -- Profile
+  INSERT INTO public.profiles (user_id, first_name, last_name, username, job_title)
+  VALUES (v_admin_id, 'Platform', 'Admin', 'admin', 'System Administrator')
+  ON CONFLICT (user_id) DO UPDATE
+    SET first_name = EXCLUDED.first_name,
+        last_name  = EXCLUDED.last_name,
+        job_title  = EXCLUDED.job_title;
+
+  -- Admin role
+  INSERT INTO public.user_roles (user_id, role)
+  VALUES (v_admin_id, 'admin')
+  ON CONFLICT DO NOTHING;
+
+  -- Subscription (enterprise for admin)
+  INSERT INTO public.subscriptions (user_id, plan, is_active, trial_ends_at)
+  VALUES (v_admin_id, 'enterprise', true, NULL)
+  ON CONFLICT (user_id) DO UPDATE
+    SET plan       = 'enterprise',
+        is_active  = true,
+        trial_ends_at = NULL;
+
+  -- Wallet
+  INSERT INTO public.wallets (user_id, balance, escrow_balance, currency)
+  VALUES (v_admin_id, 0, 0, 'ZAR')
+  ON CONFLICT (user_id) DO NOTHING;
+
+END $$;
+
+-- ============================================================
+-- SEED DATA — ADDITIONAL ROLE EXAMPLES (optional)
+-- ============================================================
+-- To assign extra roles to the same admin user (multi-role):
+--
+--   INSERT INTO public.user_roles (user_id, role)
+--   VALUES
+--     ('your-uuid-here', 'learner'),
+--     ('your-uuid-here', 'sponsor'),
+--     ('your-uuid-here', 'provider')
+--   ON CONFLICT DO NOTHING;
+--
+-- To create test users for each persona, repeat STEP 1 for each
+-- user and insert their UUID into user_roles with the desired role.
+--
+-- Available roles: learner | sponsor | provider | practitioner |
+--                  support_provider | admin | seta | government |
+--                  fundi | employer
+-- ============================================================
+
+-- ============================================================
+-- TRIGGERS (re-attach after fresh import)
+-- ============================================================
+
+-- Auto-create profile + subscription on new auth user signup
+CREATE OR REPLACE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Auto-create wallet on new auth user signup
+CREATE OR REPLACE TRIGGER on_auth_user_wallet
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user_wallet();
+
+-- Auto-increment opportunity applications counter
+CREATE OR REPLACE TRIGGER trg_inc_applications
+  AFTER INSERT ON public.applications
+  FOR EACH ROW EXECUTE FUNCTION public.increment_opportunity_applications();
+
+CREATE OR REPLACE TRIGGER trg_dec_applications
+  AFTER DELETE ON public.applications
+  FOR EACH ROW EXECUTE FUNCTION public.decrement_opportunity_applications();
+
+-- Validate provider review rating (1–5)
+CREATE OR REPLACE TRIGGER trg_validate_review_rating
+  BEFORE INSERT OR UPDATE ON public.provider_reviews
+  FOR EACH ROW EXECUTE FUNCTION public.validate_review_rating();
+
+-- Recalculate listing rating avg on review insert/delete
+CREATE OR REPLACE TRIGGER trg_update_listing_rating
+  AFTER INSERT OR DELETE ON public.provider_reviews
+  FOR EACH ROW EXECUTE FUNCTION public.update_listing_rating();
+
+-- Auto-update updated_at columns
+CREATE OR REPLACE TRIGGER set_updated_at_profiles                    BEFORE UPDATE ON public.profiles                    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_subscriptions               BEFORE UPDATE ON public.subscriptions               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_wallets                     BEFORE UPDATE ON public.wallets                     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_opportunities               BEFORE UPDATE ON public.opportunities               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_applications                BEFORE UPDATE ON public.applications                FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_document_vault              BEFORE UPDATE ON public.document_vault              FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_practitioner_accreditations BEFORE UPDATE ON public.practitioner_accreditations FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_practitioner_listings       BEFORE UPDATE ON public.practitioner_listings       FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_provider_listings           BEFORE UPDATE ON public.provider_listings           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_rfqs                        BEFORE UPDATE ON public.rfqs                        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_rfq_responses               BEFORE UPDATE ON public.rfq_responses               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_funding_opportunities       BEFORE UPDATE ON public.funding_opportunities       FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_eoi_submissions             BEFORE UPDATE ON public.eoi_submissions             FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_sponsor_profiles            BEFORE UPDATE ON public.sponsor_profiles            FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_micro_tasks                 BEFORE UPDATE ON public.micro_tasks                 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_task_submissions            BEFORE UPDATE ON public.task_submissions            FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_match_results               BEFORE UPDATE ON public.match_results               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_payment_transactions        BEFORE UPDATE ON public.payment_transactions        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_withdrawal_requests         BEFORE UPDATE ON public.withdrawal_requests         FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_reports                     BEFORE UPDATE ON public.reports                     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_company_participants        BEFORE UPDATE ON public.company_participants        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+CREATE OR REPLACE TRIGGER set_updated_at_regulatory_bodies           BEFORE UPDATE ON public.regulatory_bodies           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+
+-- ============================================================
 -- END OF SCHEMA
 -- ============================================================
