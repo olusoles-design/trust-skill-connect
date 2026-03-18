@@ -8,24 +8,28 @@
 -- ENUMS
 -- ============================================================
 
-CREATE TYPE public.app_role AS ENUM (
-  'learner',
-  'sponsor',
-  'provider',
-  'practitioner',
-  'support_provider',
-  'admin',
-  'seta',
-  'government',
-  'fundi',
-  'employer'
-);
+DO $$ BEGIN
+  CREATE TYPE public.app_role AS ENUM (
+    'learner',
+    'sponsor',
+    'provider',
+    'practitioner',
+    'support_provider',
+    'admin',
+    'seta',
+    'government',
+    'fundi',
+    'employer'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TYPE public.subscription_plan AS ENUM (
-  'starter',
-  'professional',
-  'enterprise'
-);
+DO $$ BEGIN
+  CREATE TYPE public.subscription_plan AS ENUM (
+    'starter',
+    'professional',
+    'enterprise'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ============================================================
 -- TABLES
