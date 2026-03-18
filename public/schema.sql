@@ -1,38 +1,46 @@
 -- ============================================================
 --  FULL REFERENCE SCHEMA SQL
---  Generated: 2026-03-17
+--  Generated: 2026-03-18
 --  Project: SkillsBridge / Lovable Cloud (Supabase)
+--
+--  ✅ IDEMPOTENT — safe to run on an existing database.
+--     All statements use IF NOT EXISTS / OR REPLACE / ON CONFLICT
+--     so re-running will not fail or duplicate data.
 -- ============================================================
 
 -- ============================================================
 -- ENUMS
 -- ============================================================
 
-CREATE TYPE public.app_role AS ENUM (
-  'learner',
-  'sponsor',
-  'provider',
-  'practitioner',
-  'support_provider',
-  'admin',
-  'seta',
-  'government',
-  'fundi',
-  'employer'
-);
+DO $$ BEGIN
+  CREATE TYPE public.app_role AS ENUM (
+    'learner',
+    'sponsor',
+    'provider',
+    'practitioner',
+    'support_provider',
+    'admin',
+    'seta',
+    'government',
+    'fundi',
+    'employer'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
-CREATE TYPE public.subscription_plan AS ENUM (
-  'starter',
-  'professional',
-  'enterprise'
-);
+DO $$ BEGIN
+  CREATE TYPE public.subscription_plan AS ENUM (
+    'starter',
+    'professional',
+    'enterprise'
+  );
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ============================================================
 -- TABLES
 -- ============================================================
 
 -- profiles
-CREATE TABLE public.profiles (
+CREATE TABLE IF NOT EXISTS public.profiles (
   id                uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id           uuid        NOT NULL,
   first_name        text,
@@ -57,16 +65,17 @@ CREATE TABLE public.profiles (
 );
 
 -- user_roles
-CREATE TABLE public.user_roles (
+CREATE TABLE IF NOT EXISTS public.user_roles (
   id      uuid      NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id uuid      NOT NULL,
-  role    app_role  NOT NULL
+  role    app_role  NOT NULL,
+  UNIQUE (user_id, role)
 );
 
 -- subscriptions
-CREATE TABLE public.subscriptions (
+CREATE TABLE IF NOT EXISTS public.subscriptions (
   id            uuid              NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id       uuid              NOT NULL,
+  user_id       uuid              NOT NULL UNIQUE,
   plan          subscription_plan NOT NULL DEFAULT 'starter',
   is_active     boolean           NOT NULL DEFAULT true,
   trial_ends_at timestamptz                DEFAULT (now() + '30 days'::interval),
@@ -75,9 +84,9 @@ CREATE TABLE public.subscriptions (
 );
 
 -- wallets
-CREATE TABLE public.wallets (
+CREATE TABLE IF NOT EXISTS public.wallets (
   id              uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
-  user_id         uuid        NOT NULL,
+  user_id         uuid        NOT NULL UNIQUE,
   balance         numeric     NOT NULL DEFAULT 0,
   escrow_balance  numeric     NOT NULL DEFAULT 0,
   currency        text        NOT NULL DEFAULT 'ZAR',
@@ -86,7 +95,7 @@ CREATE TABLE public.wallets (
 );
 
 -- regulatory_bodies
-CREATE TABLE public.regulatory_bodies (
+CREATE TABLE IF NOT EXISTS public.regulatory_bodies (
   id                 uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   acronym            text        NOT NULL,
   full_name          text        NOT NULL,
@@ -104,7 +113,7 @@ CREATE TABLE public.regulatory_bodies (
 );
 
 -- opportunities
-CREATE TABLE public.opportunities (
+CREATE TABLE IF NOT EXISTS public.opportunities (
   id                   uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   posted_by            uuid        NOT NULL,
   title                text        NOT NULL,
@@ -133,7 +142,7 @@ CREATE TABLE public.opportunities (
 );
 
 -- applications
-CREATE TABLE public.applications (
+CREATE TABLE IF NOT EXISTS public.applications (
   id             uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   opportunity_id uuid        NOT NULL REFERENCES public.opportunities(id),
   applicant_id   uuid        NOT NULL,
@@ -144,7 +153,7 @@ CREATE TABLE public.applications (
 );
 
 -- audit_logs
-CREATE TABLE public.audit_logs (
+CREATE TABLE IF NOT EXISTS public.audit_logs (
   id           uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   actor_id     uuid        NOT NULL,
   actor_role   text        NOT NULL,
@@ -159,7 +168,7 @@ CREATE TABLE public.audit_logs (
 );
 
 -- document_vault
-CREATE TABLE public.document_vault (
+CREATE TABLE IF NOT EXISTS public.document_vault (
   id            uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id       uuid        NOT NULL,
   label         text        NOT NULL,
@@ -178,7 +187,7 @@ CREATE TABLE public.document_vault (
 );
 
 -- practitioner_accreditations
-CREATE TABLE public.practitioner_accreditations (
+CREATE TABLE IF NOT EXISTS public.practitioner_accreditations (
   id                  uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id             uuid        NOT NULL,
   role_type           text        NOT NULL,
@@ -195,7 +204,7 @@ CREATE TABLE public.practitioner_accreditations (
 );
 
 -- accreditation_qualifications
-CREATE TABLE public.accreditation_qualifications (
+CREATE TABLE IF NOT EXISTS public.accreditation_qualifications (
   id                 uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   accreditation_id   uuid        NOT NULL REFERENCES public.practitioner_accreditations(id),
   user_id            uuid        NOT NULL,
@@ -207,7 +216,7 @@ CREATE TABLE public.accreditation_qualifications (
 );
 
 -- practitioner_listings
-CREATE TABLE public.practitioner_listings (
+CREATE TABLE IF NOT EXISTS public.practitioner_listings (
   id           uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id      uuid,
   first_name   text        NOT NULL,
@@ -233,7 +242,7 @@ CREATE TABLE public.practitioner_listings (
 );
 
 -- practitioner_listing_accreds
-CREATE TABLE public.practitioner_listing_accreds (
+CREATE TABLE IF NOT EXISTS public.practitioner_listing_accreds (
   id         uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   listing_id uuid        NOT NULL REFERENCES public.practitioner_listings(id),
   role_type  text        NOT NULL,
@@ -246,7 +255,7 @@ CREATE TABLE public.practitioner_listing_accreds (
 );
 
 -- provider_listings
-CREATE TABLE public.provider_listings (
+CREATE TABLE IF NOT EXISTS public.provider_listings (
   id             uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id        uuid        NOT NULL,
   title          text        NOT NULL,
@@ -268,7 +277,7 @@ CREATE TABLE public.provider_listings (
 );
 
 -- provider_reviews
-CREATE TABLE public.provider_reviews (
+CREATE TABLE IF NOT EXISTS public.provider_reviews (
   id          uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   listing_id  uuid        NOT NULL REFERENCES public.provider_listings(id),
   reviewer_id uuid        NOT NULL,
@@ -278,7 +287,7 @@ CREATE TABLE public.provider_reviews (
 );
 
 -- rfqs
-CREATE TABLE public.rfqs (
+CREATE TABLE IF NOT EXISTS public.rfqs (
   id          uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   buyer_id    uuid        NOT NULL,
   title       text        NOT NULL,
@@ -295,7 +304,7 @@ CREATE TABLE public.rfqs (
 );
 
 -- rfq_responses
-CREATE TABLE public.rfq_responses (
+CREATE TABLE IF NOT EXISTS public.rfq_responses (
   id           uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   rfq_id       uuid        NOT NULL REFERENCES public.rfqs(id),
   provider_id  uuid        NOT NULL,
@@ -310,7 +319,7 @@ CREATE TABLE public.rfq_responses (
 );
 
 -- funding_opportunities
-CREATE TABLE public.funding_opportunities (
+CREATE TABLE IF NOT EXISTS public.funding_opportunities (
   id                   uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   sponsor_id           uuid        NOT NULL,
   title                text        NOT NULL,
@@ -334,7 +343,7 @@ CREATE TABLE public.funding_opportunities (
 );
 
 -- eoi_submissions
-CREATE TABLE public.eoi_submissions (
+CREATE TABLE IF NOT EXISTS public.eoi_submissions (
   id             uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   funding_opp_id uuid        NOT NULL REFERENCES public.funding_opportunities(id),
   provider_id    uuid        NOT NULL,
@@ -349,7 +358,7 @@ CREATE TABLE public.eoi_submissions (
 );
 
 -- sponsor_profiles
-CREATE TABLE public.sponsor_profiles (
+CREATE TABLE IF NOT EXISTS public.sponsor_profiles (
   id              uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id         uuid        NOT NULL,
   company_name    text        NOT NULL,
@@ -371,7 +380,7 @@ CREATE TABLE public.sponsor_profiles (
 );
 
 -- micro_tasks
-CREATE TABLE public.micro_tasks (
+CREATE TABLE IF NOT EXISTS public.micro_tasks (
   id          uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   posted_by   uuid        NOT NULL,
   title       text        NOT NULL,
@@ -392,7 +401,7 @@ CREATE TABLE public.micro_tasks (
 );
 
 -- task_submissions
-CREATE TABLE public.task_submissions (
+CREATE TABLE IF NOT EXISTS public.task_submissions (
   id            uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   task_id       uuid        NOT NULL REFERENCES public.micro_tasks(id),
   worker_id     uuid        NOT NULL,
@@ -411,7 +420,7 @@ CREATE TABLE public.task_submissions (
 );
 
 -- task_ratings
-CREATE TABLE public.task_ratings (
+CREATE TABLE IF NOT EXISTS public.task_ratings (
   id         uuid      NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   task_id    uuid      NOT NULL REFERENCES public.micro_tasks(id),
   rater_id   uuid      NOT NULL,
@@ -423,7 +432,7 @@ CREATE TABLE public.task_ratings (
 );
 
 -- match_results
-CREATE TABLE public.match_results (
+CREATE TABLE IF NOT EXISTS public.match_results (
   id             uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id        uuid        NOT NULL,
   opportunity_id uuid        NOT NULL REFERENCES public.opportunities(id),
@@ -435,7 +444,7 @@ CREATE TABLE public.match_results (
 );
 
 -- payment_transactions
-CREATE TABLE public.payment_transactions (
+CREATE TABLE IF NOT EXISTS public.payment_transactions (
   id          uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id     uuid        NOT NULL,
   type        text        NOT NULL,
@@ -450,7 +459,7 @@ CREATE TABLE public.payment_transactions (
 );
 
 -- withdrawal_requests
-CREATE TABLE public.withdrawal_requests (
+CREATE TABLE IF NOT EXISTS public.withdrawal_requests (
   id               uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id          uuid        NOT NULL,
   amount           numeric     NOT NULL,
@@ -468,7 +477,7 @@ CREATE TABLE public.withdrawal_requests (
 );
 
 -- reports
-CREATE TABLE public.reports (
+CREATE TABLE IF NOT EXISTS public.reports (
   id                 uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   user_id            uuid        NOT NULL,
   regulatory_body_id uuid        REFERENCES public.regulatory_bodies(id),
@@ -485,7 +494,7 @@ CREATE TABLE public.reports (
 );
 
 -- company_participants
-CREATE TABLE public.company_participants (
+CREATE TABLE IF NOT EXISTS public.company_participants (
   id                    uuid        NOT NULL DEFAULT gen_random_uuid() PRIMARY KEY,
   opportunity_id        uuid        NOT NULL REFERENCES public.opportunities(id),
   user_id               uuid        NOT NULL,
@@ -608,168 +617,469 @@ ALTER TABLE public.reports                     ENABLE ROW LEVEL SECURITY;
 ALTER TABLE public.company_participants        ENABLE ROW LEVEL SECURITY;
 
 -- ── profiles ──────────────────────────────────────────────
-CREATE POLICY "Authenticated users view profiles"   ON public.profiles FOR SELECT TO authenticated USING (true);
-CREATE POLICY "Users can view their own profile"    ON public.profiles FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own profile"  ON public.profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update their own profile"  ON public.profiles FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Authenticated users view profiles"   ON public.profiles FOR SELECT TO authenticated USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users can view their own profile"    ON public.profiles FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users can insert their own profile"  ON public.profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users can update their own profile"  ON public.profiles FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── user_roles ────────────────────────────────────────────
-CREATE POLICY "Users can view their own roles"   ON public.user_roles FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own roles" ON public.user_roles FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can view their own roles"   ON public.user_roles FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users can insert their own roles" ON public.user_roles FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── subscriptions ─────────────────────────────────────────
-CREATE POLICY "Users can view their own subscription"   ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users can insert their own subscription" ON public.subscriptions FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users can update their own subscription" ON public.subscriptions FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users can view their own subscription"   ON public.subscriptions FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users can insert their own subscription" ON public.subscriptions FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users can update their own subscription" ON public.subscriptions FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── wallets ───────────────────────────────────────────────
-CREATE POLICY "Users view own wallet"   ON public.wallets FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users insert own wallet" ON public.wallets FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own wallet" ON public.wallets FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users view own wallet"   ON public.wallets FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users insert own wallet" ON public.wallets FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users update own wallet" ON public.wallets FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── regulatory_bodies ─────────────────────────────────────
-CREATE POLICY "Public read active regulatory bodies" ON public.regulatory_bodies FOR SELECT USING (is_active = true);
-CREATE POLICY "Admins manage regulatory bodies"      ON public.regulatory_bodies FOR ALL   USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Public read active regulatory bodies" ON public.regulatory_bodies FOR SELECT USING (is_active = true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage regulatory bodies"      ON public.regulatory_bodies FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── opportunities ─────────────────────────────────────────
-CREATE POLICY "Anyone can view active opportunities" ON public.opportunities FOR SELECT USING (status = 'active');
-CREATE POLICY "Poster can insert own opportunity"    ON public.opportunities FOR INSERT WITH CHECK (auth.uid() = posted_by);
-CREATE POLICY "Poster can update own opportunity"    ON public.opportunities FOR UPDATE USING (auth.uid() = posted_by);
-CREATE POLICY "Poster can delete own opportunity"    ON public.opportunities FOR DELETE USING (auth.uid() = posted_by);
+DO $$ BEGIN
+  CREATE POLICY "Anyone can view active opportunities" ON public.opportunities FOR SELECT USING (status = 'active');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster can insert own opportunity"    ON public.opportunities FOR INSERT WITH CHECK (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster can update own opportunity"    ON public.opportunities FOR UPDATE USING (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster can delete own opportunity"    ON public.opportunities FOR DELETE USING (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── applications ──────────────────────────────────────────
-CREATE POLICY "Applicant views own applications"         ON public.applications FOR SELECT USING (auth.uid() = applicant_id);
-CREATE POLICY "Applicant submits application"            ON public.applications FOR INSERT WITH CHECK (auth.uid() = applicant_id);
-CREATE POLICY "Applicant can withdraw application"       ON public.applications FOR DELETE USING (auth.uid() = applicant_id);
-CREATE POLICY "Poster views applications on own listings" ON public.applications FOR SELECT USING (EXISTS (SELECT 1 FROM public.opportunities o WHERE o.id = applications.opportunity_id AND o.posted_by = auth.uid()));
-CREATE POLICY "Poster updates application status"        ON public.applications FOR UPDATE USING (EXISTS (SELECT 1 FROM public.opportunities o WHERE o.id = applications.opportunity_id AND o.posted_by = auth.uid()));
+DO $$ BEGIN
+  CREATE POLICY "Applicant views own applications"          ON public.applications FOR SELECT USING (auth.uid() = applicant_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Applicant submits application"             ON public.applications FOR INSERT WITH CHECK (auth.uid() = applicant_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Applicant can withdraw application"        ON public.applications FOR DELETE USING (auth.uid() = applicant_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster views applications on own listings" ON public.applications FOR SELECT USING (EXISTS (SELECT 1 FROM public.opportunities o WHERE o.id = applications.opportunity_id AND o.posted_by = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster updates application status"         ON public.applications FOR UPDATE USING (EXISTS (SELECT 1 FROM public.opportunities o WHERE o.id = applications.opportunity_id AND o.posted_by = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── audit_logs ────────────────────────────────────────────
-CREATE POLICY "Actors insert own audit logs"  ON public.audit_logs FOR INSERT WITH CHECK (auth.uid() = actor_id);
-CREATE POLICY "Admins read all audit logs"    ON public.audit_logs FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
-CREATE POLICY "SETA reads audit logs"         ON public.audit_logs FOR SELECT TO authenticated USING (has_role(auth.uid(), 'seta'));
-CREATE POLICY "Government reads audit logs"   ON public.audit_logs FOR SELECT TO authenticated USING (has_role(auth.uid(), 'government'));
-CREATE POLICY "Users read own audit trail"    ON public.audit_logs FOR SELECT TO authenticated USING (auth.uid() = actor_id);
+DO $$ BEGIN
+  CREATE POLICY "Actors insert own audit logs"  ON public.audit_logs FOR INSERT WITH CHECK (auth.uid() = actor_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins read all audit logs"    ON public.audit_logs FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "SETA reads audit logs"         ON public.audit_logs FOR SELECT TO authenticated USING (has_role(auth.uid(), 'seta'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Government reads audit logs"   ON public.audit_logs FOR SELECT TO authenticated USING (has_role(auth.uid(), 'government'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users read own audit trail"    ON public.audit_logs FOR SELECT TO authenticated USING (auth.uid() = actor_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── document_vault ────────────────────────────────────────
-CREATE POLICY "Users view own documents"          ON public.document_vault FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users insert own documents"        ON public.document_vault FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users delete own pending documents" ON public.document_vault FOR DELETE USING (auth.uid() = user_id AND status = 'pending');
-CREATE POLICY "Admins view all documents"         ON public.document_vault FOR SELECT USING (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'seta'));
-CREATE POLICY "Admins update document status"     ON public.document_vault FOR UPDATE USING (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'seta'));
+DO $$ BEGIN
+  CREATE POLICY "Users view own documents"           ON public.document_vault FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users insert own documents"         ON public.document_vault FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users delete own pending documents" ON public.document_vault FOR DELETE USING (auth.uid() = user_id AND status = 'pending');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins view all documents"          ON public.document_vault FOR SELECT USING (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'seta'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins update document status"      ON public.document_vault FOR UPDATE USING (has_role(auth.uid(), 'admin') OR has_role(auth.uid(), 'seta'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── practitioner_accreditations ───────────────────────────
-CREATE POLICY "Users view own accreditations"                ON public.practitioner_accreditations FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users insert own accreditations"              ON public.practitioner_accreditations FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own accreditations"              ON public.practitioner_accreditations FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Users delete own accreditations"              ON public.practitioner_accreditations FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Authenticated users view active accreditations" ON public.practitioner_accreditations FOR SELECT TO authenticated USING (status = 'active');
-CREATE POLICY "Admins manage all accreditations"             ON public.practitioner_accreditations FOR ALL USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Users view own accreditations"                 ON public.practitioner_accreditations FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users insert own accreditations"               ON public.practitioner_accreditations FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users update own accreditations"               ON public.practitioner_accreditations FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users delete own accreditations"               ON public.practitioner_accreditations FOR DELETE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Authenticated users view active accreditations" ON public.practitioner_accreditations FOR SELECT TO authenticated USING (status = 'active');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage all accreditations"              ON public.practitioner_accreditations FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── accreditation_qualifications ──────────────────────────
-CREATE POLICY "Users view own qualifications"   ON public.accreditation_qualifications FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users insert own qualifications" ON public.accreditation_qualifications FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users delete own qualifications" ON public.accreditation_qualifications FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Admins manage qualifications"    ON public.accreditation_qualifications FOR ALL USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Users view own qualifications"   ON public.accreditation_qualifications FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users insert own qualifications" ON public.accreditation_qualifications FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users delete own qualifications" ON public.accreditation_qualifications FOR DELETE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage qualifications"    ON public.accreditation_qualifications FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── practitioner_listings ─────────────────────────────────
-CREATE POLICY "Public view active practitioner listings" ON public.practitioner_listings FOR SELECT TO authenticated USING (status = 'active');
-CREATE POLICY "Owner manages own listing"                ON public.practitioner_listings FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Admins manage practitioner listings"      ON public.practitioner_listings FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Public view active practitioner listings" ON public.practitioner_listings FOR SELECT TO authenticated USING (status = 'active');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Owner manages own listing"                ON public.practitioner_listings FOR ALL TO authenticated USING (auth.uid() = user_id) WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage practitioner listings"      ON public.practitioner_listings FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── practitioner_listing_accreds ──────────────────────────
-CREATE POLICY "Public view practitioner listing accreds"  ON public.practitioner_listing_accreds FOR SELECT TO authenticated USING (true);
-CREATE POLICY "Admins manage practitioner listing accreds" ON public.practitioner_listing_accreds FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Public view practitioner listing accreds"  ON public.practitioner_listing_accreds FOR SELECT TO authenticated USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage practitioner listing accreds" ON public.practitioner_listing_accreds FOR ALL TO authenticated USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── provider_listings ─────────────────────────────────────
-CREATE POLICY "Anyone views active provider listings" ON public.provider_listings FOR SELECT USING (status = 'active');
-CREATE POLICY "Owner views own listings"              ON public.provider_listings FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Owner inserts listing"                 ON public.provider_listings FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Owner updates listing"                 ON public.provider_listings FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Owner deletes listing"                 ON public.provider_listings FOR DELETE USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Anyone views active provider listings" ON public.provider_listings FOR SELECT USING (status = 'active');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Owner views own listings"              ON public.provider_listings FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Owner inserts listing"                 ON public.provider_listings FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Owner updates listing"                 ON public.provider_listings FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Owner deletes listing"                 ON public.provider_listings FOR DELETE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── provider_reviews ──────────────────────────────────────
-CREATE POLICY "Anyone views reviews"            ON public.provider_reviews FOR SELECT USING (true);
-CREATE POLICY "Authenticated users add reviews" ON public.provider_reviews FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
-CREATE POLICY "Reviewer deletes own review"     ON public.provider_reviews FOR DELETE USING (auth.uid() = reviewer_id);
+DO $$ BEGIN
+  CREATE POLICY "Anyone views reviews"            ON public.provider_reviews FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Authenticated users add reviews" ON public.provider_reviews FOR INSERT WITH CHECK (auth.uid() = reviewer_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Reviewer deletes own review"     ON public.provider_reviews FOR DELETE USING (auth.uid() = reviewer_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── rfqs ──────────────────────────────────────────────────
-CREATE POLICY "Buyer manages own RFQs"  ON public.rfqs FOR ALL  USING (auth.uid() = buyer_id);
-CREATE POLICY "Providers view open RFQs" ON public.rfqs FOR SELECT USING (status = 'open');
+DO $$ BEGIN
+  CREATE POLICY "Buyer manages own RFQs"   ON public.rfqs FOR ALL    USING (auth.uid() = buyer_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Providers view open RFQs" ON public.rfqs FOR SELECT USING (status = 'open');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── rfq_responses ─────────────────────────────────────────
-CREATE POLICY "Provider manages own responses"      ON public.rfq_responses FOR ALL    USING (auth.uid() = provider_id);
-CREATE POLICY "Buyer views responses to own RFQs"  ON public.rfq_responses FOR SELECT USING (EXISTS (SELECT 1 FROM public.rfqs r WHERE r.id = rfq_responses.rfq_id AND r.buyer_id = auth.uid()));
-CREATE POLICY "Buyer updates response status"       ON public.rfq_responses FOR UPDATE USING (EXISTS (SELECT 1 FROM public.rfqs r WHERE r.id = rfq_responses.rfq_id AND r.buyer_id = auth.uid()));
+DO $$ BEGIN
+  CREATE POLICY "Provider manages own responses"     ON public.rfq_responses FOR ALL    USING (auth.uid() = provider_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Buyer views responses to own RFQs"  ON public.rfq_responses FOR SELECT USING (EXISTS (SELECT 1 FROM public.rfqs r WHERE r.id = rfq_responses.rfq_id AND r.buyer_id = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Buyer updates response status"      ON public.rfq_responses FOR UPDATE USING (EXISTS (SELECT 1 FROM public.rfqs r WHERE r.id = rfq_responses.rfq_id AND r.buyer_id = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── funding_opportunities ─────────────────────────────────
-CREATE POLICY "Public view open funding opportunities"    ON public.funding_opportunities FOR SELECT USING (status = 'open');
-CREATE POLICY "Sponsor views own funding opportunities"   ON public.funding_opportunities FOR SELECT USING (auth.uid() = sponsor_id);
-CREATE POLICY "Sponsor inserts own funding opportunities" ON public.funding_opportunities FOR INSERT WITH CHECK (auth.uid() = sponsor_id);
-CREATE POLICY "Sponsor updates own funding opportunities" ON public.funding_opportunities FOR UPDATE USING (auth.uid() = sponsor_id);
-CREATE POLICY "Sponsor deletes own funding opportunities" ON public.funding_opportunities FOR DELETE USING (auth.uid() = sponsor_id);
-CREATE POLICY "Admins manage all funding opportunities"   ON public.funding_opportunities FOR ALL   USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Public view open funding opportunities"    ON public.funding_opportunities FOR SELECT USING (status = 'open');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor views own funding opportunities"   ON public.funding_opportunities FOR SELECT USING (auth.uid() = sponsor_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor inserts own funding opportunities" ON public.funding_opportunities FOR INSERT WITH CHECK (auth.uid() = sponsor_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor updates own funding opportunities" ON public.funding_opportunities FOR UPDATE USING (auth.uid() = sponsor_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor deletes own funding opportunities" ON public.funding_opportunities FOR DELETE USING (auth.uid() = sponsor_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage all funding opportunities"   ON public.funding_opportunities FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── eoi_submissions ───────────────────────────────────────
-CREATE POLICY "Provider views own EOIs"             ON public.eoi_submissions FOR SELECT USING (auth.uid() = provider_id);
-CREATE POLICY "Provider submits EOI"                ON public.eoi_submissions FOR INSERT WITH CHECK (auth.uid() = provider_id);
-CREATE POLICY "Provider updates own pending EOI"    ON public.eoi_submissions FOR UPDATE USING (auth.uid() = provider_id AND status = 'pending');
-CREATE POLICY "Provider withdraws own pending EOI"  ON public.eoi_submissions FOR DELETE USING (auth.uid() = provider_id AND status = 'pending');
-CREATE POLICY "Sponsor views EOIs on own opportunities" ON public.eoi_submissions FOR SELECT USING (EXISTS (SELECT 1 FROM public.funding_opportunities fo WHERE fo.id = eoi_submissions.funding_opp_id AND fo.sponsor_id = auth.uid()));
-CREATE POLICY "Sponsor updates EOI status on own opportunities" ON public.eoi_submissions FOR UPDATE USING (EXISTS (SELECT 1 FROM public.funding_opportunities fo WHERE fo.id = eoi_submissions.funding_opp_id AND fo.sponsor_id = auth.uid()));
-CREATE POLICY "Admins manage all EOIs"              ON public.eoi_submissions FOR ALL USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Provider views own EOIs"                         ON public.eoi_submissions FOR SELECT USING (auth.uid() = provider_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Provider submits EOI"                            ON public.eoi_submissions FOR INSERT WITH CHECK (auth.uid() = provider_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Provider updates own pending EOI"                ON public.eoi_submissions FOR UPDATE USING (auth.uid() = provider_id AND status = 'pending');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Provider withdraws own pending EOI"              ON public.eoi_submissions FOR DELETE USING (auth.uid() = provider_id AND status = 'pending');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor views EOIs on own opportunities"         ON public.eoi_submissions FOR SELECT USING (EXISTS (SELECT 1 FROM public.funding_opportunities fo WHERE fo.id = eoi_submissions.funding_opp_id AND fo.sponsor_id = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor updates EOI status on own opportunities" ON public.eoi_submissions FOR UPDATE USING (EXISTS (SELECT 1 FROM public.funding_opportunities fo WHERE fo.id = eoi_submissions.funding_opp_id AND fo.sponsor_id = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage all EOIs"                          ON public.eoi_submissions FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── sponsor_profiles ──────────────────────────────────────
-CREATE POLICY "Public view published sponsor profiles" ON public.sponsor_profiles FOR SELECT USING (is_public = true);
-CREATE POLICY "Sponsor views own profile"              ON public.sponsor_profiles FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Sponsor inserts own profile"            ON public.sponsor_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Sponsor updates own profile"            ON public.sponsor_profiles FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Sponsor deletes own profile"            ON public.sponsor_profiles FOR DELETE USING (auth.uid() = user_id);
-CREATE POLICY "Admins manage all sponsor profiles"     ON public.sponsor_profiles FOR ALL   USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Public view published sponsor profiles" ON public.sponsor_profiles FOR SELECT USING (is_public = true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor views own profile"              ON public.sponsor_profiles FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor inserts own profile"            ON public.sponsor_profiles FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor updates own profile"            ON public.sponsor_profiles FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Sponsor deletes own profile"            ON public.sponsor_profiles FOR DELETE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage all sponsor profiles"     ON public.sponsor_profiles FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── micro_tasks ───────────────────────────────────────────
-CREATE POLICY "Poster inserts own micro_task"    ON public.micro_tasks FOR INSERT WITH CHECK (auth.uid() = posted_by);
-CREATE POLICY "Poster updates own micro_task"    ON public.micro_tasks FOR UPDATE USING (auth.uid() = posted_by);
-CREATE POLICY "Poster deletes own micro_task"    ON public.micro_tasks FOR DELETE USING (auth.uid() = posted_by);
-CREATE POLICY "Poster views own tasks"           ON public.micro_tasks FOR SELECT TO authenticated USING (auth.uid() = posted_by);
-CREATE POLICY "Learners browse available tasks"  ON public.micro_tasks FOR SELECT TO authenticated USING ((status = 'active') OR (status = 'available' AND has_role(auth.uid(), 'learner')));
-CREATE POLICY "Admins view all micro_tasks"      ON public.micro_tasks FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Poster inserts own micro_task"    ON public.micro_tasks FOR INSERT WITH CHECK (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster updates own micro_task"    ON public.micro_tasks FOR UPDATE USING (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster deletes own micro_task"    ON public.micro_tasks FOR DELETE USING (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster views own tasks"           ON public.micro_tasks FOR SELECT TO authenticated USING (auth.uid() = posted_by);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Learners browse available tasks"  ON public.micro_tasks FOR SELECT TO authenticated USING ((status = 'active') OR (status = 'available' AND has_role(auth.uid(), 'learner')));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins view all micro_tasks"      ON public.micro_tasks FOR SELECT TO authenticated USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── task_submissions ──────────────────────────────────────
-CREATE POLICY "Worker inserts own submission"             ON public.task_submissions FOR INSERT WITH CHECK (auth.uid() = worker_id);
-CREATE POLICY "Worker updates in_progress submission"     ON public.task_submissions FOR UPDATE USING (auth.uid() = worker_id);
-CREATE POLICY "Worker views own submissions"              ON public.task_submissions FOR SELECT USING (auth.uid() = worker_id);
-CREATE POLICY "Poster views submissions on own tasks"     ON public.task_submissions FOR SELECT USING (EXISTS (SELECT 1 FROM public.micro_tasks t WHERE t.id = task_submissions.task_id AND t.posted_by = auth.uid()));
-CREATE POLICY "Poster reviews submissions on own tasks"   ON public.task_submissions FOR UPDATE USING (EXISTS (SELECT 1 FROM public.micro_tasks t WHERE t.id = task_submissions.task_id AND t.posted_by = auth.uid()));
+DO $$ BEGIN
+  CREATE POLICY "Worker inserts own submission"           ON public.task_submissions FOR INSERT WITH CHECK (auth.uid() = worker_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Worker updates in_progress submission"   ON public.task_submissions FOR UPDATE USING (auth.uid() = worker_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Worker views own submissions"            ON public.task_submissions FOR SELECT USING (auth.uid() = worker_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster views submissions on own tasks"   ON public.task_submissions FOR SELECT USING (EXISTS (SELECT 1 FROM public.micro_tasks t WHERE t.id = task_submissions.task_id AND t.posted_by = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster reviews submissions on own tasks" ON public.task_submissions FOR UPDATE USING (EXISTS (SELECT 1 FROM public.micro_tasks t WHERE t.id = task_submissions.task_id AND t.posted_by = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── task_ratings ──────────────────────────────────────────
-CREATE POLICY "Anyone views task ratings"         ON public.task_ratings FOR SELECT USING (true);
-CREATE POLICY "Authenticated users create ratings" ON public.task_ratings FOR INSERT WITH CHECK (auth.uid() = rater_id);
+DO $$ BEGIN
+  CREATE POLICY "Anyone views task ratings"          ON public.task_ratings FOR SELECT USING (true);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Authenticated users create ratings" ON public.task_ratings FOR INSERT WITH CHECK (auth.uid() = rater_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── match_results ─────────────────────────────────────────
-CREATE POLICY "Users view own matches"   ON public.match_results FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users upsert own matches" ON public.match_results FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own matches" ON public.match_results FOR UPDATE USING (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users view own matches"   ON public.match_results FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users upsert own matches" ON public.match_results FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users update own matches" ON public.match_results FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── payment_transactions ──────────────────────────────────
-CREATE POLICY "Users view own transactions" ON public.payment_transactions FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Service inserts transactions" ON public.payment_transactions FOR INSERT WITH CHECK (auth.uid() = user_id);
+DO $$ BEGIN
+  CREATE POLICY "Users view own transactions"  ON public.payment_transactions FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Service inserts transactions" ON public.payment_transactions FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── withdrawal_requests ───────────────────────────────────
-CREATE POLICY "Users view own withdrawals"   ON public.withdrawal_requests FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users insert own withdrawals" ON public.withdrawal_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own withdrawals" ON public.withdrawal_requests FOR UPDATE USING (auth.uid() = user_id AND status = 'pending');
+DO $$ BEGIN
+  CREATE POLICY "Users view own withdrawals"   ON public.withdrawal_requests FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users insert own withdrawals" ON public.withdrawal_requests FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users update own withdrawals" ON public.withdrawal_requests FOR UPDATE USING (auth.uid() = user_id AND status = 'pending');
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── reports ───────────────────────────────────────────────
-CREATE POLICY "Users view own reports"   ON public.reports FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Users create own reports" ON public.reports FOR INSERT WITH CHECK (auth.uid() = user_id);
-CREATE POLICY "Users update own reports" ON public.reports FOR UPDATE USING (auth.uid() = user_id);
-CREATE POLICY "Admins manage all reports" ON public.reports FOR ALL USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Users view own reports"    ON public.reports FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users create own reports"  ON public.reports FOR INSERT WITH CHECK (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Users update own reports"  ON public.reports FOR UPDATE USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage all reports" ON public.reports FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
 
 -- ── company_participants ──────────────────────────────────
-CREATE POLICY "Participant views own record"               ON public.company_participants FOR SELECT USING (auth.uid() = user_id);
-CREATE POLICY "Poster manages participants on own opportunity" ON public.company_participants FOR ALL USING (EXISTS (SELECT 1 FROM public.opportunities o WHERE o.id = company_participants.opportunity_id AND o.posted_by = auth.uid()));
-CREATE POLICY "Admins manage all participants"             ON public.company_participants FOR ALL USING (has_role(auth.uid(), 'admin'));
+DO $$ BEGIN
+  CREATE POLICY "Participant views own record"                  ON public.company_participants FOR SELECT USING (auth.uid() = user_id);
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Poster manages participants on own opportunity" ON public.company_participants FOR ALL USING (EXISTS (SELECT 1 FROM public.opportunities o WHERE o.id = company_participants.opportunity_id AND o.posted_by = auth.uid()));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+DO $$ BEGIN
+  CREATE POLICY "Admins manage all participants"                ON public.company_participants FOR ALL USING (has_role(auth.uid(), 'admin'));
+EXCEPTION WHEN duplicate_object THEN NULL; END $$;
+
+-- ============================================================
+-- TRIGGERS (re-attach after fresh import)
+-- ============================================================
+
+-- Auto-create profile + subscription on new auth user signup
+DROP TRIGGER IF EXISTS on_auth_user_created ON auth.users;
+CREATE TRIGGER on_auth_user_created
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
+
+-- Auto-create wallet on new auth user signup
+DROP TRIGGER IF EXISTS on_auth_user_wallet ON auth.users;
+CREATE TRIGGER on_auth_user_wallet
+  AFTER INSERT ON auth.users
+  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user_wallet();
+
+-- Auto-increment opportunity applications counter
+DROP TRIGGER IF EXISTS trg_inc_applications ON public.applications;
+CREATE TRIGGER trg_inc_applications
+  AFTER INSERT ON public.applications
+  FOR EACH ROW EXECUTE FUNCTION public.increment_opportunity_applications();
+
+DROP TRIGGER IF EXISTS trg_dec_applications ON public.applications;
+CREATE TRIGGER trg_dec_applications
+  AFTER DELETE ON public.applications
+  FOR EACH ROW EXECUTE FUNCTION public.decrement_opportunity_applications();
+
+-- Validate provider review rating (1–5)
+DROP TRIGGER IF EXISTS trg_validate_review_rating ON public.provider_reviews;
+CREATE TRIGGER trg_validate_review_rating
+  BEFORE INSERT OR UPDATE ON public.provider_reviews
+  FOR EACH ROW EXECUTE FUNCTION public.validate_review_rating();
+
+-- Recalculate listing rating avg on review insert/delete
+DROP TRIGGER IF EXISTS trg_update_listing_rating ON public.provider_reviews;
+CREATE TRIGGER trg_update_listing_rating
+  AFTER INSERT OR DELETE ON public.provider_reviews
+  FOR EACH ROW EXECUTE FUNCTION public.update_listing_rating();
+
+-- Auto-update updated_at columns
+DROP TRIGGER IF EXISTS set_updated_at_profiles                    ON public.profiles;
+CREATE TRIGGER set_updated_at_profiles                    BEFORE UPDATE ON public.profiles                    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_subscriptions               ON public.subscriptions;
+CREATE TRIGGER set_updated_at_subscriptions               BEFORE UPDATE ON public.subscriptions               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_wallets                     ON public.wallets;
+CREATE TRIGGER set_updated_at_wallets                     BEFORE UPDATE ON public.wallets                     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_opportunities               ON public.opportunities;
+CREATE TRIGGER set_updated_at_opportunities               BEFORE UPDATE ON public.opportunities               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_applications                ON public.applications;
+CREATE TRIGGER set_updated_at_applications                BEFORE UPDATE ON public.applications                FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_document_vault              ON public.document_vault;
+CREATE TRIGGER set_updated_at_document_vault              BEFORE UPDATE ON public.document_vault              FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_practitioner_accreditations ON public.practitioner_accreditations;
+CREATE TRIGGER set_updated_at_practitioner_accreditations BEFORE UPDATE ON public.practitioner_accreditations FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_practitioner_listings       ON public.practitioner_listings;
+CREATE TRIGGER set_updated_at_practitioner_listings       BEFORE UPDATE ON public.practitioner_listings       FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_provider_listings           ON public.provider_listings;
+CREATE TRIGGER set_updated_at_provider_listings           BEFORE UPDATE ON public.provider_listings           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_rfqs                        ON public.rfqs;
+CREATE TRIGGER set_updated_at_rfqs                        BEFORE UPDATE ON public.rfqs                        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_rfq_responses               ON public.rfq_responses;
+CREATE TRIGGER set_updated_at_rfq_responses               BEFORE UPDATE ON public.rfq_responses               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_funding_opportunities       ON public.funding_opportunities;
+CREATE TRIGGER set_updated_at_funding_opportunities       BEFORE UPDATE ON public.funding_opportunities       FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_eoi_submissions             ON public.eoi_submissions;
+CREATE TRIGGER set_updated_at_eoi_submissions             BEFORE UPDATE ON public.eoi_submissions             FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_sponsor_profiles            ON public.sponsor_profiles;
+CREATE TRIGGER set_updated_at_sponsor_profiles            BEFORE UPDATE ON public.sponsor_profiles            FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_micro_tasks                 ON public.micro_tasks;
+CREATE TRIGGER set_updated_at_micro_tasks                 BEFORE UPDATE ON public.micro_tasks                 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_task_submissions            ON public.task_submissions;
+CREATE TRIGGER set_updated_at_task_submissions            BEFORE UPDATE ON public.task_submissions            FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_match_results               ON public.match_results;
+CREATE TRIGGER set_updated_at_match_results               BEFORE UPDATE ON public.match_results               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_payment_transactions        ON public.payment_transactions;
+CREATE TRIGGER set_updated_at_payment_transactions        BEFORE UPDATE ON public.payment_transactions        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_withdrawal_requests         ON public.withdrawal_requests;
+CREATE TRIGGER set_updated_at_withdrawal_requests         BEFORE UPDATE ON public.withdrawal_requests         FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_reports                     ON public.reports;
+CREATE TRIGGER set_updated_at_reports                     BEFORE UPDATE ON public.reports                     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_company_participants        ON public.company_participants;
+CREATE TRIGGER set_updated_at_company_participants        BEFORE UPDATE ON public.company_participants        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
+DROP TRIGGER IF EXISTS set_updated_at_regulatory_bodies           ON public.regulatory_bodies;
+CREATE TRIGGER set_updated_at_regulatory_bodies           BEFORE UPDATE ON public.regulatory_bodies           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ============================================================
 -- SEED DATA — ADMIN USER
@@ -777,26 +1087,26 @@ CREATE POLICY "Admins manage all participants"             ON public.company_par
 --
 -- ⚠️  IMPORTANT — HOW TO CREATE AN ADMIN USER:
 --
---  Supabase manages authentication in the internal `auth.users` table,
---  which CANNOT be inserted into via plain SQL in the dashboard SQL editor.
---  You must create the auth user first, then run the seed below.
+--  Authentication manages users internally and they CANNOT be
+--  inserted into via plain SQL. You must create the auth user
+--  first, then run the seed below.
 --
 --  STEP 1 — Create the auth user (choose ONE method):
 --
---    A) Via Supabase Dashboard (recommended):
---       → Authentication → Users → "Add user"
+--    A) Via the Lovable Cloud backend (recommended):
+--       → Open Backend → Authentication → Users → "Add user"
 --       → Enter email + password (e.g. admin@yourdomain.com / AdminPass123!)
 --       → Copy the generated UUID shown in the Users table
 --
---    B) Via Supabase CLI or API:
+--    B) Via API:
 --       curl -X POST 'https://<project-ref>.supabase.co/auth/v1/signup' \
 --         -H "apikey: <anon-key>" \
 --         -H "Content-Type: application/json" \
 --         -d '{"email":"admin@yourdomain.com","password":"AdminPass123!"}'
 --       → Copy the returned `id` UUID
 --
---  STEP 2 — Replace the UUID below with your real user UUID, then run
---           this entire block in the SQL editor:
+--  STEP 2 — Replace the UUID below with your real user UUID,
+--           then run this DO block in the SQL editor:
 --
 -- ============================================================
 
@@ -822,8 +1132,8 @@ BEGIN
   INSERT INTO public.subscriptions (user_id, plan, is_active, trial_ends_at)
   VALUES (v_admin_id, 'enterprise', true, NULL)
   ON CONFLICT (user_id) DO UPDATE
-    SET plan       = 'enterprise',
-        is_active  = true,
+    SET plan          = 'enterprise',
+        is_active     = true,
         trial_ends_at = NULL;
 
   -- Wallet
@@ -852,63 +1162,6 @@ END $$;
 --                  support_provider | admin | seta | government |
 --                  fundi | employer
 -- ============================================================
-
--- ============================================================
--- TRIGGERS (re-attach after fresh import)
--- ============================================================
-
--- Auto-create profile + subscription on new auth user signup
-CREATE OR REPLACE TRIGGER on_auth_user_created
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user();
-
--- Auto-create wallet on new auth user signup
-CREATE OR REPLACE TRIGGER on_auth_user_wallet
-  AFTER INSERT ON auth.users
-  FOR EACH ROW EXECUTE FUNCTION public.handle_new_user_wallet();
-
--- Auto-increment opportunity applications counter
-CREATE OR REPLACE TRIGGER trg_inc_applications
-  AFTER INSERT ON public.applications
-  FOR EACH ROW EXECUTE FUNCTION public.increment_opportunity_applications();
-
-CREATE OR REPLACE TRIGGER trg_dec_applications
-  AFTER DELETE ON public.applications
-  FOR EACH ROW EXECUTE FUNCTION public.decrement_opportunity_applications();
-
--- Validate provider review rating (1–5)
-CREATE OR REPLACE TRIGGER trg_validate_review_rating
-  BEFORE INSERT OR UPDATE ON public.provider_reviews
-  FOR EACH ROW EXECUTE FUNCTION public.validate_review_rating();
-
--- Recalculate listing rating avg on review insert/delete
-CREATE OR REPLACE TRIGGER trg_update_listing_rating
-  AFTER INSERT OR DELETE ON public.provider_reviews
-  FOR EACH ROW EXECUTE FUNCTION public.update_listing_rating();
-
--- Auto-update updated_at columns
-CREATE OR REPLACE TRIGGER set_updated_at_profiles                    BEFORE UPDATE ON public.profiles                    FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_subscriptions               BEFORE UPDATE ON public.subscriptions               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_wallets                     BEFORE UPDATE ON public.wallets                     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_opportunities               BEFORE UPDATE ON public.opportunities               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_applications                BEFORE UPDATE ON public.applications                FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_document_vault              BEFORE UPDATE ON public.document_vault              FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_practitioner_accreditations BEFORE UPDATE ON public.practitioner_accreditations FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_practitioner_listings       BEFORE UPDATE ON public.practitioner_listings       FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_provider_listings           BEFORE UPDATE ON public.provider_listings           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_rfqs                        BEFORE UPDATE ON public.rfqs                        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_rfq_responses               BEFORE UPDATE ON public.rfq_responses               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_funding_opportunities       BEFORE UPDATE ON public.funding_opportunities       FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_eoi_submissions             BEFORE UPDATE ON public.eoi_submissions             FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_sponsor_profiles            BEFORE UPDATE ON public.sponsor_profiles            FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_micro_tasks                 BEFORE UPDATE ON public.micro_tasks                 FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_task_submissions            BEFORE UPDATE ON public.task_submissions            FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_match_results               BEFORE UPDATE ON public.match_results               FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_payment_transactions        BEFORE UPDATE ON public.payment_transactions        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_withdrawal_requests         BEFORE UPDATE ON public.withdrawal_requests         FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_reports                     BEFORE UPDATE ON public.reports                     FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_company_participants        BEFORE UPDATE ON public.company_participants        FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
-CREATE OR REPLACE TRIGGER set_updated_at_regulatory_bodies           BEFORE UPDATE ON public.regulatory_bodies           FOR EACH ROW EXECUTE FUNCTION public.update_updated_at_column();
 
 -- ============================================================
 -- END OF SCHEMA
