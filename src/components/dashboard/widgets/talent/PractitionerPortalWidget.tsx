@@ -550,8 +550,6 @@ export function PractitionerPortalWidget() {
   // Sharing state
   const [approveReq, setApproveReq] = useState<SharingRequest | null>(null);
 
-  if (!user) return null;
-
   // ─── Queries ────────────────────────────────────────────────────────────────
 
   const { data: profile } = useQuery({
