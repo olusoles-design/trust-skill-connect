@@ -14,6 +14,75 @@ export type Database = {
   }
   public: {
     Tables: {
+      academic_credentials: {
+        Row: {
+          completion_year: number | null
+          created_at: string
+          document_url: string | null
+          field_of_study: string | null
+          id: string
+          institution: string
+          qualification_type: string
+          shareable: boolean
+          status: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          completion_year?: number | null
+          created_at?: string
+          document_url?: string | null
+          field_of_study?: string | null
+          id?: string
+          institution: string
+          qualification_type: string
+          shareable?: boolean
+          status?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          completion_year?: number | null
+          created_at?: string
+          document_url?: string | null
+          field_of_study?: string | null
+          id?: string
+          institution?: string
+          qualification_type?: string
+          shareable?: boolean
+          status?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      access_logs: {
+        Row: {
+          access_token: string
+          action: string
+          created_at: string
+          id: string
+          metadata: Json
+          viewer_id: string | null
+        }
+        Insert: {
+          access_token: string
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          viewer_id?: string | null
+        }
+        Update: {
+          access_token?: string
+          action?: string
+          created_at?: string
+          id?: string
+          metadata?: Json
+          viewer_id?: string | null
+        }
+        Relationships: []
+      }
       accreditation_qualifications: {
         Row: {
           accreditation_id: string
@@ -462,6 +531,39 @@ export type Database = {
         }
         Relationships: []
       }
+      notifications: {
+        Row: {
+          body: string | null
+          created_at: string
+          data: Json
+          id: string
+          read_at: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Insert: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          read_at?: string | null
+          title: string
+          type: string
+          user_id: string
+        }
+        Update: {
+          body?: string | null
+          created_at?: string
+          data?: Json
+          id?: string
+          read_at?: string | null
+          title?: string
+          type?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       opportunities: {
         Row: {
           applications: number
@@ -606,6 +708,7 @@ export type Database = {
           registration_number: string | null
           role_type: string
           seta_body: string
+          shareable: boolean
           status: string
           updated_at: string
           user_id: string
@@ -621,6 +724,7 @@ export type Database = {
           registration_number?: string | null
           role_type: string
           seta_body: string
+          shareable?: boolean
           status?: string
           updated_at?: string
           user_id: string
@@ -636,6 +740,7 @@ export type Database = {
           registration_number?: string | null
           role_type?: string
           seta_body?: string
+          shareable?: boolean
           status?: string
           updated_at?: string
           user_id?: string
@@ -781,6 +886,7 @@ export type Database = {
           location: string | null
           nqf_level: string | null
           phone: string | null
+          sharing_settings: Json
           skills: string[] | null
           updated_at: string
           user_id: string
@@ -804,6 +910,7 @@ export type Database = {
           location?: string | null
           nqf_level?: string | null
           phone?: string | null
+          sharing_settings?: Json
           skills?: string[] | null
           updated_at?: string
           user_id: string
@@ -827,6 +934,7 @@ export type Database = {
           location?: string | null
           nqf_level?: string | null
           phone?: string | null
+          sharing_settings?: Json
           skills?: string[] | null
           updated_at?: string
           user_id?: string
@@ -1145,6 +1253,83 @@ export type Database = {
         }
         Relationships: []
       }
+      shared_access: {
+        Row: {
+          access_token: string
+          created_at: string
+          document_urls: Json
+          expiry: string
+          id: string
+          request_id: string
+          watermark: boolean
+        }
+        Insert: {
+          access_token?: string
+          created_at?: string
+          document_urls?: Json
+          expiry: string
+          id?: string
+          request_id: string
+          watermark?: boolean
+        }
+        Update: {
+          access_token?: string
+          created_at?: string
+          document_urls?: Json
+          expiry?: string
+          id?: string
+          request_id?: string
+          watermark?: boolean
+        }
+        Relationships: [
+          {
+            foreignKeyName: "shared_access_request_id_fkey"
+            columns: ["request_id"]
+            isOneToOne: false
+            referencedRelation: "sharing_requests"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      sharing_requests: {
+        Row: {
+          access_expiry: string | null
+          approved_at: string | null
+          created_at: string
+          id: string
+          message: string
+          practitioner_id: string
+          requested_types: Json
+          requester_id: string
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          access_expiry?: string | null
+          approved_at?: string | null
+          created_at?: string
+          id?: string
+          message: string
+          practitioner_id: string
+          requested_types?: Json
+          requester_id: string
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          access_expiry?: string | null
+          approved_at?: string | null
+          created_at?: string
+          id?: string
+          message?: string
+          practitioner_id?: string
+          requested_types?: Json
+          requester_id?: string
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
       sponsor_profiles: {
         Row: {
           annual_budget: string | null
@@ -1356,6 +1541,48 @@ export type Database = {
           id?: string
           role?: Database["public"]["Enums"]["app_role"]
           user_id?: string
+        }
+        Relationships: []
+      }
+      vendor_credentials: {
+        Row: {
+          certification_name: string
+          created_at: string
+          credential_id: string | null
+          document_url: string | null
+          expiry_date: string | null
+          id: string
+          issue_date: string | null
+          shareable: boolean
+          updated_at: string
+          user_id: string
+          vendor: string
+        }
+        Insert: {
+          certification_name: string
+          created_at?: string
+          credential_id?: string | null
+          document_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          shareable?: boolean
+          updated_at?: string
+          user_id: string
+          vendor: string
+        }
+        Update: {
+          certification_name?: string
+          created_at?: string
+          credential_id?: string | null
+          document_url?: string | null
+          expiry_date?: string | null
+          id?: string
+          issue_date?: string | null
+          shareable?: boolean
+          updated_at?: string
+          user_id?: string
+          vendor?: string
         }
         Relationships: []
       }

@@ -67,6 +67,7 @@ export type Capability =
   | "manage_sponsor_profile"       // Sponsor manages their own directory listing
   | "browse_sponsor_directory"    // Learners/providers browse the sponsor directory
   | "browse_practitioner_directory" // Any authenticated user finds registered practitioners
+  | "practitioner_portal"           // Enhanced practitioner portal with all credential management
   | "view_audit_logs";              // Platform Admin / Oversight — full audit trail
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
@@ -114,6 +115,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "marketplace_discovery",
     "practitioner_accreditations",
     "upload_accreditation",
+    "practitioner_portal",
     "browse_sponsor_directory",
     "browse_practitioner_directory",
   ],
@@ -267,6 +269,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "browse_sponsor_directory",
     "browse_practitioner_directory",
     "view_audit_logs",
+    "practitioner_portal",
   ],
 };
 
@@ -337,6 +340,8 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   browse_sponsor_directory:             { minPlan: "starter" },
   // Practitioner Directory
   browse_practitioner_directory:        { minPlan: "starter" },
+  // Practitioner Portal
+  practitioner_portal:                  { minPlan: "starter" },
   // Audit Log
   view_audit_logs:                      { minPlan: "starter" },
 };

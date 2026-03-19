@@ -19,6 +19,7 @@ import { SmartContractingWidget }      from "./talent/SmartContractingWidget";
 import { PractitionerAccreditationsWidget } from "./talent/PractitionerAccreditationsWidget";
 import { AccreditationUploaderWidget }      from "./talent/AccreditationUploaderWidget";
 import { PractitionerDirectoryWidget }      from "./talent/PractitionerDirectoryWidget";
+import { PractitionerPortalWidget }         from "./talent/PractitionerPortalWidget";
 
 // ─── Business
 import { OpportunityManagerWidget }    from "./business/OpportunityManagerWidget";
@@ -326,5 +327,10 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     component: MultiCompanySponsorshipWidget, layout: "full", persona: "business",
     title: "Multi-Company Sponsorship", description: "Manage Lead, Host & Funder companies with cost-sharing and B-BBEE allocation.",
     icon: "Building2", color: "bg-primary/10", accentColor: "text-primary",
+  },
+  practitioner_portal: {
+    component: PractitionerPortalWidget, layout: "full", persona: "talent",
+    title: "Practitioner Portal", description: "Manage your professional credentials — accreditations, academic qualifications, vendor certifications and secure sharing.",
+    icon: "ShieldCheck", color: "bg-primary/10", accentColor: "text-primary",
   },
 };
