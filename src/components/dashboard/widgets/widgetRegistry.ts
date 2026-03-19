@@ -328,4 +328,9 @@ export const WIDGET_REGISTRY: Partial<Record<Capability, WidgetMeta>> = {
     title: "Multi-Company Sponsorship", description: "Manage Lead, Host & Funder companies with cost-sharing and B-BBEE allocation.",
     icon: "Building2", color: "bg-primary/10", accentColor: "text-primary",
   },
+  practitioner_portal: {
+    component: PractitionerPortalWidget, layout: "full", persona: "talent",
+    title: "Practitioner Portal", description: "Manage your professional credentials — accreditations, academic qualifications, vendor certifications and secure sharing.",
+    icon: "ShieldCheck", color: "bg-primary/10", accentColor: "text-primary",
+  },
 };
