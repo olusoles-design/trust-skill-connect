@@ -25,9 +25,8 @@ import {
 } from "@/components/ui/table";
 import {
   User, GraduationCap, Award, Share2, Bell, Plus, Pencil, Trash2,
-  FileText, ExternalLink, CheckCircle2, XCircle, Clock, Eye,
-  Download, ShieldCheck, Upload, Settings, Loader2, RefreshCw,
-  Calendar, Building2, Hash, Globe, ChevronDown,
+  FileText, CheckCircle2, XCircle, Upload, Loader2, RefreshCw,
+  Globe, ShieldCheck,
 } from "lucide-react";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
