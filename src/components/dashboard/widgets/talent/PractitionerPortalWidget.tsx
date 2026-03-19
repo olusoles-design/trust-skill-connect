@@ -572,60 +572,69 @@ export function PractitionerPortalWidget() {
   });
 
   const { data: academic = [], refetch: refetchAcademic } = useQuery({
-    queryKey: ["academic_credentials", user.id],
+    queryKey: ["academic_credentials", user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const { data } = await (supabase.from("academic_credentials" as any) as any)
-        .select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+        .select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       return (data ?? []) as AcademicCredential[];
     },
   });
 
   const { data: vendor = [], refetch: refetchVendor } = useQuery({
-    queryKey: ["vendor_credentials", user.id],
+    queryKey: ["vendor_credentials", user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const { data } = await (supabase.from("vendor_credentials" as any) as any)
-        .select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+        .select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       return (data ?? []) as VendorCredential[];
     },
   });
 
   const { data: inboxRequests = [], refetch: refetchInbox } = useQuery({
-    queryKey: ["sharing_requests_inbox", user.id],
+    queryKey: ["sharing_requests_inbox", user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const { data } = await (supabase.from("sharing_requests" as any) as any)
-        .select("*").eq("practitioner_id", user.id).order("created_at", { ascending: false });
+        .select("*").eq("practitioner_id", user!.id).order("created_at", { ascending: false });
       return (data ?? []) as SharingRequest[];
     },
   });
 
   const { data: sentRequests = [] } = useQuery({
-    queryKey: ["sharing_requests_sent", user.id],
+    queryKey: ["sharing_requests_sent", user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const { data } = await (supabase.from("sharing_requests" as any) as any)
-        .select("*").eq("requester_id", user.id).order("created_at", { ascending: false });
+        .select("*").eq("requester_id", user!.id).order("created_at", { ascending: false });
       return (data ?? []) as SharingRequest[];
     },
   });
 
   const { data: notifications = [], refetch: refetchNotifs } = useQuery({
-    queryKey: ["notifications", user.id],
+    queryKey: ["notifications", user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const { data } = await (supabase.from("notifications" as any) as any)
-        .select("*").eq("user_id", user.id).order("created_at", { ascending: false }).limit(50);
+        .select("*").eq("user_id", user!.id).order("created_at", { ascending: false }).limit(50);
       return (data ?? []) as Notification[];
     },
   });
 
   const unreadCount = notifications.filter(n => !n.read_at).length;
 
-  // Realtime
+  // Realtime subscription
   useEffect(() => {
+    if (!user) return;
     const ch = supabase.channel("notifications_" + user.id)
       .on("postgres_changes", { event: "INSERT", schema: "public", table: "notifications", filter: `user_id=eq.${user.id}` },
         () => refetchNotifs())
       .subscribe();
     return () => { supabase.removeChannel(ch); };
-  }, [user.id, refetchNotifs]);
+  }, [user?.id, refetchNotifs]);
+
+  // Early return after all hooks
+  if (!user) return null;
 
   // ─── Profile init ──────────────────────────────────────────────────────────
 
