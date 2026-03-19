@@ -338,6 +338,8 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   browse_sponsor_directory:             { minPlan: "starter" },
   // Practitioner Directory
   browse_practitioner_directory:        { minPlan: "starter" },
+  // Practitioner Portal
+  practitioner_portal:                  { minPlan: "starter" },
   // Audit Log
   view_audit_logs:                      { minPlan: "starter" },
 };
