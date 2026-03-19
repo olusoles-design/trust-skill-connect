@@ -633,11 +633,7 @@ export function PractitionerPortalWidget() {
     return () => { supabase.removeChannel(ch); };
   }, [user?.id, refetchNotifs]);
 
-  // Early return after all hooks
-  if (!user) return null;
-
-  // ─── Profile init ──────────────────────────────────────────────────────────
-
+  // Profile init — must be before early return
   useEffect(() => {
     if (profile && !editingProfile) {
       setProfileForm({
@@ -653,6 +649,9 @@ export function PractitionerPortalWidget() {
       });
     }
   }, [profile]);
+
+  // Early return after ALL hooks
+  if (!user) return null;
 
   // ─── Mutations ─────────────────────────────────────────────────────────────
 
