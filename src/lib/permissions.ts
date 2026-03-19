@@ -269,6 +269,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "browse_sponsor_directory",
     "browse_practitioner_directory",
     "view_audit_logs",
+    "practitioner_portal",
   ],
 };
 
