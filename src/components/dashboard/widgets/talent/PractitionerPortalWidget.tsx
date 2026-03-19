@@ -550,21 +550,23 @@ export function PractitionerPortalWidget() {
   // Sharing state
   const [approveReq, setApproveReq] = useState<SharingRequest | null>(null);
 
-  // ─── Queries ────────────────────────────────────────────────────────────────
+  // ─── Queries (all hooks must be above early returns) ─────────────────────
 
   const { data: profile } = useQuery({
-    queryKey: ["profile", user.id],
+    queryKey: ["profile", user?.id],
+    enabled: !!user,
     queryFn: async () => {
-      const { data } = await supabase.from("profiles").select("*").eq("user_id", user.id).maybeSingle();
+      const { data } = await supabase.from("profiles").select("*").eq("user_id", user!.id).maybeSingle();
       return data;
     },
   });
 
   const { data: accreditations = [] } = useQuery({
-    queryKey: ["practitioner_accreditations", user.id],
+    queryKey: ["practitioner_accreditations", user?.id],
+    enabled: !!user,
     queryFn: async () => {
       const { data } = await (supabase.from("practitioner_accreditations" as any) as any)
-        .select("*").eq("user_id", user.id).order("created_at", { ascending: false });
+        .select("*").eq("user_id", user!.id).order("created_at", { ascending: false });
       return data ?? [];
     },
   });
