@@ -1032,8 +1032,10 @@ export function PractitionerPortalWidget() {
   // Credential form states
   const [showAcadForm, setShowAcadForm] = useState(false);
   const [editAcad, setEditAcad] = useState<AcademicCredential | null>(null);
+  const [acadUploadedUrl, setAcadUploadedUrl] = useState<string | null>(null);
   const [showVendorForm, setShowVendorForm] = useState(false);
   const [editVendor, setEditVendor] = useState<VendorCredential | null>(null);
+  const [vendorUploadedUrl, setVendorUploadedUrl] = useState<string | null>(null);
 
   // Accreditation uploader
   const [showUploader, setShowUploader] = useState(false);
