@@ -443,6 +443,69 @@ function VendorForm({
   );
 }
 
+// ─── CredentialUploadZone ─────────────────────────────────────────────────────
+
+function CredentialUploadZone({
+  userId, credType, onUploaded,
+}: {
+  userId: string;
+  credType: "academic" | "vendor";
+  onUploaded: (url: string) => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  async function handleFile(file: File) {
+    setUploading(true);
+    try {
+      const path = `${userId}/${credType}/${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage.from("documents").upload(path, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from("documents").getPublicUrl(path);
+      toast({ title: "File uploaded", description: "Fill in the details below and save." });
+      onUploaded(data.publicUrl);
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div
+      className={cn(
+        "relative border-2 border-dashed rounded-xl px-5 py-4 flex items-center gap-4 cursor-pointer transition-all",
+        dragging ? "border-primary bg-primary/5 scale-[1.005]" : "border-border hover:border-primary/40 hover:bg-muted/20"
+      )}
+      onDragOver={e => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
+      onClick={() => !uploading && fileRef.current?.click()}
+    >
+      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        {uploading
+          ? <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          : <Upload className="w-4 h-4 text-primary" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-foreground">
+          {uploading ? "Uploading…" : credType === "academic" ? "Upload Academic Certificate" : "Upload Vendor Certificate"}
+        </p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">
+          Drag & drop or click — PDF, JPEG or PNG · max 20 MB
+        </p>
+      </div>
+      {!uploading && (
+        <span className="text-[10px] font-medium text-primary shrink-0">Browse</span>
+      )}
+      <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+        onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+    </div>
+  );
+}
+
 // ─── AccreditationUploader ────────────────────────────────────────────────────
 
 function AccreditationUploader({ userId, onComplete }: { userId: string; onComplete: () => void }) {
