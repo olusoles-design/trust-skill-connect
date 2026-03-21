@@ -18,6 +18,7 @@ import { AvailabilityToggleWidget }   from "@/components/dashboard/widgets/talen
 import { SmartContractingWidget }     from "@/components/dashboard/widgets/talent/SmartContractingWidget";
 import { PractitionerAccreditationsWidget } from "@/components/dashboard/widgets/talent/PractitionerAccreditationsWidget";
 import { PractitionerDirectoryWidget }      from "@/components/dashboard/widgets/talent/PractitionerDirectoryWidget";
+import { PractitionerPortalWidget }         from "@/components/dashboard/widgets/talent/PractitionerPortalWidget";
 // Business – Employer/Sponsor
 import { OpportunityManagerWidget }   from "@/components/dashboard/widgets/business/OpportunityManagerWidget";
 import { TeamRosterWidget }           from "@/components/dashboard/widgets/business/TeamRosterWidget";
