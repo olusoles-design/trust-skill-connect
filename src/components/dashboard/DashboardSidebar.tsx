@@ -41,6 +41,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Smart Contracting",         url: "/dashboard/contracting",     icon: FileSignature, capability: "smart_contracting"             },
   { title: "Practitioner Accreditations", url: "/dashboard/accreditations",   icon: Award,        capability: "practitioner_accreditations"   },
   { title: "Practitioner Directory",      url: "/dashboard/practitioners",    icon: UserSearch,   capability: "browse_practitioner_directory" },
+  { title: "Practitioner Portal",         url: "/dashboard/practitioner-portal", icon: BadgeCheck, capability: "practitioner_portal"           },
   // Gigs & Micro-tasks – Learner only
   { title: "Gigs & Micro-tasks",          url: "/dashboard/gigs",             icon: Zap,          capability: "view_tasks"                    },
   { title: "My Earnings & Tasks",         url: "/dashboard/my-tasks",         icon: Wallet,       capability: "my_tasks"                      },
