@@ -443,6 +443,69 @@ function VendorForm({
   );
 }
 
+// ─── CredentialUploadZone ─────────────────────────────────────────────────────
+
+function CredentialUploadZone({
+  userId, credType, onUploaded,
+}: {
+  userId: string;
+  credType: "academic" | "vendor";
+  onUploaded: (url: string) => void;
+}) {
+  const [dragging, setDragging] = useState(false);
+  const [uploading, setUploading] = useState(false);
+  const fileRef = useRef<HTMLInputElement>(null);
+  const { toast } = useToast();
+
+  async function handleFile(file: File) {
+    setUploading(true);
+    try {
+      const path = `${userId}/${credType}/${Date.now()}_${file.name}`;
+      const { error } = await supabase.storage.from("documents").upload(path, file);
+      if (error) throw error;
+      const { data } = supabase.storage.from("documents").getPublicUrl(path);
+      toast({ title: "File uploaded", description: "Fill in the details below and save." });
+      onUploaded(data.publicUrl);
+    } catch {
+      toast({ title: "Upload failed", variant: "destructive" });
+    } finally {
+      setUploading(false);
+    }
+  }
+
+  return (
+    <div
+      className={cn(
+        "relative border-2 border-dashed rounded-xl px-5 py-4 flex items-center gap-4 cursor-pointer transition-all",
+        dragging ? "border-primary bg-primary/5 scale-[1.005]" : "border-border hover:border-primary/40 hover:bg-muted/20"
+      )}
+      onDragOver={e => { e.preventDefault(); setDragging(true); }}
+      onDragLeave={() => setDragging(false)}
+      onDrop={e => { e.preventDefault(); setDragging(false); const f = e.dataTransfer.files?.[0]; if (f) handleFile(f); }}
+      onClick={() => !uploading && fileRef.current?.click()}
+    >
+      <div className="w-9 h-9 rounded-lg bg-primary/10 flex items-center justify-center shrink-0">
+        {uploading
+          ? <Loader2 className="w-4 h-4 text-primary animate-spin" />
+          : <Upload className="w-4 h-4 text-primary" />}
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-xs font-semibold text-foreground">
+          {uploading ? "Uploading…" : credType === "academic" ? "Upload Academic Certificate" : "Upload Vendor Certificate"}
+        </p>
+        <p className="text-[10px] text-muted-foreground mt-0.5">
+          Drag & drop or click — PDF, JPEG or PNG · max 20 MB
+        </p>
+      </div>
+      {!uploading && (
+        <span className="text-[10px] font-medium text-primary shrink-0">Browse</span>
+      )}
+      <input ref={fileRef} type="file" accept=".pdf,.jpg,.jpeg,.png" className="hidden"
+        onChange={e => { const f = e.target.files?.[0]; if (f) handleFile(f); }} />
+    </div>
+  );
+}
+
 // ─── AccreditationUploader ────────────────────────────────────────────────────
 
 function AccreditationUploader({ userId, onComplete }: { userId: string; onComplete: () => void }) {
@@ -1032,8 +1095,10 @@ export function PractitionerPortalWidget() {
   // Credential form states
   const [showAcadForm, setShowAcadForm] = useState(false);
   const [editAcad, setEditAcad] = useState<AcademicCredential | null>(null);
+  const [acadUploadedUrl, setAcadUploadedUrl] = useState<string | null>(null);
   const [showVendorForm, setShowVendorForm] = useState(false);
   const [editVendor, setEditVendor] = useState<VendorCredential | null>(null);
+  const [vendorUploadedUrl, setVendorUploadedUrl] = useState<string | null>(null);
 
   // Accreditation uploader
   const [showUploader, setShowUploader] = useState(false);
@@ -1673,49 +1738,70 @@ export function PractitionerPortalWidget() {
         {/* ══════════════ CREDENTIALS TAB ══════════════ */}
         <TabsContent value="credentials" className="mt-4 space-y-4">
           <Tabs value={credSubTab} onValueChange={setCredSubTab}>
-            <TabsList className="h-8 gap-1">
-              <TabsTrigger value="academic" className="text-xs h-7 gap-1">
-                <GraduationCap className="w-3 h-3" /> Academic
-                {academic.length > 0 && (
-                  <Badge variant="secondary" className="text-[9px] h-4 px-1 ml-0.5">{academic.length}</Badge>
+            <div className="flex items-center justify-between gap-3">
+              <TabsList className="h-8 gap-1">
+                <TabsTrigger value="academic" className="text-xs h-7 gap-1">
+                  <GraduationCap className="w-3 h-3" /> Academic
+                  {academic.length > 0 && (
+                    <Badge variant="secondary" className="text-[9px] h-4 px-1 ml-0.5">{academic.length}</Badge>
+                  )}
+                </TabsTrigger>
+                <TabsTrigger value="vendor" className="text-xs h-7 gap-1">
+                  <Globe className="w-3 h-3" /> Vendor
+                  {vendor.length > 0 && (
+                    <Badge variant="secondary" className="text-[9px] h-4 px-1 ml-0.5">{vendor.length}</Badge>
+                  )}
+                </TabsTrigger>
+              </TabsList>
+              <div className="flex items-center gap-1.5">
+                {credSubTab === "academic" ? (
+                  <Button size="sm" className="h-7 text-xs gap-1.5"
+                    onClick={() => { setShowAcadForm(true); setEditAcad(null); }}>
+                    <Plus className="w-3 h-3" /> Add Qualification
+                  </Button>
+                ) : (
+                  <Button size="sm" className="h-7 text-xs gap-1.5"
+                    onClick={() => { setShowVendorForm(true); setEditVendor(null); }}>
+                    <Plus className="w-3 h-3" /> Add Certification
+                  </Button>
                 )}
-              </TabsTrigger>
-              <TabsTrigger value="vendor" className="text-xs h-7 gap-1">
-                <Globe className="w-3 h-3" /> Vendor
-                {vendor.length > 0 && (
-                  <Badge variant="secondary" className="text-[9px] h-4 px-1 ml-0.5">{vendor.length}</Badge>
-                )}
-              </TabsTrigger>
-            </TabsList>
-
-            {/* Academic Qualifications */}
-            <TabsContent value="academic" className="mt-3 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Academic qualifications and degrees</p>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1"
-                  onClick={() => { setShowAcadForm(true); setEditAcad(null); }}>
-                  <Plus className="w-3 h-3" /> Add
-                </Button>
               </div>
+            </div>
 
+            {/* ── Academic Qualifications ── */}
+            <TabsContent value="academic" className="mt-3 space-y-3">
+              {/* Upload zone – always visible at top */}
+              <CredentialUploadZone
+                userId={user.id}
+                credType="academic"
+                onUploaded={(url) => {
+                  setShowAcadForm(true);
+                  setEditAcad(null);
+                  // stash the URL so AcademicForm picks it up via initial prop
+                  setAcadUploadedUrl(url);
+                }}
+              />
+
+              {/* Add / Edit form */}
               {(showAcadForm || editAcad) && (
                 <div className="p-4 rounded-xl border border-primary/20 bg-primary/5">
                   <p className="text-xs font-semibold text-primary mb-3">
                     {editAcad ? "Edit Qualification" : "Add Qualification"}
                   </p>
                   <AcademicForm
-                    initial={editAcad ?? undefined}
-                    onSave={saveAcademic}
-                    onCancel={() => { setShowAcadForm(false); setEditAcad(null); }}
+                    initial={editAcad ?? (acadUploadedUrl ? { document_url: acadUploadedUrl } : undefined)}
+                    onSave={async (data) => { await saveAcademic(data); setAcadUploadedUrl(null); }}
+                    onCancel={() => { setShowAcadForm(false); setEditAcad(null); setAcadUploadedUrl(null); }}
                     userId={user.id}
                   />
                 </div>
               )}
 
               {academic.length === 0 && !showAcadForm ? (
-                <div className="p-8 text-center rounded-xl border-2 border-dashed border-border">
+                <div className="p-6 text-center rounded-xl border-2 border-dashed border-border">
                   <GraduationCap className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-                  <p className="text-xs text-muted-foreground">No qualifications added yet</p>
+                  <p className="text-xs font-medium text-foreground">No academic qualifications yet</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Upload a certificate above or click Add Qualification</p>
                 </div>
               ) : academic.length > 0 && (
                 <div className="rounded-xl border border-border overflow-hidden shadow-[var(--shadow-sm)]">
@@ -1723,24 +1809,28 @@ export function PractitionerPortalWidget() {
                     <TableHeader>
                       <TableRow className="bg-muted/40">
                         <TableHead className="text-[10px] h-8">Qualification</TableHead>
-                        <TableHead className="text-[10px] h-8 hidden sm:table-cell">Field</TableHead>
-                        <TableHead className="text-[10px] h-8">Institution</TableHead>
-                        <TableHead className="text-[10px] h-8 hidden sm:table-cell">Year</TableHead>
+                        <TableHead className="text-[10px] h-8 hidden sm:table-cell">Institution</TableHead>
+                        <TableHead className="text-[10px] h-8 hidden md:table-cell">Year</TableHead>
                         <TableHead className="text-[10px] h-8">Status</TableHead>
+                        <TableHead className="text-[10px] h-8">Shareable</TableHead>
                         <TableHead className="text-[10px] h-8 text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {academic.map(a => (
                         <TableRow key={a.id} className="text-xs">
-                          <TableCell className="font-medium max-w-[120px]">
-                            <span className="truncate block">{a.qualification_type}</span>
+                          <TableCell className="font-medium">
+                            <div className="min-w-0">
+                              <p className="truncate max-w-[130px]">{a.qualification_type}</p>
+                              {a.field_of_study && (
+                                <p className="text-[10px] text-muted-foreground truncate max-w-[130px]">{a.field_of_study}</p>
+                              )}
+                            </div>
                           </TableCell>
-                          <TableCell className="text-muted-foreground hidden sm:table-cell">{a.field_of_study || "—"}</TableCell>
-                          <TableCell className="text-muted-foreground max-w-[100px]">
+                          <TableCell className="text-muted-foreground hidden sm:table-cell max-w-[110px]">
                             <span className="truncate block">{a.institution}</span>
                           </TableCell>
-                          <TableCell className="hidden sm:table-cell tabular-nums">{a.completion_year || "—"}</TableCell>
+                          <TableCell className="hidden md:table-cell tabular-nums text-muted-foreground">{a.completion_year || "—"}</TableCell>
                           <TableCell>
                             <Badge
                               variant={a.status === "completed" ? "default" : "secondary"}
@@ -1749,22 +1839,41 @@ export function PractitionerPortalWidget() {
                               {a.status === "completed" ? "Done" : "In Progress"}
                             </Badge>
                           </TableCell>
+                          <TableCell>
+                            <button
+                              title={a.shareable ? "Shareable — click to disable" : "Not shareable — click to enable"}
+                              onClick={async () => {
+                                await (supabase.from("academic_credentials" as any) as any)
+                                  .update({ shareable: !a.shareable }).eq("id", a.id);
+                                refetchAcademic();
+                              }}
+                              className={cn(
+                                "flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded transition-colors",
+                                a.shareable
+                                  ? "bg-success/15 text-success hover:bg-success/25"
+                                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                              )}
+                            >
+                              {a.shareable ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                              {a.shareable ? "On" : "Off"}
+                            </button>
+                          </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-0.5">
                               {a.document_url && (
-                                <a href={a.document_url} target="_blank" rel="noreferrer">
-                                  <button className="p-1 rounded hover:bg-muted">
-                                    <FileText className="w-3 h-3 text-primary" />
+                                <a href={a.document_url} target="_blank" rel="noreferrer" title="View document">
+                                  <button className="p-1.5 rounded hover:bg-primary/10 transition-colors">
+                                    <FileText className="w-3.5 h-3.5 text-primary" />
                                   </button>
                                 </a>
                               )}
-                              <button className="p-1 rounded hover:bg-muted"
-                                onClick={() => { setEditAcad(a); setShowAcadForm(false); }}>
-                                <Pencil className="w-3 h-3 text-muted-foreground" />
+                              <button className="p-1.5 rounded hover:bg-muted transition-colors" title="Edit"
+                                onClick={() => { setEditAcad(a); setShowAcadForm(false); setAcadUploadedUrl(null); }}>
+                                <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                               </button>
-                              <button className="p-1 rounded hover:bg-muted"
+                              <button className="p-1.5 rounded hover:bg-destructive/10 transition-colors" title="Delete"
                                 onClick={() => deleteAcademic(a.id)}>
-                                <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                                <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                               </button>
                             </div>
                           </TableCell>
@@ -1776,34 +1885,39 @@ export function PractitionerPortalWidget() {
               )}
             </TabsContent>
 
-            {/* Vendor / International Certifications */}
+            {/* ── Vendor / International Certifications ── */}
             <TabsContent value="vendor" className="mt-3 space-y-3">
-              <div className="flex items-center justify-between">
-                <p className="text-xs text-muted-foreground">Vendor & international certifications</p>
-                <Button variant="outline" size="sm" className="h-7 text-xs gap-1"
-                  onClick={() => { setShowVendorForm(true); setEditVendor(null); }}>
-                  <Plus className="w-3 h-3" /> Add
-                </Button>
-              </div>
+              {/* Upload zone */}
+              <CredentialUploadZone
+                userId={user.id}
+                credType="vendor"
+                onUploaded={(url) => {
+                  setShowVendorForm(true);
+                  setEditVendor(null);
+                  setVendorUploadedUrl(url);
+                }}
+              />
 
+              {/* Add / Edit form */}
               {(showVendorForm || editVendor) && (
                 <div className="p-4 rounded-xl border border-primary/20 bg-primary/5">
                   <p className="text-xs font-semibold text-primary mb-3">
                     {editVendor ? "Edit Certification" : "Add Certification"}
                   </p>
                   <VendorForm
-                    initial={editVendor ?? undefined}
-                    onSave={saveVendor}
-                    onCancel={() => { setShowVendorForm(false); setEditVendor(null); }}
+                    initial={editVendor ?? (vendorUploadedUrl ? { document_url: vendorUploadedUrl } : undefined)}
+                    onSave={async (data) => { await saveVendor(data); setVendorUploadedUrl(null); }}
+                    onCancel={() => { setShowVendorForm(false); setEditVendor(null); setVendorUploadedUrl(null); }}
                     userId={user.id}
                   />
                 </div>
               )}
 
               {vendor.length === 0 && !showVendorForm ? (
-                <div className="p-8 text-center rounded-xl border-2 border-dashed border-border">
+                <div className="p-6 text-center rounded-xl border-2 border-dashed border-border">
                   <Globe className="w-8 h-8 text-muted-foreground mx-auto mb-2 opacity-50" />
-                  <p className="text-xs text-muted-foreground">No vendor certifications added yet</p>
+                  <p className="text-xs font-medium text-foreground">No vendor certifications yet</p>
+                  <p className="text-[11px] text-muted-foreground mt-1">Upload a certificate above or click Add Certification</p>
                 </div>
               ) : vendor.length > 0 && (
                 <div className="rounded-xl border border-border overflow-hidden shadow-[var(--shadow-sm)]">
@@ -1811,20 +1925,21 @@ export function PractitionerPortalWidget() {
                     <TableHeader>
                       <TableRow className="bg-muted/40">
                         <TableHead className="text-[10px] h-8">Certification</TableHead>
-                        <TableHead className="text-[10px] h-8">Vendor</TableHead>
-                        <TableHead className="text-[10px] h-8 hidden sm:table-cell">Credential ID</TableHead>
+                        <TableHead className="text-[10px] h-8 hidden sm:table-cell">Vendor</TableHead>
+                        <TableHead className="text-[10px] h-8 hidden md:table-cell">Credential ID</TableHead>
                         <TableHead className="text-[10px] h-8">Expiry</TableHead>
+                        <TableHead className="text-[10px] h-8">Shareable</TableHead>
                         <TableHead className="text-[10px] h-8 text-right">Actions</TableHead>
                       </TableRow>
                     </TableHeader>
                     <TableBody>
                       {vendor.map(v => (
                         <TableRow key={v.id} className="text-xs">
-                          <TableCell className="font-medium max-w-[120px]">
+                          <TableCell className="font-medium max-w-[130px]">
                             <span className="truncate block">{v.certification_name}</span>
                           </TableCell>
-                          <TableCell className="text-muted-foreground">{v.vendor}</TableCell>
-                          <TableCell className="font-mono text-[10px] text-primary/70 hidden sm:table-cell">
+                          <TableCell className="text-muted-foreground hidden sm:table-cell">{v.vendor}</TableCell>
+                          <TableCell className="font-mono text-[10px] text-primary/70 hidden md:table-cell">
                             {v.credential_id || "—"}
                           </TableCell>
                           <TableCell>
@@ -1833,22 +1948,41 @@ export function PractitionerPortalWidget() {
                               {isExpired(v.expiry_date) && " ⚠"}
                             </span>
                           </TableCell>
+                          <TableCell>
+                            <button
+                              title={v.shareable ? "Shareable — click to disable" : "Not shareable — click to enable"}
+                              onClick={async () => {
+                                await (supabase.from("vendor_credentials" as any) as any)
+                                  .update({ shareable: !v.shareable }).eq("id", v.id);
+                                refetchVendor();
+                              }}
+                              className={cn(
+                                "flex items-center gap-1 text-[10px] font-medium px-1.5 py-0.5 rounded transition-colors",
+                                v.shareable
+                                  ? "bg-success/15 text-success hover:bg-success/25"
+                                  : "bg-muted text-muted-foreground hover:bg-muted/80"
+                              )}
+                            >
+                              {v.shareable ? <Unlock className="w-3 h-3" /> : <Lock className="w-3 h-3" />}
+                              {v.shareable ? "On" : "Off"}
+                            </button>
+                          </TableCell>
                           <TableCell className="text-right">
-                            <div className="flex items-center justify-end gap-1">
+                            <div className="flex items-center justify-end gap-0.5">
                               {v.document_url && (
-                                <a href={v.document_url} target="_blank" rel="noreferrer">
-                                  <button className="p-1 rounded hover:bg-muted">
-                                    <FileText className="w-3 h-3 text-primary" />
+                                <a href={v.document_url} target="_blank" rel="noreferrer" title="View document">
+                                  <button className="p-1.5 rounded hover:bg-primary/10 transition-colors">
+                                    <FileText className="w-3.5 h-3.5 text-primary" />
                                   </button>
                                 </a>
                               )}
-                              <button className="p-1 rounded hover:bg-muted"
-                                onClick={() => { setEditVendor(v); setShowVendorForm(false); }}>
-                                <Pencil className="w-3 h-3 text-muted-foreground" />
+                              <button className="p-1.5 rounded hover:bg-muted transition-colors" title="Edit"
+                                onClick={() => { setEditVendor(v); setShowVendorForm(false); setVendorUploadedUrl(null); }}>
+                                <Pencil className="w-3.5 h-3.5 text-muted-foreground" />
                               </button>
-                              <button className="p-1 rounded hover:bg-muted"
+                              <button className="p-1.5 rounded hover:bg-destructive/10 transition-colors" title="Delete"
                                 onClick={() => deleteVendor(v.id)}>
-                                <Trash2 className="w-3 h-3 text-muted-foreground hover:text-destructive" />
+                                <Trash2 className="w-3.5 h-3.5 text-muted-foreground hover:text-destructive" />
                               </button>
                             </div>
                           </TableCell>
