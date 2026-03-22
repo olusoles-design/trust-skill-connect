@@ -122,7 +122,7 @@ export function MenusManager() {
 
       {!isLoading && menus.length === 0 && (
         <div className="py-12 text-center text-muted-foreground">
-          <MenuIcon className="w-8 h-8 mx-auto mb-2 opacity-30" />
+          <Plus className="w-8 h-8 mx-auto mb-2 opacity-30" />
           <p className="text-sm">No menus yet. Create your first menu.</p>
         </div>
       )}

@@ -217,7 +217,7 @@ export function PageBlocksEditor({ pageId }: { pageId: string }) {
                 )}
                 {block.block_type === "content_list" && (
                   <p className="text-xs text-muted-foreground mt-0.5">
-                    {(block.config as ContentListConfig).display_mode} · {(block.config as ContentListConfig).columns ?? 3} cols · limit {(block.config as ContentListConfig).item_limit}
+                    {(block.config as unknown as ContentListConfig).display_mode} · {(block.config as unknown as ContentListConfig).columns ?? 3} cols · limit {(block.config as unknown as ContentListConfig).item_limit}
                   </p>
                 )}
               </div>
