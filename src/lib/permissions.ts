@@ -345,6 +345,8 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   practitioner_portal:                  { minPlan: "starter" },
   // Audit Log
   view_audit_logs:                      { minPlan: "starter" },
+  // CMS / Design Manager
+  design_manager:                       { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────
