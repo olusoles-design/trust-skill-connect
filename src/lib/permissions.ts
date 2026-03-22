@@ -68,7 +68,8 @@ export type Capability =
   | "browse_sponsor_directory"    // Learners/providers browse the sponsor directory
   | "browse_practitioner_directory" // Any authenticated user finds registered practitioners
   | "practitioner_portal"           // Enhanced practitioner portal with all credential management
-  | "view_audit_logs";              // Platform Admin / Oversight — full audit trail
+  | "view_audit_logs"              // Platform Admin / Oversight — full audit trail
+  | "design_manager";              // CMS: menus, pages, blocks
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
@@ -270,6 +271,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "browse_practitioner_directory",
     "view_audit_logs",
     "practitioner_portal",
+    "design_manager",
   ],
 };
 
@@ -344,6 +346,8 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   practitioner_portal:                  { minPlan: "starter" },
   // Audit Log
   view_audit_logs:                      { minPlan: "starter" },
+  // CMS / Design Manager
+  design_manager:                       { minPlan: "starter" },
 };
 
 // ─── Plan ranking ──────────────────────────────────────────────────────────

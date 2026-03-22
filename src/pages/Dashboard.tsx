@@ -48,6 +48,7 @@ import { ReportsAnalyticsWidget }     from "@/components/dashboard/widgets/overs
 import { PlatformAdminWidget }        from "@/components/dashboard/widgets/oversight/PlatformAdminWidget";
 import { TrustLedgerWidget }          from "@/components/dashboard/widgets/oversight/TrustLedgerWidget";
 import { PortalSwitcherWidget }       from "@/components/dashboard/widgets/oversight/PortalSwitcherWidget";
+import { DesignManagerWidget }        from "@/components/dashboard/widgets/oversight/DesignManagerWidget";
 
 function PageView({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   const navigate = useNavigate();
@@ -134,6 +135,7 @@ export default function Dashboard() {
               <Route path="ledger"  element={<PageView title="Trust Ledger" description="Immutable audit trail with QR verification for B-BBEE audits."><TrustLedgerWidget /></PageView>} />
               <Route path="admin"   element={<PageView title="Platform Administration" description="Users, content moderation and system settings."><PlatformAdminWidget /></PageView>} />
               <Route path="portals" element={<PageView title="Portal Switcher" description="Preview any role's dashboard without switching accounts."><PortalSwitcherWidget /></PageView>} />
+              <Route path="design-manager" element={<PageView title="Design Manager" description="Build and manage menus, pages and content blocks."><DesignManagerWidget /></PageView>} />
 
               <Route path="*" element={<WidgetGrid />} />
             </Routes>
