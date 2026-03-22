@@ -68,7 +68,8 @@ export type Capability =
   | "browse_sponsor_directory"    // Learners/providers browse the sponsor directory
   | "browse_practitioner_directory" // Any authenticated user finds registered practitioners
   | "practitioner_portal"           // Enhanced practitioner portal with all credential management
-  | "view_audit_logs";              // Platform Admin / Oversight — full audit trail
+  | "view_audit_logs"              // Platform Admin / Oversight — full audit trail
+  | "design_manager";              // CMS: menus, pages, blocks
 
 // ─── Persona Groups ────────────────────────────────────────────────────────
 
