@@ -73,6 +73,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Trust Ledger",              url: "/dashboard/ledger",          icon: Link2,         capability: "trust_ledger"            },
   { title: "Platform Admin",            url: "/dashboard/admin",           icon: ShieldCheck,   capability: "platform_admin"          },
   { title: "Portal Switcher",           url: "/dashboard/portals",         icon: Eye,           capability: "portal_switcher"         },
+  { title: "Design Manager",            url: "/dashboard/design-manager",  icon: Palette,       capability: "design_manager"          },
 ];
 
 const PERSONA_LABELS: Record<string, string> = {
