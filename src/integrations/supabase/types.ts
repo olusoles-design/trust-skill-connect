@@ -204,6 +204,239 @@ export type Database = {
         }
         Relationships: []
       }
+      cms_menu_items: {
+        Row: {
+          created_at: string
+          icon_name: string | null
+          id: string
+          is_active: boolean
+          item_type: string
+          label: string
+          menu_id: string
+          open_in_new_tab: boolean
+          parent_id: string | null
+          sort_order: number
+          target_url: string | null
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean
+          item_type?: string
+          label: string
+          menu_id: string
+          open_in_new_tab?: boolean
+          parent_id?: string | null
+          sort_order?: number
+          target_url?: string | null
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          icon_name?: string | null
+          id?: string
+          is_active?: boolean
+          item_type?: string
+          label?: string
+          menu_id?: string
+          open_in_new_tab?: boolean
+          parent_id?: string | null
+          sort_order?: number
+          target_url?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_menu_items_menu_id_fkey"
+            columns: ["menu_id"]
+            isOneToOne: false
+            referencedRelation: "cms_menus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_menu_items_parent_id_fkey"
+            columns: ["parent_id"]
+            isOneToOne: false
+            referencedRelation: "cms_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_menus: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_active: boolean
+          name: string
+          slug: string
+          sort_order: number
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name: string
+          slug: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_active?: boolean
+          name?: string
+          slug?: string
+          sort_order?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
+      cms_page_blocks: {
+        Row: {
+          block_type: string
+          config: Json
+          content: string | null
+          created_at: string
+          id: string
+          is_active: boolean
+          page_id: string
+          sort_order: number
+          title: string | null
+          updated_at: string
+        }
+        Insert: {
+          block_type?: string
+          config?: Json
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          page_id: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Update: {
+          block_type?: string
+          config?: Json
+          content?: string | null
+          created_at?: string
+          id?: string
+          is_active?: boolean
+          page_id?: string
+          sort_order?: number
+          title?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_page_blocks_page_id_fkey"
+            columns: ["page_id"]
+            isOneToOne: false
+            referencedRelation: "cms_pages"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      cms_pages: {
+        Row: {
+          created_at: string
+          created_by: string
+          description: string | null
+          id: string
+          is_homepage: boolean
+          is_published: boolean
+          meta_desc: string | null
+          meta_title: string | null
+          slug: string
+          title: string
+          updated_at: string
+          updated_by: string | null
+        }
+        Insert: {
+          created_at?: string
+          created_by: string
+          description?: string | null
+          id?: string
+          is_homepage?: boolean
+          is_published?: boolean
+          meta_desc?: string | null
+          meta_title?: string | null
+          slug: string
+          title: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Update: {
+          created_at?: string
+          created_by?: string
+          description?: string | null
+          id?: string
+          is_homepage?: boolean
+          is_published?: boolean
+          meta_desc?: string | null
+          meta_title?: string | null
+          slug?: string
+          title?: string
+          updated_at?: string
+          updated_by?: string | null
+        }
+        Relationships: []
+      }
+      cms_role_menu_permissions: {
+        Row: {
+          created_at: string
+          id: string
+          is_enabled: boolean
+          menu_id: string | null
+          menu_item_id: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at: string
+        }
+        Insert: {
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          menu_id?: string | null
+          menu_item_id?: string | null
+          role: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Update: {
+          created_at?: string
+          id?: string
+          is_enabled?: boolean
+          menu_id?: string | null
+          menu_item_id?: string | null
+          role?: Database["public"]["Enums"]["app_role"]
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "cms_role_menu_permissions_menu_id_fkey"
+            columns: ["menu_id"]
+            isOneToOne: false
+            referencedRelation: "cms_menus"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "cms_role_menu_permissions_menu_item_id_fkey"
+            columns: ["menu_item_id"]
+            isOneToOne: false
+            referencedRelation: "cms_menu_items"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       company_participants: {
         Row: {
           agreement_document_url: string | null
