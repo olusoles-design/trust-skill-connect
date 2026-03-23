@@ -26,7 +26,15 @@ const activityTypeColor: Record<string, string> = {
 };
 
 export function PlatformAdminWidget() {
-  return (
+  const navigate = useNavigate();
+
+  const ADMIN_ACTIONS = [
+    { label:"Manage Users",       icon:Users,       color:"text-primary", bg:"bg-primary/10", onClick: () => navigate("/dashboard/manage-users") },
+    { label:"Review Verifications",icon:ShieldCheck, color:"text-destructive", bg:"bg-destructive/10", onClick: () => navigate("/dashboard/verify") },
+    { label:"System Settings",    icon:Settings,    color:"text-muted-foreground", bg:"bg-muted", onClick: () => navigate("/dashboard/settings") },
+    { label:"Content Moderation", icon:AlertTriangle,color:"text-accent-foreground", bg:"bg-accent/20", onClick: () => {} },
+    { label:"Database Backup",    icon:Database,    color:"text-primary", bg:"bg-primary/10", onClick: () => {} },
+  ];
     <div className="space-y-5">
       {/* System stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
