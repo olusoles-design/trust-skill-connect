@@ -25,18 +25,53 @@ interface MenuItem {
 }
 
 const BUILTIN_ROUTES = [
-  { label: "Dashboard Home", url: "/dashboard" },
-  { label: "Browse Opportunities", url: "/dashboard/opportunities" },
-  { label: "My Applications", url: "/dashboard/applications" },
-  { label: "Profile & CV", url: "/dashboard/profile" },
-  { label: "Document Vault", url: "/dashboard/vault" },
-  { label: "Practitioner Portal", url: "/dashboard/practitioner-portal" },
-  { label: "Reports & Analytics", url: "/dashboard/reports" },
-  { label: "Platform Admin", url: "/dashboard/admin" },
-  { label: "Design Manager", url: "/dashboard/design-manager" },
-  { label: "Payments", url: "/dashboard/payments" },
-  { label: "Settings", url: "/dashboard/settings" },
+  // Common
+  { group: "General",    label: "Dashboard Home",         url: "/dashboard" },
+  { group: "General",    label: "Payments & Wallet",      url: "/dashboard/payments" },
+  { group: "General",    label: "Settings",               url: "/dashboard/settings" },
+  // Talent
+  { group: "Talent",     label: "Browse Opportunities",   url: "/dashboard/opportunities" },
+  { group: "Talent",     label: "My Applications",        url: "/dashboard/applications" },
+  { group: "Talent",     label: "Profile & CV",           url: "/dashboard/profile" },
+  { group: "Talent",     label: "Document Vault",         url: "/dashboard/vault" },
+  { group: "Talent",     label: "Availability & Contracts",url: "/dashboard/availability" },
+  { group: "Talent",     label: "Smart Contracting",      url: "/dashboard/contracting" },
+  { group: "Talent",     label: "Practitioner Accreditations", url: "/dashboard/accreditations" },
+  { group: "Talent",     label: "Practitioner Directory", url: "/dashboard/practitioners" },
+  { group: "Talent",     label: "Practitioner Portal",    url: "/dashboard/practitioner-portal" },
+  { group: "Talent",     label: "Gigs & Micro-tasks",     url: "/dashboard/gigs" },
+  { group: "Talent",     label: "My Earnings & Tasks",    url: "/dashboard/my-tasks" },
+  // Business
+  { group: "Business",   label: "Post Opportunities",     url: "/dashboard/post" },
+  { group: "Business",   label: "Manage Learners",        url: "/dashboard/learners" },
+  { group: "Business",   label: "Learner Pipeline",       url: "/dashboard/pipeline" },
+  { group: "Business",   label: "B-BBEE Simulator",       url: "/dashboard/bbee" },
+  { group: "Business",   label: "Tax Calculator",         url: "/dashboard/tax" },
+  { group: "Business",   label: "WSP/ATR Reports",        url: "/dashboard/wsp" },
+  { group: "Business",   label: "Tender Feed",            url: "/dashboard/tender-feed" },
+  { group: "Business",   label: "Learner Recruitment",    url: "/dashboard/recruitment" },
+  { group: "Business",   label: "Outcome Tracking",       url: "/dashboard/outcomes" },
+  { group: "Business",   label: "Procurement Hub",        url: "/dashboard/procurement" },
+  { group: "Business",   label: "Procurement Alerts",     url: "/dashboard/alerts" },
+  { group: "Business",   label: "RFQ Board",              url: "/dashboard/rfq" },
+  { group: "Business",   label: "Facility Booking",       url: "/dashboard/booking" },
+  { group: "Business",   label: "Marketplace Listing",    url: "/dashboard/marketplace" },
+  { group: "Business",   label: "Marketplace Discovery",  url: "/dashboard/discovery" },
+  { group: "Business",   label: "Tender Matching",        url: "/dashboard/tenders" },
+  { group: "Business",   label: "Workflow Engine",        url: "/dashboard/workflow" },
+  // Funding
+  { group: "Funding",    label: "Fund Learners",          url: "/dashboard/funding" },
+  // Oversight
+  { group: "Oversight",  label: "Verify Documents",       url: "/dashboard/verify" },
+  { group: "Oversight",  label: "Reports & Analytics",    url: "/dashboard/reports" },
+  { group: "Oversight",  label: "Trust Ledger",           url: "/dashboard/ledger" },
+  { group: "Oversight",  label: "Platform Admin",         url: "/dashboard/admin" },
+  { group: "Oversight",  label: "Manage Users",           url: "/dashboard/manage-users" },
+  { group: "Oversight",  label: "Portal Switcher",        url: "/dashboard/portals" },
+  { group: "Oversight",  label: "Design Manager",         url: "/dashboard/design-manager" },
 ];
+
+const ROUTE_GROUPS = [...new Set(BUILTIN_ROUTES.map(r => r.group))];
 
 const emptyForm = {
   label: "",
