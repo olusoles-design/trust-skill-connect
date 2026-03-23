@@ -2,21 +2,21 @@ import { Users, ShieldCheck, Activity, AlertTriangle, Settings, Database, Trendi
 import { useNavigate } from "react-router-dom";
 
 const SYSTEM_STATS = [
-  { label:"Total Users",       value:"1,248",  trend:"+23 today",  icon:Users,      color:"text-primary" },
-  { label:"Active Sessions",   value:"84",     trend:"Live",       icon:Activity,   color:"text-green-600" },
-  { label:"Pending Verif.",    value:"12",     trend:"Action needed",icon:ShieldCheck,color:"text-destructive" },
-  { label:"Open Tickets",      value:"7",      trend:"2 critical", icon:AlertTriangle,color:"text-accent-foreground" },
-  { label:"DB Records",        value:"38.4k",  trend:"+124 today", icon:Database,   color:"text-primary" },
-  { label:"Uptime",            value:"99.9%",  trend:"30d avg",    icon:TrendingUp, color:"text-green-600" },
+  { label:"Total Users",       value:"1,248",  trend:"+23 today",    icon:Users,        color:"text-primary" },
+  { label:"Active Sessions",   value:"84",     trend:"Live",         icon:Activity,     color:"text-green-600" },
+  { label:"Pending Verif.",    value:"12",     trend:"Action needed",icon:ShieldCheck,  color:"text-destructive" },
+  { label:"Open Tickets",      value:"7",      trend:"2 critical",   icon:AlertTriangle,color:"text-accent-foreground" },
+  { label:"DB Records",        value:"38.4k",  trend:"+124 today",   icon:Database,     color:"text-primary" },
+  { label:"Uptime",            value:"99.9%",  trend:"30d avg",      icon:TrendingUp,   color:"text-green-600" },
 ];
 
 const RECENT_ACTIVITY = [
-  { action:"New user registered",       user:"nomvula.sithole@gmail.com",  role:"Learner",         time:"2m ago",  type:"success" },
-  { action:"Verification approved",     user:"Bytes Academy",              role:"Provider",        time:"8m ago",  type:"success" },
-  { action:"Failed login attempt",      user:"unknown@mail.com",           role:"—",               time:"14m ago", type:"warning" },
-  { action:"Role change request",       user:"thabo.dlamini@corp.co.za",   role:"Employer → Admin",time:"25m ago", type:"info" },
-  { action:"Content flagged",           user:"system",                     role:"Auto-mod",        time:"1h ago",  type:"warning" },
-  { action:"Subscription upgraded",     user:"cape.digital@studio.co.za",  role:"Professional",    time:"2h ago",  type:"success" },
+  { action:"New user registered",   user:"nomvula.sithole@gmail.com", role:"Learner",          time:"2m ago",  type:"success" },
+  { action:"Verification approved", user:"Bytes Academy",             role:"Provider",         time:"8m ago",  type:"success" },
+  { action:"Failed login attempt",  user:"unknown@mail.com",          role:"—",                time:"14m ago", type:"warning" },
+  { action:"Role change request",   user:"thabo.dlamini@corp.co.za",  role:"Employer → Admin", time:"25m ago", type:"info"    },
+  { action:"Content flagged",       user:"system",                    role:"Auto-mod",         time:"1h ago",  type:"warning" },
+  { action:"Subscription upgraded", user:"cape.digital@studio.co.za", role:"Professional",     time:"2h ago",  type:"success" },
 ];
 
 const activityTypeColor: Record<string, string> = {
@@ -29,12 +29,14 @@ export function PlatformAdminWidget() {
   const navigate = useNavigate();
 
   const ADMIN_ACTIONS = [
-    { label:"Manage Users",       icon:Users,       color:"text-primary", bg:"bg-primary/10", onClick: () => navigate("/dashboard/manage-users") },
-    { label:"Review Verifications",icon:ShieldCheck, color:"text-destructive", bg:"bg-destructive/10", onClick: () => navigate("/dashboard/verify") },
-    { label:"System Settings",    icon:Settings,    color:"text-muted-foreground", bg:"bg-muted", onClick: () => navigate("/dashboard/settings") },
-    { label:"Content Moderation", icon:AlertTriangle,color:"text-accent-foreground", bg:"bg-accent/20", onClick: () => {} },
-    { label:"Database Backup",    icon:Database,    color:"text-primary", bg:"bg-primary/10", onClick: () => {} },
+    { label:"Manage Users",        icon:Users,        color:"text-primary",           bg:"bg-primary/10",     onClick: () => navigate("/dashboard/manage-users") },
+    { label:"Review Verifications",icon:ShieldCheck,  color:"text-destructive",       bg:"bg-destructive/10", onClick: () => navigate("/dashboard/verify")        },
+    { label:"System Settings",     icon:Settings,     color:"text-muted-foreground",  bg:"bg-muted",          onClick: () => navigate("/dashboard/settings")      },
+    { label:"Content Moderation",  icon:AlertTriangle,color:"text-accent-foreground", bg:"bg-accent/20",      onClick: () => {}                                   },
+    { label:"Database Backup",     icon:Database,     color:"text-primary",           bg:"bg-primary/10",     onClick: () => {}                                   },
   ];
+
+  return (
     <div className="space-y-5">
       {/* System stats grid */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -75,20 +77,20 @@ export function PlatformAdminWidget() {
         <div className="rounded-xl border border-border bg-card p-4 space-y-3">
           <p className="text-xs font-semibold text-muted-foreground">Admin Actions</p>
           <div className="space-y-2">
-            {[
-              { label:"Manage Users",       icon:Users,       color:"text-primary", bg:"bg-primary/10" },
-              { label:"Review Verifications",icon:ShieldCheck, color:"text-destructive", bg:"bg-destructive/10" },
-              { label:"System Settings",    icon:Settings,    color:"text-muted-foreground", bg:"bg-muted" },
-              { label:"Content Moderation", icon:AlertTriangle,color:"text-accent-foreground", bg:"bg-accent/20" },
-              { label:"Database Backup",    icon:Database,    color:"text-primary", bg:"bg-primary/10" },
-            ].map(action => {
+            {ADMIN_ACTIONS.map(action => {
               const Icon = action.icon;
               return (
-                <button key={action.label} className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-all text-left group">
+                <button
+                  key={action.label}
+                  onClick={action.onClick}
+                  className="w-full flex items-center gap-3 p-2.5 rounded-lg hover:bg-muted/50 transition-all text-left group"
+                >
                   <div className={`w-7 h-7 rounded-lg ${action.bg} flex items-center justify-center flex-shrink-0`}>
                     <Icon className={`w-3.5 h-3.5 ${action.color}`} />
                   </div>
-                  <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">{action.label}</span>
+                  <span className="text-xs font-medium text-muted-foreground group-hover:text-foreground transition-colors">
+                    {action.label}
+                  </span>
                 </button>
               );
             })}
