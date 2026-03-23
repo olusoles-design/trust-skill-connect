@@ -254,9 +254,14 @@ export function MenuItemsEditor({ menuId }: { menuId: string }) {
                   <SelectTrigger>
                     <SelectValue placeholder="Select a page" />
                   </SelectTrigger>
-                  <SelectContent>
-                    {BUILTIN_ROUTES.map(r => (
-                      <SelectItem key={r.url} value={r.url}>{r.label}</SelectItem>
+                  <SelectContent className="max-h-64">
+                    {ROUTE_GROUPS.map(group => (
+                      <div key={group}>
+                        <div className="px-2 py-1.5 text-[10px] font-semibold text-muted-foreground uppercase tracking-wider">{group}</div>
+                        {BUILTIN_ROUTES.filter(r => r.group === group).map(r => (
+                          <SelectItem key={r.url} value={r.url}>{r.label}</SelectItem>
+                        ))}
+                      </div>
                     ))}
                   </SelectContent>
                 </Select>
