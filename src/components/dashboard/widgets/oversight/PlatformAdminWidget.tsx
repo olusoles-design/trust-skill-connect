@@ -1,4 +1,5 @@
 import { Users, ShieldCheck, Activity, AlertTriangle, Settings, Database, TrendingUp } from "lucide-react";
+import { useNavigate } from "react-router-dom";
 
 const SYSTEM_STATS = [
   { label:"Total Users",       value:"1,248",  trend:"+23 today",  icon:Users,      color:"text-primary" },
