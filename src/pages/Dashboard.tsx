@@ -49,6 +49,7 @@ import { PlatformAdminWidget }        from "@/components/dashboard/widgets/overs
 import { TrustLedgerWidget }          from "@/components/dashboard/widgets/oversight/TrustLedgerWidget";
 import { PortalSwitcherWidget }       from "@/components/dashboard/widgets/oversight/PortalSwitcherWidget";
 import { DesignManagerWidget }        from "@/components/dashboard/widgets/oversight/DesignManagerWidget";
+import { ManageUsersWidget }          from "@/components/dashboard/widgets/oversight/ManageUsersWidget";
 
 function PageView({ title, description, children }: { title: string; description: string; children: React.ReactNode }) {
   const navigate = useNavigate();
