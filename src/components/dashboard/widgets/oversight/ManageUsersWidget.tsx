@@ -139,6 +139,11 @@ export function ManageUsersWidget() {
     },
   });
 
+  // Auto-select first user when data loads
+  useEffect(() => {
+    if (users.length > 0 && !selectedUser) setSelectedUser(users[0]);
+  }, [users]);
+
   // ── Mutations ──────────────────────────────────────────────────────────────
   const addRoleMut = useMutation({
     mutationFn: async ({ user_id, role }: { user_id: string; role: AppRole }) => {
@@ -162,7 +167,7 @@ export function ManageUsersWidget() {
   const filtered = useMemo(() => {
     const term = search.toLowerCase();
     const roleFilter = ROLE_FILTERS.find(f => f.key === activeFilter);
-    return users.filter(u => {
+    return users.filter((u: UserRow) => {
       const matchSearch = !term ||
         u.display_name.toLowerCase().includes(term) ||
         u.user_id.toLowerCase().includes(term);
@@ -175,7 +180,9 @@ export function ManageUsersWidget() {
   const filterCount = useMemo(() => {
     return Object.fromEntries(ROLE_FILTERS.map(f => [
       f.key,
-      f.roles.length === 0 ? users.length : users.filter(u => u.roles.some(r => f.roles.includes(r))).length
+      f.roles.length === 0
+        ? (users as UserRow[]).length
+        : (users as UserRow[]).filter((u: UserRow) => u.roles.some(r => f.roles.includes(r))).length
     ]));
   }, [users]);
 
