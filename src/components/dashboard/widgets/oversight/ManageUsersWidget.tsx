@@ -339,9 +339,9 @@ export function ManageUsersWidget() {
           </div>
 
           {/* Footer */}
-          {filtered.length > 0 && (
+          {(filtered as UserRow[]).length > 0 && (
             <div className="px-4 py-2 border-t border-border bg-muted/20 text-[10px] text-muted-foreground">
-              Showing {filtered.length} of {users.length} users
+              Showing {(filtered as UserRow[]).length} of {(users as UserRow[]).length} users
             </div>
           )}
         </div>
