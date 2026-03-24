@@ -99,7 +99,7 @@ export function ManageUsersWidget() {
   const [addRole, setAddRole]           = useState<AppRole>("learner");
 
   // ── Fetch ──────────────────────────────────────────────────────────────────
-  const { data: users = [], isLoading, refetch } = useQuery({
+  const { data: users = [], isLoading, refetch } = useQuery<UserRow[]>({
     queryKey: ["manage-users"],
     queryFn: async () => {
       const [{ data: roles, error: rolesErr }, { data: profiles }] = await Promise.all([
@@ -109,7 +109,7 @@ export function ManageUsersWidget() {
       if (rolesErr) throw rolesErr;
 
       const map = new Map<string, UserRow>();
-      for (const r of roles ?? []) {
+      for (const r of (roles ?? [])) {
         if (!map.has(r.user_id)) {
           const p = profiles?.find(x => x.user_id === r.user_id);
           const firstName = p?.first_name ?? null;
@@ -134,11 +134,8 @@ export function ManageUsersWidget() {
         }
         map.get(r.user_id)!.roles.push(r.role as AppRole);
       }
-      return Array.from(map.values());
-    },
-    onSuccess: (data) => {
-      // Auto-select first user
-      if (data.length > 0 && !selectedUser) setSelectedUser(data[0]);
+      const result = Array.from(map.values());
+      return result;
     },
   });
 
