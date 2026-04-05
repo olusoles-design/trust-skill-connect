@@ -112,6 +112,7 @@ export function AvailabilityToggleWidget() {
   const [available,        setAvailable]        = useState(true);
   const [visibility,       setVisibility]       = useState<"public" | "sdp_only">("public");
   const [activePractTypes, setActivePractTypes] = useState<PractitionerType[]>(["facilitator", "assessor"]);
+  const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>("freelance");
 
   const toggleType = (t: PractitionerType) =>
     setActivePractTypes(prev =>
