@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu } from "lucide-react";
+import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock } from "lucide-react";
 
 // ─── Practitioner sub-types ────────────────────────────────────────────────
 
