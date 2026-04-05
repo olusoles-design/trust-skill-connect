@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu } from "lucide-react";
+import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock } from "lucide-react";
 
 // ─── Practitioner sub-types ────────────────────────────────────────────────
 
@@ -45,6 +45,38 @@ const PRACTITIONER_TYPES: Record<PractitionerType, PractitionerTypeMeta> = {
   },
 };
 
+// ─── Employment status ───────────────────────────────────────────────────────
+
+type EmploymentStatus = "freelance" | "employed_permanent" | "employed_fixed";
+
+interface EmploymentMeta {
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+const EMPLOYMENT_STATUSES: Record<EmploymentStatus, EmploymentMeta> = {
+  freelance: {
+    label: "Freelance / Independent",
+    description: "Available for any contract, project or gig work",
+    icon: UserCheck,
+    color: "text-emerald-600 bg-emerald-500/10",
+  },
+  employed_permanent: {
+    label: "Employed – Permanent",
+    description: "Permanently employed; may accept side work with employer consent",
+    icon: Building,
+    color: "text-blue-600 bg-blue-500/10",
+  },
+  employed_fixed: {
+    label: "Employed – Fixed-Term",
+    description: "On a fixed-term contract; available after end date or for parallel work",
+    icon: CalendarClock,
+    color: "text-orange-600 bg-orange-500/10",
+  },
+};
+
 // ─── Contract data ────────────────────────────────────────────────────────────
 
 interface Contract {
@@ -80,6 +112,7 @@ export function AvailabilityToggleWidget() {
   const [available,        setAvailable]        = useState(true);
   const [visibility,       setVisibility]       = useState<"public" | "sdp_only">("public");
   const [activePractTypes, setActivePractTypes] = useState<PractitionerType[]>(["facilitator", "assessor"]);
+  const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>("freelance");
 
   const toggleType = (t: PractitionerType) =>
     setActivePractTypes(prev =>
@@ -119,6 +152,42 @@ export function AvailabilityToggleWidget() {
             ))}
           </div>
         )}
+      </div>
+
+      {/* ── Employment Status ──────────────────────────────────────────────── */}
+      <div className="space-y-2">
+        <div className="flex items-center justify-between">
+          <p className="text-xs font-semibold text-foreground">Employment Status</p>
+          <p className="text-[10px] text-muted-foreground">Select one</p>
+        </div>
+        <div className="flex flex-col gap-2">
+          {(Object.entries(EMPLOYMENT_STATUSES) as [EmploymentStatus, EmploymentMeta][]).map(([key, meta]) => {
+            const Icon = meta.icon;
+            const active = employmentStatus === key;
+            return (
+              <button
+                key={key}
+                onClick={() => setEmploymentStatus(key)}
+                className={`text-left p-3 rounded-xl border-2 transition-all ${
+                  active ? "border-primary/40 bg-primary/5" : "border-border bg-card opacity-60 hover:opacity-80"
+                }`}
+              >
+                <div className="flex items-center gap-3">
+                  <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${active ? meta.color : "bg-muted text-muted-foreground"}`}>
+                    <Icon className="w-4 h-4" />
+                  </div>
+                  <div className="flex-1 min-w-0">
+                    <span className="text-xs font-semibold text-foreground">{meta.label}</span>
+                    <p className="text-[10px] text-muted-foreground leading-snug">{meta.description}</p>
+                  </div>
+                  {active && (
+                    <span className="text-[9px] font-bold text-emerald-600 bg-emerald-500/10 px-1.5 py-0.5 rounded-full flex-shrink-0">Selected</span>
+                  )}
+                </div>
+              </button>
+            );
+          })}
+        </div>
       </div>
 
       {/* ── Practitioner type selection ─────────────────────────────────────── */}
