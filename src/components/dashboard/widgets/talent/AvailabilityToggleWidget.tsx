@@ -45,6 +45,38 @@ const PRACTITIONER_TYPES: Record<PractitionerType, PractitionerTypeMeta> = {
   },
 };
 
+// ─── Employment status ───────────────────────────────────────────────────────
+
+type EmploymentStatus = "freelance" | "employed_permanent" | "employed_fixed";
+
+interface EmploymentMeta {
+  label: string;
+  description: string;
+  icon: React.ElementType;
+  color: string;
+}
+
+const EMPLOYMENT_STATUSES: Record<EmploymentStatus, EmploymentMeta> = {
+  freelance: {
+    label: "Freelance / Independent",
+    description: "Available for any contract, project or gig work",
+    icon: UserCheck,
+    color: "text-emerald-600 bg-emerald-500/10",
+  },
+  employed_permanent: {
+    label: "Employed – Permanent",
+    description: "Permanently employed; may accept side work with employer consent",
+    icon: Building,
+    color: "text-blue-600 bg-blue-500/10",
+  },
+  employed_fixed: {
+    label: "Employed – Fixed-Term",
+    description: "On a fixed-term contract; available after end date or for parallel work",
+    icon: CalendarClock,
+    color: "text-orange-600 bg-orange-500/10",
+  },
+};
+
 // ─── Contract data ────────────────────────────────────────────────────────────
 
 interface Contract {
