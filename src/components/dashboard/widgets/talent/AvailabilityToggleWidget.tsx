@@ -380,11 +380,48 @@ export function AvailabilityToggleWidget() {
 
       {/* ── Contracts ───────────────────────────────────────────────────────── */}
       <div>
-        <p className="text-xs font-semibold text-foreground mb-2">My Contracts</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-foreground">My Contracts</p>
+          <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1" onClick={() => setShowAddContract(!showAddContract)}>
+            {showAddContract ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+            {showAddContract ? "Cancel" : "Add"}
+          </Button>
+        </div>
+
+        {showAddContract && (
+          <div className="p-3 rounded-xl border border-primary/30 bg-primary/5 space-y-2 mb-3">
+            <Input placeholder="Client name" value={newContract.client_name} onChange={e => setNewContract(p => ({ ...p, client_name: e.target.value }))} className="h-8 text-xs" />
+            <Input placeholder="Programme" value={newContract.programme} onChange={e => setNewContract(p => ({ ...p, programme: e.target.value }))} className="h-8 text-xs" />
+            <div className="grid grid-cols-3 gap-2">
+              <select value={newContract.practitioner_type} onChange={e => setNewContract(p => ({ ...p, practitioner_type: e.target.value as PractitionerType }))} className="h-8 text-xs rounded-md border border-border bg-background px-2">
+                {(Object.entries(PRACTITIONER_TYPES) as [PractitionerType, PractitionerTypeMeta][]).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+              <Input type="number" placeholder="Days" value={newContract.total_days} onChange={e => setNewContract(p => ({ ...p, total_days: +e.target.value }))} className="h-8 text-xs" />
+              <Input type="number" placeholder="Rate/day" value={newContract.daily_rate || ""} onChange={e => setNewContract(p => ({ ...p, daily_rate: +e.target.value }))} className="h-8 text-xs" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <select value={newContract.status} onChange={e => setNewContract(p => ({ ...p, status: e.target.value }))} className="h-8 text-xs rounded-md border border-border bg-background px-2">
+                <option value="active">Active</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+              </select>
+              <Button size="sm" className="h-8 text-xs" onClick={addContract} disabled={contractSaving || !newContract.client_name}>
+                {contractSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Save Contract"}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
-          {CONTRACTS.map(c => {
-            const typeMeta = PRACTITIONER_TYPES[c.type];
+          {contracts.length === 0 && (
+            <p className="text-[10px] text-muted-foreground text-center py-4">No contracts yet. Click "Add" to create one.</p>
+          )}
+          {contracts.map(c => {
+            const typeMeta = PRACTITIONER_TYPES[c.practitioner_type] ?? PRACTITIONER_TYPES.facilitator;
             const TypeIcon = typeMeta.icon;
+            const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-ZA", { day: "2-digit", month: "short" }) : "—";
             return (
               <div key={c.id} className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${typeMeta.color}`}>
@@ -392,15 +429,15 @@ export function AvailabilityToggleWidget() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-xs font-semibold text-foreground truncate">{c.client}</p>
+                    <p className="text-xs font-semibold text-foreground truncate">{c.client_name}</p>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold capitalize ${STATUS_CFG[c.status]}`}>{c.status}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${typeMeta.color}`}>{typeMeta.label}</span>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.programme}</p>
                   <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
-                    <span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{c.startDate} – {c.endDate}</span>
-                    <span className="font-semibold text-foreground">{c.rate}</span>
-                    <span>{c.days} days</span>
+                    <span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{fmtDate(c.start_date)} – {fmtDate(c.end_date)}</span>
+                    <span className="font-semibold text-foreground">R{c.daily_rate.toLocaleString()}/day</span>
+                    <span>{c.total_days} days</span>
                   </div>
                 </div>
               </div>
