@@ -113,20 +113,23 @@ export function AvailabilityToggleWidget() {
   const [visibility, setVisibility]             = useState<"public" | "sdp_only">("public");
   const [activePractTypes, setActivePractTypes] = useState<PractitionerType[]>(["facilitator", "assessor"]);
   const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>("freelance");
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [showAddContract, setShowAddContract] = useState(false);
+  const [newContract, setNewContract] = useState({ client_name: "", programme: "", practitioner_type: "facilitator" as PractitionerType, total_days: 1, daily_rate: 0, status: "active" });
+  const [contractSaving, setContractSaving] = useState(false);
 
-  // ── Load from profile ───────────────────────────────────────────────────
+  // ── Load from profile + contracts ───────────────────────────────────────
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("availability, demographics")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const [profileRes, contractsRes] = await Promise.all([
+        supabase.from("profiles").select("availability, demographics").eq("user_id", user.id).maybeSingle(),
+        supabase.from("practitioner_contracts").select("*").eq("practitioner_id", user.id).order("created_at", { ascending: false }),
+      ]);
 
-      if (data) {
-        setAvailable(data.availability === "available" || data.availability === "flexible");
-        const demo = (data.demographics ?? {}) as Record<string, unknown>;
+      if (profileRes.data) {
+        setAvailable(profileRes.data.availability === "available" || profileRes.data.availability === "flexible");
+        const demo = (profileRes.data.demographics ?? {}) as Record<string, unknown>;
         if (demo.visibility === "sdp_only") setVisibility("sdp_only");
         if (demo.employment_status && typeof demo.employment_status === "string") {
           setEmploymentStatus(demo.employment_status as EmploymentStatus);
@@ -135,9 +138,33 @@ export function AvailabilityToggleWidget() {
           setActivePractTypes(demo.practitioner_types as PractitionerType[]);
         }
       }
+      if (contractsRes.data) {
+        setContracts(contractsRes.data.map(c => ({
+          ...c,
+          practitioner_type: c.practitioner_type as PractitionerType,
+        })));
+      }
       setLoading(false);
     })();
   }, [user]);
+
+  const addContract = async () => {
+    if (!user || !newContract.client_name || !newContract.programme) return;
+    setContractSaving(true);
+    const { data, error } = await supabase.from("practitioner_contracts").insert({
+      practitioner_id: user.id,
+      ...newContract,
+    }).select().single();
+    setContractSaving(false);
+    if (error) {
+      toast({ title: "Failed to add contract", description: error.message, variant: "destructive" });
+    } else if (data) {
+      setContracts(prev => [{ ...data, practitioner_type: data.practitioner_type as PractitionerType }, ...prev]);
+      setNewContract({ client_name: "", programme: "", practitioner_type: "facilitator", total_days: 1, daily_rate: 0, status: "active" });
+      setShowAddContract(false);
+      toast({ title: "Contract added" });
+    }
+  };
 
   // ── Save to profile ─────────────────────────────────────────────────────
   const save = useCallback(async (
