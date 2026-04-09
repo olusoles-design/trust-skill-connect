@@ -1027,6 +1027,57 @@ export type Database = {
         }
         Relationships: []
       }
+      practitioner_contracts: {
+        Row: {
+          client_name: string
+          created_at: string
+          currency: string
+          daily_rate: number
+          end_date: string | null
+          id: string
+          notes: string | null
+          practitioner_id: string
+          practitioner_type: string
+          programme: string
+          start_date: string | null
+          status: string
+          total_days: number
+          updated_at: string
+        }
+        Insert: {
+          client_name: string
+          created_at?: string
+          currency?: string
+          daily_rate?: number
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          practitioner_id: string
+          practitioner_type?: string
+          programme: string
+          start_date?: string | null
+          status?: string
+          total_days?: number
+          updated_at?: string
+        }
+        Update: {
+          client_name?: string
+          created_at?: string
+          currency?: string
+          daily_rate?: number
+          end_date?: string | null
+          id?: string
+          notes?: string | null
+          practitioner_id?: string
+          practitioner_type?: string
+          programme?: string
+          start_date?: string | null
+          status?: string
+          total_days?: number
+          updated_at?: string
+        }
+        Relationships: []
+      }
       practitioner_listing_accreds: {
         Row: {
           created_at: string

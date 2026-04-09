@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock, Loader2, Save } from "lucide-react";
+import { Star, Clock, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock, Loader2, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // ─── Practitioner sub-types ────────────────────────────────────────────────
 
@@ -80,26 +82,20 @@ const EMPLOYMENT_STATUSES: Record<EmploymentStatus, EmploymentMeta> = {
   },
 };
 
-// ─── Contract data (mock until contracts table exists) ─────────────────────
+// ─── Contract type ─────────────────────────────────────────────────────────
 
 interface Contract {
   id: string;
-  client: string;
+  client_name: string;
   programme: string;
-  type: PractitionerType;
-  startDate: string;
-  endDate: string;
-  days: number;
-  rate: string;
-  status: "active" | "upcoming" | "completed";
+  practitioner_type: PractitionerType;
+  start_date: string | null;
+  end_date: string | null;
+  total_days: number;
+  daily_rate: number;
+  currency: string;
+  status: string;
 }
-
-const CONTRACTS: Contract[] = [
-  { id:"1", client:"Bytes Academy",   programme:"IT Support NQF3",         type:"facilitator", startDate:"15 Jan", endDate:"30 Nov", days:45, rate:"R1 800/day", status:"active"    },
-  { id:"2", client:"TIH Training",    programme:"Data Analytics NQF4",      type:"assessor",    startDate:"01 Feb", endDate:"28 Feb", days:8,  rate:"R2 200/day", status:"upcoming"  },
-  { id:"3", client:"Empower SA",      programme:"Management NQF4",          type:"moderator",   startDate:"Sep 24", endDate:"Nov 24", days:6,  rate:"R2 500/day", status:"completed" },
-  { id:"4", client:"JSE Listed Co.",  programme:"Annual WSP/ATR & B-BBEE",  type:"sdf",         startDate:"Jan 25", endDate:"Mar 25", days:20, rate:"R1 950/day", status:"completed" },
-];
 
 const STATUS_CFG: Record<string, string> = {
   active:    "bg-emerald-500/10 text-emerald-600",
@@ -117,20 +113,23 @@ export function AvailabilityToggleWidget() {
   const [visibility, setVisibility]             = useState<"public" | "sdp_only">("public");
   const [activePractTypes, setActivePractTypes] = useState<PractitionerType[]>(["facilitator", "assessor"]);
   const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>("freelance");
+  const [contracts, setContracts] = useState<Contract[]>([]);
+  const [showAddContract, setShowAddContract] = useState(false);
+  const [newContract, setNewContract] = useState({ client_name: "", programme: "", practitioner_type: "facilitator" as PractitionerType, total_days: 1, daily_rate: 0, status: "active" });
+  const [contractSaving, setContractSaving] = useState(false);
 
-  // ── Load from profile ───────────────────────────────────────────────────
+  // ── Load from profile + contracts ───────────────────────────────────────
   useEffect(() => {
     if (!user) return;
     (async () => {
-      const { data } = await supabase
-        .from("profiles")
-        .select("availability, demographics")
-        .eq("user_id", user.id)
-        .maybeSingle();
+      const [profileRes, contractsRes] = await Promise.all([
+        supabase.from("profiles").select("availability, demographics").eq("user_id", user.id).maybeSingle(),
+        supabase.from("practitioner_contracts").select("*").eq("practitioner_id", user.id).order("created_at", { ascending: false }),
+      ]);
 
-      if (data) {
-        setAvailable(data.availability === "available" || data.availability === "flexible");
-        const demo = (data.demographics ?? {}) as Record<string, unknown>;
+      if (profileRes.data) {
+        setAvailable(profileRes.data.availability === "available" || profileRes.data.availability === "flexible");
+        const demo = (profileRes.data.demographics ?? {}) as Record<string, unknown>;
         if (demo.visibility === "sdp_only") setVisibility("sdp_only");
         if (demo.employment_status && typeof demo.employment_status === "string") {
           setEmploymentStatus(demo.employment_status as EmploymentStatus);
@@ -139,9 +138,33 @@ export function AvailabilityToggleWidget() {
           setActivePractTypes(demo.practitioner_types as PractitionerType[]);
         }
       }
+      if (contractsRes.data) {
+        setContracts(contractsRes.data.map(c => ({
+          ...c,
+          practitioner_type: c.practitioner_type as PractitionerType,
+        })));
+      }
       setLoading(false);
     })();
   }, [user]);
+
+  const addContract = async () => {
+    if (!user || !newContract.client_name || !newContract.programme) return;
+    setContractSaving(true);
+    const { data, error } = await supabase.from("practitioner_contracts").insert({
+      practitioner_id: user.id,
+      ...newContract,
+    }).select().single();
+    setContractSaving(false);
+    if (error) {
+      toast({ title: "Failed to add contract", description: error.message, variant: "destructive" });
+    } else if (data) {
+      setContracts(prev => [{ ...data, practitioner_type: data.practitioner_type as PractitionerType }, ...prev]);
+      setNewContract({ client_name: "", programme: "", practitioner_type: "facilitator", total_days: 1, daily_rate: 0, status: "active" });
+      setShowAddContract(false);
+      toast({ title: "Contract added" });
+    }
+  };
 
   // ── Save to profile ─────────────────────────────────────────────────────
   const save = useCallback(async (
@@ -357,11 +380,48 @@ export function AvailabilityToggleWidget() {
 
       {/* ── Contracts ───────────────────────────────────────────────────────── */}
       <div>
-        <p className="text-xs font-semibold text-foreground mb-2">My Contracts</p>
+        <div className="flex items-center justify-between mb-2">
+          <p className="text-xs font-semibold text-foreground">My Contracts</p>
+          <Button variant="ghost" size="sm" className="h-6 text-[10px] gap-1" onClick={() => setShowAddContract(!showAddContract)}>
+            {showAddContract ? <X className="w-3 h-3" /> : <Plus className="w-3 h-3" />}
+            {showAddContract ? "Cancel" : "Add"}
+          </Button>
+        </div>
+
+        {showAddContract && (
+          <div className="p-3 rounded-xl border border-primary/30 bg-primary/5 space-y-2 mb-3">
+            <Input placeholder="Client name" value={newContract.client_name} onChange={e => setNewContract(p => ({ ...p, client_name: e.target.value }))} className="h-8 text-xs" />
+            <Input placeholder="Programme" value={newContract.programme} onChange={e => setNewContract(p => ({ ...p, programme: e.target.value }))} className="h-8 text-xs" />
+            <div className="grid grid-cols-3 gap-2">
+              <select value={newContract.practitioner_type} onChange={e => setNewContract(p => ({ ...p, practitioner_type: e.target.value as PractitionerType }))} className="h-8 text-xs rounded-md border border-border bg-background px-2">
+                {(Object.entries(PRACTITIONER_TYPES) as [PractitionerType, PractitionerTypeMeta][]).map(([k, v]) => (
+                  <option key={k} value={k}>{v.label}</option>
+                ))}
+              </select>
+              <Input type="number" placeholder="Days" value={newContract.total_days} onChange={e => setNewContract(p => ({ ...p, total_days: +e.target.value }))} className="h-8 text-xs" />
+              <Input type="number" placeholder="Rate/day" value={newContract.daily_rate || ""} onChange={e => setNewContract(p => ({ ...p, daily_rate: +e.target.value }))} className="h-8 text-xs" />
+            </div>
+            <div className="grid grid-cols-2 gap-2">
+              <select value={newContract.status} onChange={e => setNewContract(p => ({ ...p, status: e.target.value }))} className="h-8 text-xs rounded-md border border-border bg-background px-2">
+                <option value="active">Active</option>
+                <option value="upcoming">Upcoming</option>
+                <option value="completed">Completed</option>
+              </select>
+              <Button size="sm" className="h-8 text-xs" onClick={addContract} disabled={contractSaving || !newContract.client_name}>
+                {contractSaving ? <Loader2 className="w-3 h-3 animate-spin" /> : "Save Contract"}
+              </Button>
+            </div>
+          </div>
+        )}
+
         <div className="space-y-2">
-          {CONTRACTS.map(c => {
-            const typeMeta = PRACTITIONER_TYPES[c.type];
+          {contracts.length === 0 && (
+            <p className="text-[10px] text-muted-foreground text-center py-4">No contracts yet. Click "Add" to create one.</p>
+          )}
+          {contracts.map(c => {
+            const typeMeta = PRACTITIONER_TYPES[c.practitioner_type] ?? PRACTITIONER_TYPES.facilitator;
             const TypeIcon = typeMeta.icon;
+            const fmtDate = (d: string | null) => d ? new Date(d).toLocaleDateString("en-ZA", { day: "2-digit", month: "short" }) : "—";
             return (
               <div key={c.id} className="flex items-start gap-3 p-3 rounded-xl border border-border bg-card">
                 <div className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${typeMeta.color}`}>
@@ -369,15 +429,15 @@ export function AvailabilityToggleWidget() {
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 flex-wrap">
-                    <p className="text-xs font-semibold text-foreground truncate">{c.client}</p>
+                    <p className="text-xs font-semibold text-foreground truncate">{c.client_name}</p>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-semibold capitalize ${STATUS_CFG[c.status]}`}>{c.status}</span>
                     <span className={`text-[10px] px-1.5 py-0.5 rounded-full font-bold ${typeMeta.color}`}>{typeMeta.label}</span>
                   </div>
                   <p className="text-[10px] text-muted-foreground mt-0.5 truncate">{c.programme}</p>
                   <div className="flex items-center gap-3 mt-1 text-[10px] text-muted-foreground">
-                    <span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{c.startDate} – {c.endDate}</span>
-                    <span className="font-semibold text-foreground">{c.rate}</span>
-                    <span>{c.days} days</span>
+                    <span className="flex items-center gap-0.5"><Clock className="w-2.5 h-2.5" />{fmtDate(c.start_date)} – {fmtDate(c.end_date)}</span>
+                    <span className="font-semibold text-foreground">R{c.daily_rate.toLocaleString()}/day</span>
+                    <span>{c.total_days} days</span>
                   </div>
                 </div>
               </div>
