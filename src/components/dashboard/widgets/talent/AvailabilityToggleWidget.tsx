@@ -1,6 +1,9 @@
-import { useState } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock } from "lucide-react";
+import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock, Loader2, Save } from "lucide-react";
+import { supabase } from "@/integrations/supabase/client";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/hooks/use-toast";
 
 // ─── Practitioner sub-types ────────────────────────────────────────────────
 
@@ -77,7 +80,7 @@ const EMPLOYMENT_STATUSES: Record<EmploymentStatus, EmploymentMeta> = {
   },
 };
 
-// ─── Contract data ────────────────────────────────────────────────────────────
+// ─── Contract data (mock until contracts table exists) ─────────────────────
 
 interface Contract {
   id: string;
@@ -98,29 +101,116 @@ const CONTRACTS: Contract[] = [
   { id:"4", client:"JSE Listed Co.",  programme:"Annual WSP/ATR & B-BBEE",  type:"sdf",         startDate:"Jan 25", endDate:"Mar 25", days:20, rate:"R1 950/day", status:"completed" },
 ];
 
-const STATUS_CFG = {
+const STATUS_CFG: Record<string, string> = {
   active:    "bg-emerald-500/10 text-emerald-600",
   upcoming:  "bg-primary/10 text-primary",
   completed: "bg-muted text-muted-foreground",
 };
 
-const reputationScore = 87;
-const reputationLabel = reputationScore >= 90 ? "Elite" : reputationScore >= 75 ? "Trusted" : "Rising";
-const reputationColor = reputationScore >= 90 ? "text-yellow-500" : reputationScore >= 75 ? "text-primary" : "text-muted-foreground";
-
 export function AvailabilityToggleWidget() {
-  const [available,        setAvailable]        = useState(true);
-  const [visibility,       setVisibility]       = useState<"public" | "sdp_only">("public");
+  const { user } = useAuth();
+  const { toast } = useToast();
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+
+  const [available, setAvailable]               = useState(true);
+  const [visibility, setVisibility]             = useState<"public" | "sdp_only">("public");
   const [activePractTypes, setActivePractTypes] = useState<PractitionerType[]>(["facilitator", "assessor"]);
   const [employmentStatus, setEmploymentStatus] = useState<EmploymentStatus>("freelance");
+
+  // ── Load from profile ───────────────────────────────────────────────────
+  useEffect(() => {
+    if (!user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("availability, demographics")
+        .eq("user_id", user.id)
+        .maybeSingle();
+
+      if (data) {
+        setAvailable(data.availability === "available" || data.availability === "flexible");
+        const demo = (data.demographics ?? {}) as Record<string, unknown>;
+        if (demo.visibility === "sdp_only") setVisibility("sdp_only");
+        if (demo.employment_status && typeof demo.employment_status === "string") {
+          setEmploymentStatus(demo.employment_status as EmploymentStatus);
+        }
+        if (Array.isArray(demo.practitioner_types)) {
+          setActivePractTypes(demo.practitioner_types as PractitionerType[]);
+        }
+      }
+      setLoading(false);
+    })();
+  }, [user]);
+
+  // ── Save to profile ─────────────────────────────────────────────────────
+  const save = useCallback(async (
+    avail: boolean, vis: string, empStatus: string, practTypes: PractitionerType[]
+  ) => {
+    if (!user) return;
+    setSaving(true);
+
+    // First get current demographics to merge
+    const { data: current } = await supabase
+      .from("profiles")
+      .select("demographics")
+      .eq("user_id", user.id)
+      .maybeSingle();
+
+    const existingDemo = (current?.demographics ?? {}) as Record<string, unknown>;
+
+    const { error } = await supabase
+      .from("profiles")
+      .update({
+        availability: avail ? (vis === "sdp_only" ? "available" : "available") : "unavailable",
+        demographics: {
+          ...existingDemo,
+          visibility: vis,
+          employment_status: empStatus,
+          practitioner_types: practTypes,
+        },
+      })
+      .eq("user_id", user.id);
+
+    setSaving(false);
+    if (error) {
+      toast({ title: "Save failed", description: error.message, variant: "destructive" });
+    }
+  }, [user, toast]);
+
+  // Auto-save on changes
+  useEffect(() => {
+    if (loading) return;
+    const t = setTimeout(() => save(available, visibility, employmentStatus, activePractTypes), 600);
+    return () => clearTimeout(t);
+  }, [available, visibility, employmentStatus, activePractTypes, loading, save]);
 
   const toggleType = (t: PractitionerType) =>
     setActivePractTypes(prev =>
       prev.includes(t) ? prev.filter(x => x !== t) : [...prev, t]
     );
 
+  const reputationScore = 87;
+  const reputationLabel = reputationScore >= 90 ? "Elite" : reputationScore >= 75 ? "Trusted" : "Rising";
+  const reputationColor = reputationScore >= 90 ? "text-yellow-500" : reputationScore >= 75 ? "text-primary" : "text-muted-foreground";
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-16">
+        <Loader2 className="w-5 h-5 animate-spin text-muted-foreground" />
+      </div>
+    );
+  }
+
   return (
     <div className="space-y-4">
+
+      {/* Saving indicator */}
+      {saving && (
+        <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+          <Loader2 className="w-3 h-3 animate-spin" /> Saving…
+        </div>
+      )}
 
       {/* ── Availability toggle ─────────────────────────────────────────────── */}
       <div className={`p-4 rounded-xl border-2 transition-all duration-300 ${available ? "border-emerald-500/40 bg-emerald-500/5" : "border-border bg-muted/30"}`}>
