@@ -1,9 +1,11 @@
 import { useState, useEffect, useCallback } from "react";
 import { Switch } from "@/components/ui/switch";
-import { Star, Clock, Award, Users, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock, Loader2, Save } from "lucide-react";
+import { Star, Clock, FileText, Briefcase, GraduationCap, Cpu, UserCheck, Building, CalendarClock, Loader2, Plus, X } from "lucide-react";
 import { supabase } from "@/integrations/supabase/client";
 import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/hooks/use-toast";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
 
 // ─── Practitioner sub-types ────────────────────────────────────────────────
 
