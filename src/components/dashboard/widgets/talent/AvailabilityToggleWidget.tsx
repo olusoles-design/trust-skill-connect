@@ -80,26 +80,20 @@ const EMPLOYMENT_STATUSES: Record<EmploymentStatus, EmploymentMeta> = {
   },
 };
 
-// ─── Contract data (mock until contracts table exists) ─────────────────────
+// ─── Contract type ─────────────────────────────────────────────────────────
 
 interface Contract {
   id: string;
-  client: string;
+  client_name: string;
   programme: string;
-  type: PractitionerType;
-  startDate: string;
-  endDate: string;
-  days: number;
-  rate: string;
-  status: "active" | "upcoming" | "completed";
+  practitioner_type: PractitionerType;
+  start_date: string | null;
+  end_date: string | null;
+  total_days: number;
+  daily_rate: number;
+  currency: string;
+  status: string;
 }
-
-const CONTRACTS: Contract[] = [
-  { id:"1", client:"Bytes Academy",   programme:"IT Support NQF3",         type:"facilitator", startDate:"15 Jan", endDate:"30 Nov", days:45, rate:"R1 800/day", status:"active"    },
-  { id:"2", client:"TIH Training",    programme:"Data Analytics NQF4",      type:"assessor",    startDate:"01 Feb", endDate:"28 Feb", days:8,  rate:"R2 200/day", status:"upcoming"  },
-  { id:"3", client:"Empower SA",      programme:"Management NQF4",          type:"moderator",   startDate:"Sep 24", endDate:"Nov 24", days:6,  rate:"R2 500/day", status:"completed" },
-  { id:"4", client:"JSE Listed Co.",  programme:"Annual WSP/ATR & B-BBEE",  type:"sdf",         startDate:"Jan 25", endDate:"Mar 25", days:20, rate:"R1 950/day", status:"completed" },
-];
 
 const STATUS_CFG: Record<string, string> = {
   active:    "bg-emerald-500/10 text-emerald-600",
