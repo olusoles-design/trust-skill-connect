@@ -16,7 +16,7 @@ export default function Footer() {
               </span>
             </div>
             <p className="text-xs leading-relaxed">
-              South Africa's Triple-Verified Skills Development Ecosystem.
+              South Africa's connected skills development directory.
             </p>
           </div>
 
@@ -28,7 +28,7 @@ export default function Footer() {
             },
             {
               heading: "Features",
-              links: ["Matching Engine", "Verification", "BEE Dashboard", "Marketplace", "Micro-Tasks"],
+              links: ["Directory Search", "Profiles", "BEE Dashboard", "Marketplace", "Micro-Tasks"],
             },
             {
               heading: "Compliance",
@@ -58,7 +58,7 @@ export default function Footer() {
 
         <div className="border-t border-white/10 pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
           <p className="text-xs">© 2025 SkillsMark (Pty) Ltd. All rights reserved. Registered in South Africa.</p>
-          <p className="text-xs">POPIA Compliant · SETA Approved · B-BBEE Verified</p>
+          <p className="text-xs">POPIA Compliant · SETA Aligned · B-BBEE Ready</p>
         </div>
       </div>
     </footer>

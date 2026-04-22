@@ -63,8 +63,8 @@ export default function Hero({ onGetStarted }: HeroProps) {
             transition={{ duration: 0.7, delay: 0.2 }}
             className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
-            SkillsMark connects learners, sponsors, providers, practitioners, and support services 
-            through a revolutionary Triple-Verification Trust Engine — powering real skills development outcomes.
+            SkillsMark is a unified skills directory connecting learners, sponsors, providers, practitioners, and support services 
+            in one searchable ecosystem — making it easier to discover people, programmes, suppliers, and opportunities.
           </motion.p>
 
           {/* CTAs */}
@@ -84,7 +84,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
               href="#verification"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 rounded-xl border border-white/20 text-white font-semibold text-lg hover:bg-white/10 transition-all"
             >
-              See How It Works
+              Explore the Directory
             </a>
           </motion.div>
 

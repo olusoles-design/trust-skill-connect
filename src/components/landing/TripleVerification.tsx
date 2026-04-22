@@ -4,48 +4,48 @@ import { Fingerprint, Award, BarChart3, ShieldCheck, CheckCircle2 } from "lucide
 const verifications = [
   {
     icon: Fingerprint,
-    badge: "IDENTITY",
-    title: "Identity Verification",
+    badge: "PEOPLE",
+    title: "People Directory",
     color: "from-teal to-cyan-500",
     glow: "shadow-teal",
     items: [
-      "SA ID / passport validation",
-      "Company registration (CIPC)",
-      "BEE certificate status",
-      "SARS tax compliance",
+      "Learners ready for placement",
+      "Practitioners and facilitators",
+      "Employers and sponsors",
+      "Support service providers",
     ],
     description:
-      "Every individual and organization is confirmed to be who they say they are. Official documentation is validated at source, providing rock-solid identity assurance.",
+      "Find the right people across South Africa's skills ecosystem with structured profiles, role context, availability, and contact pathways in one place.",
   },
   {
     icon: Award,
-    badge: "COMPETENCY",
-    title: "Competency Verification",
+    badge: "PROGRAMMES",
+    title: "Programme Directory",
     color: "from-gold to-amber-500",
     glow: "shadow-gold",
     items: [
-      "NQF qualification alignment",
-      "SETA unit standard linking",
-      "Professional accreditations",
-      "Train-the-Trainer credentials",
+      "Learnerships and internships",
+      "Accredited training options",
+      "Funding opportunities",
+      "Workplace placement pathways",
     ],
     description:
-      "Qualifications and skills are matched against SAQA, SETA, and industry standards. No more unverified claims — only confirmed competencies.",
+      "Browse programmes, funding routes, and development pathways with the context teams need to shortlist, compare, and move faster.",
   },
   {
     icon: BarChart3,
-    badge: "OUTCOMES",
-    title: "Outcome Verification",
+    badge: "OPPORTUNITIES",
+    title: "Opportunity Directory",
     color: "from-violet-500 to-purple-600",
     glow: "",
     items: [
-      "Learner placement tracking",
-      "Course completion records",
-      "Employer confirmation",
-      "Service delivery proof",
+      "Open roles and placements",
+      "Procurement and RFQ listings",
+      "Micro-tasks and contracts",
+      "Marketplace supplier listings",
     ],
     description:
-      "Results matter. We track and confirm whether placements happened, training was delivered, and contracts were fulfilled — creating a performance record for everyone.",
+      "Bring opportunities into one searchable environment so learners, providers, sponsors, and suppliers can connect around real demand.",
   },
 ];
 
@@ -72,16 +72,16 @@ export default function TripleVerification() {
         >
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gold/15 border border-gold/30 text-gold text-sm font-semibold mb-6">
             <ShieldCheck className="w-4 h-4" />
-            The Trust Foundation
+            Skills Ecosystem Directory
           </div>
           <h2 className="text-3xl sm:text-4xl lg:text-5xl font-bold text-white mb-4" style={{ fontFamily: 'Sora, sans-serif' }}>
-            The{" "}
-            <span className="text-gold">Triple-Verification</span>{" "}
-            System
+            One{" "}
+            <span className="text-gold">Connected Directory</span>{" "}
+            for Skills Development
           </h2>
           <p className="text-lg text-white/60 max-w-2xl mx-auto">
-            Three layers of verified trust displayed as visible badges on every profile. 
-            Build confidence. Reduce risk. Make better matches.
+            A structured place to discover people, programmes, suppliers, and opportunities across the skills development landscape.
+            Search smarter. Compare faster. Connect with purpose.
           </p>
         </motion.div>
 
@@ -94,18 +94,18 @@ export default function TripleVerification() {
           className="flex justify-center mb-16"
         >
           <div className="glass-card rounded-2xl px-8 py-6 flex items-center gap-6 flex-wrap justify-center">
-            {["Identity", "Competency", "Outcomes"].map((label, i) => (
+            {["People", "Programmes", "Opportunities"].map((label, i) => (
               <div key={label} className="flex items-center gap-3">
                 {i > 0 && <div className="w-8 h-px bg-white/20 hidden sm:block" />}
                 <div className="flex items-center gap-2">
                   <CheckCircle2 className="w-5 h-5 text-teal" />
-                  <span className="text-white font-medium text-sm">{label} Verified</span>
+                  <span className="text-white font-medium text-sm">{label} Indexed</span>
                 </div>
               </div>
             ))}
             <div className="flex items-center gap-2 px-4 py-2 rounded-full bg-teal/20 border border-teal/30 ml-4">
               <ShieldCheck className="w-4 h-4 text-teal" />
-              <span className="text-teal font-bold text-sm">Trust Score: 98</span>
+              <span className="text-teal font-bold text-sm">Directory Fit: 98</span>
             </div>
           </div>
         </motion.div>

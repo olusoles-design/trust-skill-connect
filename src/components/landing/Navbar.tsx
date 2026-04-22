@@ -4,7 +4,7 @@ import { Menu, X, ShieldCheck } from "lucide-react";
 
 const navLinks = [
   { label: "Platform", href: "#platform" },
-  { label: "Verification", href: "#verification" },
+  { label: "Directory", href: "#verification" },
   { label: "User Groups", href: "#users" },
   { label: "Marketplace", href: "#marketplace" },
   { label: "How It Works", href: "#how-it-works" },
