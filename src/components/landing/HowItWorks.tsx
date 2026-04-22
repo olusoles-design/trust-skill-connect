@@ -7,7 +7,7 @@ const steps = [
     icon: UserPlus,
     title: "Register & Build Your Profile",
     description:
-      "Select your role and complete your profile with guided multi-step forms. Save progress across sessions — no need to finish in one sitting.",
+      "Select your role and complete your profile with guided multi-step forms. Save progress across sessions, with no need to finish in one sitting.",
   },
   {
     num: "02",
@@ -21,14 +21,14 @@ const steps = [
     icon: Sparkles,
     title: "Receive Smart Matches",
     description:
-      "Our AI engine surfaces the best opportunities for you — matching on BEE requirements, qualifications, location, and availability.",
+      "Our AI engine surfaces the best opportunities for you, matching on BEE requirements, qualifications, location, and availability.",
   },
   {
     num: "04",
     icon: Handshake,
     title: "Transact with Confidence",
     description:
-      "Apply, contract, procure, or hire — with escrow payments, digital contracts, and outcome tracking built right in.",
+      "Apply, contract, procure, or hire with escrow payments, digital contracts, and outcome tracking built right in.",
   },
 ];
 

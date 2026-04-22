@@ -32,7 +32,7 @@ const features = [
   {
     icon: Zap,
     title: "Micro-Task Board",
-    description: "Learners earn immediately through verified remote tasks — data entry, transcription, surveys — while awaiting formal placements.",
+    description: "Learners earn immediately through verified remote tasks, including data entry, transcription and surveys, while awaiting formal placements.",
     tag: "Income",
   },
   {
@@ -44,19 +44,19 @@ const features = [
   {
     icon: FileText,
     title: "Digital Credentials",
-    description: "Verifiable digital badges for qualifications, completions, and service deliveries — shareable and blockchain-anchored.",
+    description: "Verifiable digital badges for qualifications, completions and service deliveries, shareable and blockchain-anchored.",
     tag: "Credentials",
   },
   {
     icon: MapPin,
     title: "Location Services",
-    description: "Discover opportunities nearby, calculate commute times, and enable location-based matching — optimized for South African cities.",
+    description: "Discover opportunities nearby, calculate commute times, and enable location-based matching, optimised for South African cities.",
     tag: "PWA",
   },
   {
     icon: Bell,
     title: "Push Notifications",
-    description: "Real-time alerts for new matches, application updates, and tender opportunities — works even when the app is closed.",
+    description: "Real-time alerts for new matches, application updates, and tender opportunities, even when the app is closed.",
     tag: "PWA",
   },
 ];
@@ -81,7 +81,7 @@ export default function PlatformFeatures() {
             <span className="text-teal">Nothing You Don't.</span>
           </h2>
           <p className="text-lg text-muted-foreground max-w-2xl mx-auto">
-            From AI-powered matching to SETA-compliant reporting — the complete operating system for South Africa's skills development sector.
+            From AI-powered matching to SETA-compliant reporting, the complete operating system for South Africa's skills development sector.
           </p>
         </motion.div>
 

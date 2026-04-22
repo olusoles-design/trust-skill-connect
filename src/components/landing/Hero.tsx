@@ -64,7 +64,7 @@ export default function Hero({ onGetStarted }: HeroProps) {
             className="text-lg sm:text-xl text-white/60 max-w-2xl mx-auto mb-10 leading-relaxed"
           >
             SkillsMark is a unified skills directory connecting learners, sponsors, providers, practitioners, and support services 
-            in one searchable ecosystem — making it easier to discover people, programmes, suppliers, and opportunities.
+            in one searchable ecosystem, making it easier to discover people, programmes, suppliers, and opportunities.
           </motion.p>
 
           {/* CTAs */}

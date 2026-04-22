@@ -30,8 +30,8 @@ export default function SupportMarketplace() {
               <span className="text-teal">Marketplace</span>
             </h2>
             <p className="text-lg text-muted-foreground leading-relaxed mb-6">
-              The unsung backbone of skills delivery — material developers, furniture suppliers, 
-              reprographic services, and equipment providers — finally have a dedicated, 
+              The unsung backbone of skills delivery, including material developers, furniture suppliers, 
+              reprographic services, and equipment providers, finally has a dedicated, 
               verified marketplace.
             </p>
             <ul className="space-y-3 mb-8">
