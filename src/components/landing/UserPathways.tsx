@@ -93,7 +93,7 @@ export default function UserPathways({ onRoleSelect }: Props) {
 
         <div className="grid lg:grid-cols-[1fr_1.4fr] gap-8 lg:gap-16 items-start">
 
-          {/* LEFT — Tab list */}
+          {/* LEFT - Tab list */}
           <div className="flex flex-col gap-2">
             {roles.map((role, i) => {
               const isActive = i === active;
@@ -141,7 +141,7 @@ export default function UserPathways({ onRoleSelect }: Props) {
             })}
           </div>
 
-          {/* RIGHT — Content panel */}
+          {/* RIGHT - Content panel */}
           <AnimatePresence mode="wait">
             <motion.div
               key={active}
