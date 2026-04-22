@@ -108,34 +108,55 @@ export function ManageUsersWidget() {
       ]);
       if (rolesErr) throw rolesErr;
 
+      const rolesByUser = new Map<string, AppRole[]>();
+      for (const r of roles ?? []) {
+        rolesByUser.set(r.user_id, [...(rolesByUser.get(r.user_id) ?? []), r.role as AppRole]);
+      }
+
       const map = new Map<string, UserRow>();
-      for (const r of (roles ?? [])) {
-        if (!map.has(r.user_id)) {
-          const p = profiles?.find(x => x.user_id === r.user_id);
-          const firstName = p?.first_name ?? null;
-          const lastName  = p?.last_name  ?? null;
-          const displayName = firstName || lastName
-            ? `${firstName ?? ""} ${lastName ?? ""}`.trim()
-            : `User ${r.user_id.slice(0, 8)}`;
-          map.set(r.user_id, {
-            user_id: r.user_id,
-            display_name: displayName,
-            first_name: firstName,
-            last_name: lastName,
-            phone: p?.phone ?? null,
-            avatar_url: p?.avatar_url ?? null,
-            location: p?.location ?? null,
-            job_title: p?.job_title ?? null,
-            company_name: p?.company_name ?? null,
-            roles: [],
-            created_at: p?.created_at ?? new Date().toISOString(),
+      for (const p of profiles ?? []) {
+        const firstName = p.first_name ?? null;
+        const lastName  = p.last_name  ?? null;
+        const displayName = firstName || lastName
+          ? `${firstName ?? ""} ${lastName ?? ""}`.trim()
+          : `User ${p.user_id.slice(0, 8)}`;
+
+        map.set(p.user_id, {
+          user_id: p.user_id,
+          display_name: displayName,
+          first_name: firstName,
+          last_name: lastName,
+          phone: p.phone ?? null,
+          avatar_url: p.avatar_url ?? null,
+          location: p.location ?? null,
+          job_title: p.job_title ?? null,
+          company_name: p.company_name ?? null,
+          roles: rolesByUser.get(p.user_id) ?? [],
+          created_at: p.created_at ?? new Date().toISOString(),
+          status: "active",
+        });
+      }
+
+      for (const [userId, userRoles] of rolesByUser) {
+        if (!map.has(userId)) {
+          map.set(userId, {
+            user_id: userId,
+            display_name: `User ${userId.slice(0, 8)}`,
+            first_name: null,
+            last_name: null,
+            phone: null,
+            avatar_url: null,
+            location: null,
+            job_title: null,
+            company_name: null,
+            roles: userRoles,
+            created_at: new Date().toISOString(),
             status: "active",
           });
         }
-        map.get(r.user_id)!.roles.push(r.role as AppRole);
       }
-      const result = Array.from(map.values());
-      return result;
+
+      return Array.from(map.values()).sort((a, b) => a.display_name.localeCompare(b.display_name));
     },
   });
 
