@@ -869,12 +869,12 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 4: Documents ──────────────────────────── */}
+              {/* REGISTER - Step 4: Documents */}
               {mode === "register" && step === 4 && (
                 <motion.div {...slide} className="space-y-5">
                   <div className="mb-2">
                     <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Sora, sans-serif" }}>Upload documents</h2>
-                    <p className="text-muted-foreground text-sm mt-1">Upload now or skip — you can always do this from your profile.</p>
+                    <p className="text-muted-foreground text-sm mt-1">Upload now or skip, you can always do this from your profile.</p>
                   </div>
 
                   {requiredDocs.length > 0 ? (
@@ -912,12 +912,12 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 5: Plan ────────────────────────────────── */}
+              {/* REGISTER - Step 5: Plan */}
               {mode === "register" && step === 5 && (
                 <motion.div {...slide} className="space-y-4">
                   <div className="mb-2">
                     <h2 className="text-2xl font-bold text-foreground" style={{ fontFamily: "Sora, sans-serif" }}>Choose a plan</h2>
-                    <p className="text-muted-foreground text-sm mt-1">Start free — upgrade anytime.</p>
+                    <p className="text-muted-foreground text-sm mt-1">Start free and upgrade anytime.</p>
                   </div>
 
                   <div className="space-y-3">
@@ -959,7 +959,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 6: Confirm ─────────────────────────────── */}
+              {/* REGISTER - Step 6: Confirm */}
               {mode === "register" && step === 6 && (
                 <motion.div {...slide} className="text-center space-y-5">
                   <div className="w-16 h-16 rounded-2xl bg-primary/10 flex items-center justify-center mx-auto">
@@ -972,7 +972,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                     </h2>
                     <p className="text-muted-foreground text-sm mt-1">
                       {selectedPlan === "Starter"      && "Your 30-day free trial is ready. Explore the full platform."}
-                      {selectedPlan === "Professional" && "Professional plan selected — R499/month, cancel anytime."}
+                      {selectedPlan === "Professional" && "Professional plan selected, R499/month, cancel anytime."}
                       {selectedPlan === "Enterprise"   && "Our team will reach out within 1 business day."}
                     </p>
                   </div>
