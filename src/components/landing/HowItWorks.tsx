@@ -12,9 +12,9 @@ const steps = [
   {
     num: "02",
     icon: ShieldCheck,
-    title: "Get Triple-Verified",
+    title: "Join the Directory",
     description:
-      "Upload documents via the website or capture them with your phone camera. Automated verification assigns your visible Trust Score badge.",
+      "Add your details, documents, services, programmes, or opportunities so the right people can find and understand your profile.",
   },
   {
     num: "03",
