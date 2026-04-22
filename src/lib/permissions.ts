@@ -61,6 +61,7 @@ export type Capability =
   | "multi_company_sponsorship" // Lead/Host/Funder company management + B-BBEE allocation
   // Admin
   | "platform_admin"
+  | "manage_users"
   | "portal_switcher"
   | "upload_accreditation"       // AI-powered accreditation letter extraction
   | "post_programme_opportunities" // Sponsor lists learnership/bursary/internship in main feed
@@ -263,6 +264,7 @@ export const ROLE_CAPABILITIES: Record<AppRole, Capability[]> = {
     "workflow_engine",
     "trust_ledger",
     "platform_admin",
+    "manage_users",
     "post_funding_opportunities",
     "browse_funding_opportunities",
     "post_programme_opportunities",
@@ -334,6 +336,7 @@ export const CAPABILITY_GATES: Record<Capability, CapabilityGate> = {
   multi_company_sponsorship: { minPlan: "professional" },
   // Admin
   platform_admin:          { minPlan: "starter" },
+  manage_users:            { minPlan: "starter" },
   portal_switcher:         { minPlan: "starter" },
   upload_accreditation:            { minPlan: "starter" },
   post_programme_opportunities:    { minPlan: "starter", limit: 3 },

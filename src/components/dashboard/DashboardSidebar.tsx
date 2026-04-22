@@ -72,6 +72,7 @@ const ALL_NAV_ITEMS: NavItem[] = [
   { title: "Reports & Analytics",       url: "/dashboard/reports",         icon: BarChart3,     capability: "view_reports"            },
   { title: "Trust Ledger",              url: "/dashboard/ledger",          icon: Link2,         capability: "trust_ledger"            },
   { title: "Platform Admin",            url: "/dashboard/admin",           icon: ShieldCheck,   capability: "platform_admin"          },
+  { title: "Manage Users",              url: "/dashboard/manage-users",    icon: Users,         capability: "manage_users"            },
   { title: "Portal Switcher",           url: "/dashboard/portals",         icon: Eye,           capability: "portal_switcher"         },
   { title: "Design Manager",            url: "/dashboard/design-manager",  icon: Palette,       capability: "design_manager"          },
 ];
@@ -87,7 +88,7 @@ const PERSONA_CAPABILITIES: Record<string, Capability[]> = {
   talent:   ["find_opportunities","apply_for_opportunities","build_profile","document_vault","availability_toggle","smart_contracting","practitioner_accreditations","browse_practitioner_directory","practitioner_portal","view_tasks","my_tasks"],
   business: ["post_opportunities","manage_learners","learner_pipeline","bbee_simulator","tax_calculator","wsp_reports","tender_feed","learner_recruitment","outcome_tracking","manage_procurement","marketplace_listing","marketplace_discovery","tender_matching","procurement_alerts","rfq_board","facility_booking","workflow_engine"],
   funding:  ["fund_learners","manage_funding","approve_payments"],
-  oversight:["verify_documents","view_reports","trust_ledger","platform_admin","portal_switcher","design_manager"],
+  oversight:["verify_documents","view_reports","trust_ledger","platform_admin","manage_users","portal_switcher","design_manager"],
 };
 
 export function DashboardSidebar() {
