@@ -715,7 +715,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 1: Hub ─────────────────────────────────── */}
+              {/* REGISTER - Step 1: Hub */}
               {mode === "register" && step === 1 && (
                 <motion.div {...slide}>
                   <div className="mb-6">
@@ -750,7 +750,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 2: Role ────────────────────────────────── */}
+              {/* REGISTER - Step 2: Role */}
               {mode === "register" && step === 2 && currentHub && !showPractitionerPicker && (
                 <motion.div {...slide}>
                   <div className="mb-6">
@@ -780,7 +780,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 2: Practitioner sub-role ──────────────── */}
+              {/* REGISTER - Step 2: Practitioner sub-role */}
               {showPractitionerPicker && (
                 <motion.div {...slide}>
                   <div className="mb-6">
@@ -803,7 +803,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                 </motion.div>
               )}
 
-              {/* ── REGISTER — Step 3: Profile form ───────────────────────── */}
+              {/* REGISTER - Step 3: Profile form */}
               {mode === "register" && step === 3 && (
                 <motion.div {...slide} className="space-y-5">
                   <div className="mb-2">
@@ -853,7 +853,7 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
                   <div className="flex items-center gap-2.5 p-3 rounded-xl bg-primary/5 border border-primary/20">
                     <CheckCircle2 className="w-4 h-4 text-primary flex-shrink-0" />
                     <p className="text-xs text-muted-foreground">
-                      <span className="font-semibold text-foreground">30-day free trial</span> — full access, no credit card needed.
+                      <span className="font-semibold text-foreground">30-day free trial</span>, with full access and no credit card needed.
                     </p>
                   </div>
 
