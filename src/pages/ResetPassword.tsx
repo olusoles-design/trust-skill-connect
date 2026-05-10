@@ -12,16 +12,61 @@ export default function ResetPassword() {
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
   const [validSession, setValidSession] = useState(false);
+  const [linkError, setLinkError] = useState<string | null>(null);
 
-  // Supabase puts the recovery token in the URL hash — onAuthStateChange
-  // fires a PASSWORD_RECOVERY event when it detects this.
   useEffect(() => {
-    const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
-      if (event === "PASSWORD_RECOVERY") {
+    let mounted = true;
+
+    const markRecoveryReady = () => {
+      if (!mounted) return;
+
+      setValidSession(true);
+      setLinkError(null);
+    };
+
+    const resolveRecoverySession = async () => {
+      const hashParams = new URLSearchParams(window.location.hash.replace(/^#/, ""));
+      const looksLikeRecoveryLink =
+        hashParams.get("type") === "recovery" ||
+        hashParams.has("access_token") ||
+        hashParams.has("refresh_token");
+
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        const { data: { session } } = await supabase.auth.getSession();
+
+        if (!mounted) return;
+
+        if (session) {
+          markRecoveryReady();
+          return;
+        }
+
+        if (!looksLikeRecoveryLink) {
+          setLinkError("This reset link is invalid or has expired. Please request a new one from the sign in form.");
+          return;
+        }
+
+        await new Promise((resolve) => window.setTimeout(resolve, 250));
+      }
+
+      if (mounted) {
+        setLinkError("This reset link is invalid or has expired. Please request a new one from the sign in form.");
+      }
+    };
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if (event === "PASSWORD_RECOVERY" || (event === "SIGNED_IN" && session)) {
         setValidSession(true);
+        setLinkError(null);
       }
     });
-    return () => subscription.unsubscribe();
+
+    void resolveRecoverySession();
+
+    return () => {
+      mounted = false;
+      subscription.unsubscribe();
+    };
   }, []);
 
   const handleReset = async () => {
@@ -57,10 +102,10 @@ export default function ResetPassword() {
           <h1 className="text-2xl font-bold text-foreground">Set new password</h1>
           <p className="text-muted-foreground text-sm mt-1">
             {done
-              ? "Password updated! Redirecting…"
+              ? "Password updated. Redirecting..."
               : validSession
               ? "Choose a strong password for your account."
-              : "Opening your reset link…"}
+              : linkError ?? "Opening your reset link..."}
           </p>
         </div>
 
@@ -99,6 +144,16 @@ export default function ResetPassword() {
               className="w-full py-3 rounded-xl gradient-teal text-primary-foreground font-semibold text-sm hover:opacity-90 transition-all flex items-center justify-center gap-2 disabled:opacity-60"
             >
               {submitting ? <Loader2 className="w-4 h-4 animate-spin" /> : "Update Password"}
+            </button>
+          </div>
+        ) : linkError ? (
+          <div className="space-y-4">
+            <p className="text-sm text-muted-foreground">Request a new password reset from the sign in form, then open the newest email link.</p>
+            <button
+              onClick={() => navigate("/")}
+              className="w-full py-3 rounded-xl gradient-teal text-primary-foreground font-semibold text-sm hover:opacity-90 transition-all"
+            >
+              Back to sign in
             </button>
           </div>
         ) : (
