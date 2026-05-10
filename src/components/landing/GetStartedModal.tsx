@@ -420,13 +420,15 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   };
 
   const handleForgotPassword = async () => {
-    if (!form.email) {
+    const email = form.email.trim().toLowerCase();
+
+    if (!email) {
       toast({ title: "Email required", description: "Enter your email address.", variant: "destructive" });
       return;
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase.auth.resetPasswordForEmail(form.email, {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
         redirectTo: `${window.location.origin}/reset-password`,
       });
       if (error) throw error;
@@ -439,13 +441,15 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
   };
 
   const handleSignIn = async () => {
-    if (!form.email || !form.password) {
+    const email = form.email.trim().toLowerCase();
+
+    if (!email || !form.password) {
       toast({ title: "Missing fields", description: "Email and password are required.", variant: "destructive" });
       return;
     }
     setSubmitting(true);
     try {
-      const { error } = await supabase.auth.signInWithPassword({ email: form.email, password: form.password });
+      const { error } = await supabase.auth.signInWithPassword({ email, password: form.password });
       if (error) throw error;
       toast({ title: "Welcome back!" });
       handleClose();
@@ -459,10 +463,13 @@ export default function GetStartedModal({ open, onClose, initialRole = null }: P
 
   const handleSignUp = async () => {
     if (!validateProfileForm()) return;
+
+    const email = form.email.trim().toLowerCase();
+
     setSubmitting(true);
     try {
       const { data, error } = await supabase.auth.signUp({
-        email: form.email, password: form.password,
+        email, password: form.password,
         options: {
           data: {
             first_name: form.firstName || null,
