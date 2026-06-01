@@ -178,6 +178,8 @@ export function DashboardSidebar() {
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          {/* Payments & Wallet temporarily hidden while payments are disabled for testing */}
+          {false && (
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip={collapsed ? "Payments" : undefined}>
               <NavLink to="/dashboard/payments" className="hover:bg-sidebar-accent text-sidebar-foreground" activeClassName="bg-primary/10 text-primary font-medium">
@@ -186,6 +188,7 @@ export function DashboardSidebar() {
               </NavLink>
             </SidebarMenuButton>
           </SidebarMenuItem>
+          )}
           <SidebarMenuItem>
             <SidebarMenuButton asChild tooltip={collapsed ? "Settings" : undefined}>
               <NavLink to="/dashboard/settings" className="hover:bg-sidebar-accent text-sidebar-foreground" activeClassName="bg-primary/10 text-primary font-medium">
