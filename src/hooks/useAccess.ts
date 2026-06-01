@@ -69,6 +69,11 @@ export function useAccess(featureOrCapability: string): AccessResult {
     return { allowed: true };
   }
 
+  // Payments disabled — everyone with the right role/capability gets access
+  if (PAYMENTS_DISABLED) {
+    return { allowed: true };
+  }
+
   const effectivePlan: SubscriptionPlan = plan ?? "starter";
   const planRank = PLAN_RANK[effectivePlan];
   const requiredRank = PLAN_RANK[gate.minPlan];
