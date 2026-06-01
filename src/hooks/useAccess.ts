@@ -33,6 +33,10 @@ export interface AccessResult {
 export function useAccess(featureOrCapability: string): AccessResult {
   const { user, role, plan, isTrialActive } = useAuth();
 
+  // TEMPORARY: Payments disabled for testing — bypass all plan/subscription gating.
+  // Still require sign-in and role capability checks below.
+  const PAYMENTS_DISABLED = true;
+
   // Resolve to a capability
   const capability = (
     FEATURE_CAPABILITY[featureOrCapability] ?? featureOrCapability
@@ -62,6 +66,11 @@ export function useAccess(featureOrCapability: string): AccessResult {
 
   // Admins bypass all subscription plan gating
   if (role === "admin") {
+    return { allowed: true };
+  }
+
+  // Payments disabled — everyone with the right role/capability gets access
+  if (PAYMENTS_DISABLED) {
     return { allowed: true };
   }
 
